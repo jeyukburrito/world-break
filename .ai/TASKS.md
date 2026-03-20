@@ -24,3 +24,4 @@
 | T-007 | 앱 성능 최적화 | `done` | [spec](handoffs/T-007-spec.md) | [result](handoffs/T-007-result.md) | [review](reviews/T-007-review.md) | force-dynamic 제거, Recharts dynamic import, next/image 적용 |
 | T-008 | PWA 적용 | `ready` | [spec](handoffs/T-008-spec.md) | | | manifest, SW, 오프라인 페이지, 앱 아이콘 |
 | T-009 | Tactical Editorial UI 전면 개편 | `done` | [spec](handoffs/T-009-spec.md) | [result](handoffs/T-009-result.md) | [review](reviews/T-009-review.md) | Material You 디자인 시스템, 4개 주요 페이지 UI 개편 |
+| T-010 | GA4 이벤트 택소노미 설계 | `draft` | [spec](handoffs/T-010-spec.md) | | | Claude 직접 진행, 사용자와 협의 |
