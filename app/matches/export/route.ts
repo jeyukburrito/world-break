@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { ensureUserProfile } from "@/lib/auth";
+import { ensureUserProfileExists } from "@/lib/auth";
 import { buildCsv } from "@/lib/csv";
 import { listMatchesForUser, parseMatchFilters } from "@/lib/matches";
 import { createClient } from "@/lib/supabase/server";
@@ -18,7 +18,7 @@ export async function GET(request: Request) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
 
-    await ensureUserProfile(user);
+    await ensureUserProfileExists(user);
 
     const url = new URL(request.url);
     const filters = parseMatchFilters(url.searchParams);

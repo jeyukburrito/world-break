@@ -34,6 +34,46 @@ export async function ensureUserProfile(user: SupabaseUser) {
   });
 }
 
+export async function ensureUserProfileExists(user: SupabaseUser) {
+  const existingUser = await prisma.user.findUnique({
+    where: {
+      id: user.id,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (existingUser) {
+    return;
+  }
+
+  const name =
+    (user.user_metadata?.name as string | undefined) ??
+    (user.user_metadata?.full_name as string | undefined) ??
+    null;
+
+  try {
+    await prisma.user.create({
+      data: {
+        id: user.id,
+        email: user.email ?? "",
+        name,
+      },
+    });
+  } catch (error) {
+    const isUniqueViolation =
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      error.code === "P2002";
+
+    if (!isUniqueViolation) {
+      throw error;
+    }
+  }
+}
+
 export function getUserDisplayInfo(user: SupabaseUser) {
   return {
     name: (user.user_metadata?.name ?? user.user_metadata?.full_name ?? null) as string | null,
@@ -63,7 +103,7 @@ export const requireUser = cache(async function requireUser() {
     redirect("/login");
   }
 
-  await ensureUserProfile(user);
+  await ensureUserProfileExists(user);
 
   return user;
 });

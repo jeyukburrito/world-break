@@ -81,6 +81,8 @@ model MatchResult {
   tags             MatchResultTag[]
 
   @@index([userId, playedAt])
+  @@index([userId, eventCategory, playedAt])
+  @@index([userId, myDeckId, playedAt])
   @@index([userId, opponentDeckName])
   @@index([userId, playOrder])
   @@index([userId, matchFormat])

@@ -47,7 +47,6 @@ export async function createGame(formData: FormData) {
   revalidatePath("/settings/decks");
   revalidatePath("/matches/new");
   revalidatePath("/matches");
-  revalidatePath("/dashboard");
   redirect(withMessage("message", "카드게임 카테고리를 추가했습니다."));
 }
 
@@ -95,7 +94,6 @@ export async function updateGame(formData: FormData) {
   revalidatePath("/settings/decks");
   revalidatePath("/matches/new");
   revalidatePath("/matches");
-  revalidatePath("/dashboard");
   redirect(withMessage("message", "카드게임 이름을 수정했습니다."));
 }
 
@@ -141,6 +139,5 @@ export async function deleteGame(formData: FormData) {
   revalidatePath("/settings/decks");
   revalidatePath("/matches/new");
   revalidatePath("/matches");
-  revalidatePath("/dashboard");
   redirect(withMessage("message", "카드게임 카테고리를 삭제했습니다."));
 }

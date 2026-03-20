@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { requireUser } from "@/lib/auth";
+import { revalidateDashboard } from "@/lib/dashboard";
 import { prisma } from "@/lib/prisma";
 import { matchResultSchema } from "@/lib/validation/match";
 
@@ -250,7 +251,7 @@ export async function createMatchResult(formData: FormData) {
   });
 
   revalidatePath("/matches");
-  revalidatePath("/dashboard");
+  revalidateDashboard(user.id);
   revalidatePath("/matches/new");
   revalidatePath("/settings/tags");
 
@@ -390,7 +391,7 @@ export async function updateMatchResult(formData: FormData) {
 
   revalidatePath("/matches");
   revalidatePath(`/matches/${matchId}/edit`);
-  revalidatePath("/dashboard");
+  revalidateDashboard(user.id);
   revalidatePath("/matches/new");
   revalidatePath("/settings/tags");
   redirect("/matches?message=record_updated");
@@ -412,7 +413,7 @@ export async function deleteMatchResult(formData: FormData) {
   });
 
   revalidatePath("/matches");
-  revalidatePath("/dashboard");
+  revalidateDashboard(user.id);
   revalidatePath("/settings/tags");
   redirect("/matches?message=record_deleted");
 }

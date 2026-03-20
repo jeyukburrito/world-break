@@ -21,6 +21,7 @@ world-break/
   prisma/        # Prisma schema and migrations
   public/        # Static assets
   .ai/           # Claude↔Codex handoff system
+    daily/       # Daily work logs (append/update every workday)
 ```
 
 ## Prisma Models
@@ -49,3 +50,12 @@ The `.ai/` directory is the single source of truth for all collaboration.
 - `.ai/release/`: release checklist and deploy notes
 
 Do not use ad-hoc notes or chat-only instructions as collaboration sources of truth.
+
+## Daily Work Log
+- Daily work logs must be written under `.ai/daily/`.
+- Use one file per day named `YYYY-MM-DD.md`.
+- After each completed work session, append or update that day's log with:
+  - summary of changes
+  - files touched
+  - validation performed
+  - open risks or follow-up items

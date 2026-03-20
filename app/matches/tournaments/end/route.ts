@@ -40,7 +40,6 @@ export async function POST(request: Request) {
 
   revalidatePath("/matches");
   revalidatePath("/matches/new");
-  revalidatePath("/dashboard");
 
   return NextResponse.redirect(new URL("/matches?message=tournament_ended", request.url));
 }

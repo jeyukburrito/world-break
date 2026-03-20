@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 
+import { ensureUserProfile } from "@/lib/auth";
 import { getSafeRedirectPath, isSupabaseConfigured } from "@/lib/env";
 import { createClient } from "@/lib/supabase/server";
 
@@ -13,11 +14,23 @@ export async function GET(request: NextRequest) {
   }
 
   if (code) {
-    const supabase = await createClient();
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    try {
+      const supabase = await createClient();
+      const { error } = await supabase.auth.exchangeCodeForSession(code);
 
-    if (!error) {
-      return NextResponse.redirect(new URL(next, request.url));
+      if (!error) {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        if (user) {
+          await ensureUserProfile(user);
+        }
+
+        return NextResponse.redirect(new URL(next, request.url));
+      }
+    } catch {
+      return NextResponse.redirect(new URL("/login?error=oauth_callback_failed", request.url));
     }
   }
 

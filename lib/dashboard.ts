@@ -1,4 +1,5 @@
 import { Prisma } from "@prisma/client";
+import { revalidateTag, unstable_cache } from "next/cache";
 
 import { prisma } from "@/lib/prisma";
 
@@ -15,6 +16,8 @@ export type FilterOptions = {
   to?: string;
   category?: string;
 };
+
+const DASHBOARD_TAG_PREFIX = "dashboard";
 
 type AggregateRow = {
   name: string;
@@ -90,7 +93,24 @@ function buildWhereSql(userId: string, opts: FilterOptions) {
   return Prisma.sql`WHERE ${Prisma.join(clauses, " AND ")}`;
 }
 
-export async function getDashboardData(userId: string, opts: FilterOptions) {
+function normalizeFilterOptions(opts: FilterOptions): FilterOptions {
+  return {
+    period: opts.period,
+    from: opts.from,
+    to: opts.to,
+    category: opts.category ?? "all",
+  };
+}
+
+function buildDashboardKeyParts(scope: string, userId: string, opts: FilterOptions) {
+  return [scope, userId, opts.period, opts.from ?? "", opts.to ?? "", opts.category ?? "all"];
+}
+
+function getDashboardTag(userId: string) {
+  return `${DASHBOARD_TAG_PREFIX}:${userId}`;
+}
+
+async function queryDashboardData(userId: string, opts: FilterOptions) {
   const whereSql = buildWhereSql(userId, opts);
 
   const [totalResult, myDeckRows, opponentRows] = await Promise.all([
@@ -129,7 +149,7 @@ export async function getDashboardData(userId: string, opts: FilterOptions) {
   };
 }
 
-export async function getMatchupMatrix(userId: string, opts: FilterOptions): Promise<MatchupCell[]> {
+async function queryTopMatchups(userId: string, opts: FilterOptions): Promise<MatchupCell[]> {
   const whereSql = buildWhereSql(userId, opts);
 
   const rows = await prisma.$queryRaw<MatchupRow[]>(Prisma.sql`
@@ -142,7 +162,11 @@ export async function getMatchupMatrix(userId: string, opts: FilterOptions): Pro
     INNER JOIN "decks" d ON d."id" = m."myDeckId"
     ${whereSql}
     GROUP BY d."name", m."opponentDeckName"
-    ORDER BY d."name" ASC, m."opponentDeckName" ASC
+    ORDER BY
+      (SUM(CASE WHEN m."isMatchWin" THEN 1 ELSE 0 END)::float / NULLIF(COUNT(*), 0)) DESC,
+      COUNT(*) DESC,
+      m."opponentDeckName" ASC
+    LIMIT 6
   `);
 
   return rows.map((row) => {
@@ -157,4 +181,32 @@ export async function getMatchupMatrix(userId: string, opts: FilterOptions): Pro
       rate: total === 0 ? 0 : Math.round((wins / total) * 100),
     };
   });
+}
+
+export async function getDashboardData(userId: string, opts: FilterOptions) {
+  const normalized = normalizeFilterOptions(opts);
+
+  return unstable_cache(
+    () => queryDashboardData(userId, normalized),
+    buildDashboardKeyParts("dashboard-data", userId, normalized),
+    {
+      tags: [getDashboardTag(userId)],
+    },
+  )();
+}
+
+export async function getTopMatchups(userId: string, opts: FilterOptions): Promise<MatchupCell[]> {
+  const normalized = normalizeFilterOptions(opts);
+
+  return unstable_cache(
+    () => queryTopMatchups(userId, normalized),
+    buildDashboardKeyParts("dashboard-top-matchups", userId, normalized),
+    {
+      tags: [getDashboardTag(userId)],
+    },
+  )();
+}
+
+export function revalidateDashboard(userId: string) {
+  revalidateTag(getDashboardTag(userId));
 }

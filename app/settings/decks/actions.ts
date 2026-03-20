@@ -67,7 +67,6 @@ export async function createDeck(formData: FormData) {
   revalidatePath("/settings/decks");
   revalidatePath("/matches/new");
   revalidatePath("/matches");
-  revalidatePath("/dashboard");
   redirect(withMessage("message", "덱을 추가했습니다."));
 }
 
