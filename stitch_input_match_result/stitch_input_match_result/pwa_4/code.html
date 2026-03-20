@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-container-highest": "#e1e2e4",
+              "inverse-on-surface": "#f0f1f3",
+              "on-secondary-fixed": "#001e2f",
+              "on-secondary-container": "#004a6d",
+              "on-tertiary-fixed-variant": "#6d3a00",
+              "surface-container": "#edeef0",
+              "on-secondary": "#ffffff",
+              "surface-dim": "#d9dadc",
+              "secondary": "#006492",
+              "inverse-surface": "#2e3132",
+              "surface-tint": "#5948ce",
+              "on-secondary-fixed-variant": "#004b6f",
+              "tertiary-fixed-dim": "#ffb77b",
+              "on-tertiary-container": "#fff0e6",
+              "on-tertiary-fixed": "#2e1500",
+              "primary-container": "#6a5ae0",
+              "surface-variant": "#e1e2e4",
+              "on-surface": "#191c1e",
+              "surface-container-lowest": "#ffffff",
+              "surface": "#f8f9fb",
+              "surface-container-low": "#f3f4f6",
+              "tertiary-container": "#a75b00",
+              "on-primary": "#ffffff",
+              "on-surface-variant": "#474554",
+              "surface-bright": "#f8f9fb",
+              "primary-fixed": "#e4dfff",
+              "error": "#ba1a1a",
+              "error-container": "#ffdad6",
+              "on-error-container": "#93000a",
+              "outline-variant": "#c8c4d6",
+              "surface-container-high": "#e7e8ea",
+              "primary-fixed-dim": "#c7bfff",
+              "tertiary-fixed": "#ffdcc2",
+              "secondary-container": "#58bcfd",
+              "on-tertiary": "#ffffff",
+              "primary": "#513fc6",
+              "secondary-fixed": "#cae6ff",
+              "on-error": "#ffffff",
+              "inverse-primary": "#c7bfff",
+              "outline": "#787585",
+              "tertiary": "#844600",
+              "on-primary-fixed": "#170065",
+              "on-primary-fixed-variant": "#412bb6",
+              "on-background": "#191c1e",
+              "on-primary-container": "#f5f1ff",
+              "background": "#f8f9fb",
+              "secondary-fixed-dim": "#8ccdff"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .donut-gradient {
+            background: conic-gradient(#513fc6 0% 65%, #6a5ae0 65% 85%, #e7e8ea 85% 100%);
+        }
+        .donut-gradient-alt {
+            background: conic-gradient(#006492 0% 40%, #58bcfd 40% 70%, #e7e8ea 70% 100%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="bg-surface/70 backdrop-blur-xl docked full-width top-0 sticky z-50 shadow-[0_12px_32px_-4px_rgba(25,28,30,0.08)]">
+<div class="flex justify-between items-center w-full px-6 py-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-indigo-600 dark:text-indigo-400">style</span>
+<h1 class="text-lg font-black tracking-tighter text-indigo-700 dark:text-indigo-300">TCG MATCH TRACKER</h1>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 rounded-full hover:bg-slate-100/50 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-slate-500">notifications</span>
+</button>
+</div>
+</div>
+</header>
+<main class="px-4 pt-6 space-y-8 max-w-md mx-auto">
+<!-- Header Section -->
+<section class="space-y-4">
+<div class="flex items-end justify-between">
+<div>
+<span class="text-[10px] font-bold uppercase tracking-widest text-primary mb-1 block">Overview</span>
+<h2 class="text-2xl font-bold tracking-tight">대시보드</h2>
+</div>
+<div class="flex bg-surface-container-high rounded-full p-1">
+<button class="px-4 py-1.5 text-xs font-bold rounded-full bg-surface-container-lowest shadow-sm text-primary">7일</button>
+<button class="px-4 py-1.5 text-xs font-medium text-slate-500 hover:text-primary transition-colors">30일</button>
+<button class="px-4 py-1.5 text-xs font-medium text-slate-500 hover:text-primary transition-colors">전체</button>
+</div>
+</div>
+</section>
+<!-- Stats Hero Card -->
+<section class="grid grid-cols-2 gap-4">
+<div class="bg-surface-container-lowest p-5 rounded-xl border-none shadow-[0_4px_20px_-4px_rgba(25,28,30,0.04)]">
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">승률 (Win Rate)</p>
+<div class="flex items-baseline gap-1">
+<span class="text-3xl font-black text-primary">68.2</span>
+<span class="text-sm font-bold text-primary">%</span>
+</div>
+<div class="mt-3 flex items-center gap-1 text-[10px] font-bold text-primary-fixed-dim">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+<span>+2.4% vs Last Week</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-5 rounded-xl border-none shadow-[0_4px_20px_-4px_rgba(25,28,30,0.04)]">
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">총 전적 (Total)</p>
+<div class="flex items-baseline gap-1">
+<span class="text-3xl font-black text-on-surface">44</span>
+<span class="text-sm font-bold text-slate-400">GAMES</span>
+</div>
+<div class="mt-3 flex items-center gap-1 text-[10px] font-bold text-slate-400">
+<span>30W 14L</span>
+</div>
+</div>
+</section>
+<!-- Donut Charts Section -->
+<section class="space-y-4">
+<div class="bg-surface-container-low p-6 rounded-2xl space-y-8">
+<!-- Usage 1 -->
+<div class="space-y-4">
+<h3 class="text-sm font-bold tracking-tight flex items-center gap-2">
+<span class="w-1 h-4 bg-primary rounded-full"></span>
+                        사용 덱 분포
+                    </h3>
+<div class="flex items-center justify-between gap-6">
+<div class="relative w-28 h-28 flex items-center justify-center">
+<div class="absolute inset-0 rounded-full donut-gradient"></div>
+<div class="absolute w-20 h-20 bg-surface-container-low rounded-full"></div>
+<div class="z-10 text-center">
+<span class="block text-xs font-black text-primary">MAIN</span>
+<span class="block text-[10px] font-bold text-slate-400">65%</span>
+</div>
+</div>
+<div class="flex-1 space-y-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span class="text-xs font-semibold">Fire King</span>
+</div>
+<span class="text-xs font-bold">22</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+<span class="text-xs font-semibold">Voiceless Voice</span>
+</div>
+<span class="text-xs font-bold">12</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-surface-container-highest"></span>
+<span class="text-xs font-semibold">Other</span>
+</div>
+<span class="text-xs font-bold">10</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Usage 2 -->
+<div class="space-y-4">
+<h3 class="text-sm font-bold tracking-tight flex items-center gap-2">
+<span class="w-1 h-4 bg-secondary rounded-full"></span>
+                        상대 덱 분포
+                    </h3>
+<div class="flex items-center justify-between gap-6">
+<div class="relative w-28 h-28 flex items-center justify-center">
+<div class="absolute inset-0 rounded-full donut-gradient-alt"></div>
+<div class="absolute w-20 h-20 bg-surface-container-low rounded-full"></div>
+<div class="z-10 text-center">
+<span class="block text-xs font-black text-secondary">TIER 1</span>
+<span class="block text-[10px] font-bold text-slate-400">40%</span>
+</div>
+</div>
+<div class="flex-1 space-y-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="text-xs font-semibold">Snake-Eye</span>
+</div>
+<span class="text-xs font-bold">18</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary-container"></span>
+<span class="text-xs font-semibold">Tenpai Dragon</span>
+</div>
+<span class="text-xs font-bold">14</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-surface-container-highest"></span>
+<span class="text-xs font-semibold">Others</span>
+</div>
+<span class="text-xs font-bold">12</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Matchup Matrix Section -->
+<section class="space-y-4 pb-12">
+<h3 class="text-sm font-bold tracking-tight px-2 flex justify-between items-center">
+<span>상성 매트릭스</span>
+<span class="text-[10px] text-primary uppercase font-bold tracking-widest cursor-pointer">View All</span>
+</h3>
+<div class="space-y-3">
+<!-- Matrix Item 1 -->
+<div class="bg-surface-container-lowest p-4 rounded-xl flex items-center justify-between shadow-[0_2px_8px_rgba(25,28,30,0.04)]">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover opacity-80" data-alt="Abstract fiery monster illustration for tcg" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3o88vKI4xzZ9cPvRFKEv4imcpXgaW-mBpo0Has3RI6Ba1wONbnVffo2jD9n0873kVCl-lo9EUkXB517VEmP4wx1Lp_ULpMmjgTLPzYtTAU9fpAbo-MV7wCvBdbCRyf4mBj3FhGWp-xUwLIWx4kvVjW6TIbEoxBdoNvnQhAKAcjBGs3cvPjWs4IkjG1h6FA0UZNkTgxd0vF3Xm9cGocDfkGoDN9chW2DAIcIHGWR3R5cGlo7y7Oy3HQpsJbnIKBxRrt3oLAlU_7a0"/>
+</div>
+<div>
+<p class="text-sm font-bold">Snake-Eye Fire King</p>
+<p class="text-[10px] font-medium text-slate-400">Win Rate: 54.5%</p>
+</div>
+</div>
+<div class="flex gap-2">
+<div class="bg-primary-fixed-dim/20 text-primary font-black text-xs px-3 py-1.5 rounded-lg">6W</div>
+<div class="bg-error-container/40 text-error font-black text-xs px-3 py-1.5 rounded-lg">5L</div>
+</div>
+</div>
+<!-- Matrix Item 2 -->
+<div class="bg-surface-container-lowest p-4 rounded-xl flex items-center justify-between shadow-[0_2px_8px_rgba(25,28,30,0.04)]">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover opacity-80" data-alt="Abstract blue dragon illustration for tcg" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDICeHSPdQ97ofirYtiU8ztVXqBC7n1NcToyDkH1KHGJJsOspkOHCtvEF1ij41txBCr7F8VY9F0QuZ33MEm00-AVRhSYXVuTptD7iIR_GK_ykqWUaO6cuy9slLl6iv_fvLmvYaCKfBjaTW01j4cTQ2mS-WHqM02QRpQJKXDYcH9ofQ4Vtv_e8SEqgbjKwRG_MpFx3aCkoKJwh1QaGmaw17mZmducZyz2xsfUw_S5vTxzwT5yeusSXRVz7lCAnbe0mzHWHYVycTwAL4"/>
+</div>
+<div>
+<p class="text-sm font-bold">Tenpai Dragon</p>
+<p class="text-[10px] font-medium text-slate-400">Win Rate: 75.0%</p>
+</div>
+</div>
+<div class="flex gap-2">
+<div class="bg-primary-fixed-dim/20 text-primary font-black text-xs px-3 py-1.5 rounded-lg">9W</div>
+<div class="bg-error-container/40 text-error font-black text-xs px-3 py-1.5 rounded-lg">3L</div>
+</div>
+</div>
+<!-- Matrix Item 3 -->
+<div class="bg-surface-container-lowest p-4 rounded-xl flex items-center justify-between shadow-[0_2px_8px_rgba(25,28,30,0.04)]">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover opacity-80" data-alt="Abstract dark machine illustration for tcg" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvh_0rsoQvTxLo5EDh6p7MJHrp9Cvr4ylouxN9-FN2syqrOC7K7G2MQb5-Z9t7MKhrKCGtpqVOyNW1K1Hs-VTq4w5gwtyG5blIkc2BeYk6f-EVf8HxmxsawWZRP2deoMFPgQoGF6TZ5pXW01z8RmVoIsFWZh-hQiyiLxaVBcG9wgipeLhx-zB7EVO30FHngQC5gsuRcoTWRd3oJYVbQ1iOl1eZj0VKLwilF-4z8WiUHkQrJc7g017Sl474KY1wfOVkgTUsmRQq7Q8"/>
+</div>
+<div>
+<p class="text-sm font-bold">Machine Nightmare</p>
+<p class="text-[10px] font-medium text-slate-400">Win Rate: 100%</p>
+</div>
+</div>
+<div class="flex gap-2">
+<div class="bg-primary-fixed-dim/20 text-primary font-black text-xs px-3 py-1.5 rounded-lg">1W</div>
+<div class="bg-error-container/40 text-error font-black text-xs px-3 py-1.5 rounded-lg">0L</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 right-0 w-full bg-surface/80 dark:bg-slate-900/80 backdrop-blur-lg flex justify-around items-center h-20 z-50 px-4 pb-safe shadow-[0_-8px_24px_-4px_rgba(25,28,30,0.06)]">
+<!-- Dashboard (Active) -->
+<a class="flex flex-col items-center justify-center bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-200 rounded-2xl px-5 py-2 transition-all active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined mb-0.5" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-['Inter'] text-[10px] font-bold uppercase tracking-widest">Dashboard</span>
+</a>
+<!-- Records -->
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:text-indigo-500 transition-colors active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined mb-0.5">history</span>
+<span class="font-['Inter'] text-[10px] font-bold uppercase tracking-widest">Records</span>
+</a>
+<!-- Input (Action) -->
+<div class="relative -mt-10">
+<button class="w-14 h-14 bg-gradient-to-br from-primary to-primary-container text-on-primary rounded-full shadow-lg shadow-primary/30 flex items-center justify-center active:scale-90 transition-all">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+</div>
+<!-- Settings -->
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:text-indigo-500 transition-colors active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined mb-0.5">settings</span>
+<span class="font-['Inter'] text-[10px] font-bold uppercase tracking-widest">Settings</span>
+</a>
+</nav>
+</body></html>
