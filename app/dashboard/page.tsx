@@ -10,19 +10,6 @@ type DashboardPageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
-function filterLabel(value: string, kind: "period" | "category") {
-  if (kind === "period") {
-    if (value === "7d") return "최근 7일";
-    if (value === "30d") return "최근 30일";
-    if (value === "custom") return "사용자 지정";
-    return "전체 기간";
-  }
-
-  if (value === "friendly") return "친선";
-  if (value === "shop") return "매장대회";
-  if (value === "cs") return "CS";
-  return "전체 이벤트";
-}
 
 export default async function DashboardPage({ searchParams }: DashboardPageProps) {
   const user = await requireUser();
@@ -51,46 +38,21 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   return (
     <AppShell
       title="대시보드"
-      description="기록 흐름과 상성을 한 화면에서 요약합니다."
       headerRight={<HeaderActions avatarUrl={display.avatarUrl} name={display.name} />}
     >
-      <section className="mb-5 overflow-hidden rounded-[32px] bg-surface-container-low p-6 shadow-sm">
-        <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-accent">Overview</p>
-        <div className="mt-3 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div className="max-w-2xl space-y-3">
-            <h2 className="text-3xl font-black tracking-tight text-ink sm:text-4xl">
-              Tactical Editorial 대시보드
-            </h2>
-            <p className="max-w-xl text-sm leading-6 text-muted">
-              최근 전적, 주력 덱, 상대 분포, 상성 흐름을 카드형 레이아웃으로 빠르게 확인합니다.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <span className="rounded-full bg-accent/10 px-3 py-1 text-xs font-semibold text-accent">
-              {filterLabel(period, "period")}
-            </span>
-            <span className="rounded-full bg-line/40 px-3 py-1 text-xs font-semibold text-muted">
-              {filterLabel(category, "category")}
-            </span>
-            <span className="rounded-full bg-paper px-3 py-1 text-xs font-semibold text-ink">
-              {totalMatches} 경기
-            </span>
-          </div>
+      {/* 컴팩트 헤더: 라벨 + 제목 + 기간 필터 인라인 배치 */}
+      <section className="mb-5 flex items-end justify-between gap-4">
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-accent">Overview</p>
+          <h2 className="text-2xl font-bold tracking-tight text-ink">대시보드</h2>
         </div>
+        <PeriodFilter activePeriod={period} defaultFrom={from} defaultTo={to} />
       </section>
 
-      <section className="mb-5 space-y-3 rounded-[32px] bg-surface-container-low p-5 shadow-sm">
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted">Filters</p>
-            <h3 className="mt-1 text-lg font-semibold text-ink">기간과 범위를 조정합니다</h3>
-          </div>
-        </div>
-        <div className="space-y-4">
-          <PeriodFilter activePeriod={period} defaultFrom={from} defaultTo={to} />
-          <CategoryFilter activeCategory={category} />
-        </div>
-      </section>
+      {/* 카테고리 필터: 카드 없이 pill 행만 */}
+      <div className="mb-5">
+        <CategoryFilter activeCategory={category} />
+      </div>
 
       <DashboardCharts
         myDeckSlices={myDeckSlices}

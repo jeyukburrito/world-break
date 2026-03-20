@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 
 type PeriodFilterProps = {
   activePeriod: string;
@@ -18,6 +18,8 @@ const presets = [
 export function PeriodFilter({ activePeriod, defaultFrom, defaultTo }: PeriodFilterProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  // 커스텀 날짜 폼 표시 여부
+  const [showCustom, setShowCustom] = useState(activePeriod === "custom");
 
   const navigate = useCallback(
     (params: Record<string, string>) => {
@@ -33,65 +35,82 @@ export function PeriodFilter({ activePeriod, defaultFrom, defaultTo }: PeriodFil
   );
 
   return (
-    <div className="space-y-3">
-      <div className="no-scrollbar flex gap-2 overflow-x-auto pb-1">
+    <div className="flex flex-col items-end gap-2">
+      {/* 프리셋 pill 토글 — 헤더에 인라인 배치 */}
+      <div className="flex items-center gap-1 rounded-full bg-paper p-1">
         {presets.map((p) => (
           <button
             key={p.value}
             type="button"
             aria-pressed={activePeriod === p.value}
-            onClick={() => navigate({ period: p.value })}
-            className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
+            onClick={() => {
+              setShowCustom(false);
+              navigate({ period: p.value });
+            }}
+            className={`whitespace-nowrap rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
               activePeriod === p.value
-                ? "bg-accent text-white shadow-[0_10px_20px_-8px_rgba(79,70,229,0.45)]"
-                : "bg-paper text-ink"
+                ? "bg-accent text-white shadow-[0_4px_12px_-2px_rgba(79,70,229,0.35)]"
+                : "text-muted hover:text-ink"
             }`}
           >
             {p.label}
           </button>
         ))}
-      </div>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          const fd = new FormData(e.currentTarget);
-          navigate({
-            period: "custom",
-            from: fd.get("from") as string,
-            to: fd.get("to") as string,
-          });
-        }}
-        className="flex flex-wrap items-end gap-2 rounded-[28px] bg-surface-container-low p-3"
-      >
-        <label className="grid gap-1 text-xs text-muted">
-          시작일
-          <input
-            type="date"
-            name="from"
-            defaultValue={defaultFrom}
-            className="rounded-2xl bg-surface px-3 py-2 text-sm text-ink shadow-sm"
-          />
-        </label>
-        <label className="grid gap-1 text-xs text-muted">
-          종료일
-          <input
-            type="date"
-            name="to"
-            defaultValue={defaultTo}
-            className="rounded-2xl bg-surface px-3 py-2 text-sm text-ink shadow-sm"
-          />
-        </label>
+        {/* 커스텀 기간 진입 버튼 */}
         <button
-          type="submit"
-          className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
+          type="button"
+          aria-pressed={activePeriod === "custom"}
+          onClick={() => setShowCustom((v) => !v)}
+          className={`whitespace-nowrap rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
             activePeriod === "custom"
-              ? "bg-accent text-white"
-              : "bg-surface text-accent shadow-sm"
+              ? "bg-accent text-white shadow-[0_4px_12px_-2px_rgba(79,70,229,0.35)]"
+              : "text-muted hover:text-ink"
           }`}
         >
-          적용
+          직접입력
         </button>
-      </form>
+      </div>
+
+      {/* 커스텀 날짜 폼 — 토글로 접기/펼치기 */}
+      {showCustom && (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            const fd = new FormData(e.currentTarget);
+            navigate({
+              period: "custom",
+              from: fd.get("from") as string,
+              to: fd.get("to") as string,
+            });
+          }}
+          className="flex flex-wrap items-end gap-2 rounded-2xl bg-surface-container-low p-3"
+        >
+          <label className="grid gap-1 text-xs text-muted">
+            시작일
+            <input
+              type="date"
+              name="from"
+              defaultValue={defaultFrom}
+              className="rounded-xl bg-surface px-3 py-1.5 text-xs text-ink shadow-sm"
+            />
+          </label>
+          <label className="grid gap-1 text-xs text-muted">
+            종료일
+            <input
+              type="date"
+              name="to"
+              defaultValue={defaultTo}
+              className="rounded-xl bg-surface px-3 py-1.5 text-xs text-ink shadow-sm"
+            />
+          </label>
+          <button
+            type="submit"
+            className="rounded-full bg-accent px-4 py-1.5 text-xs font-semibold text-white"
+          >
+            적용
+          </button>
+        </form>
+      )}
     </div>
   );
 }

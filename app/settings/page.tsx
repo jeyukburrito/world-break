@@ -13,50 +13,24 @@ export default async function SettingsPage() {
   return (
     <AppShell
       title="설정"
-      description="게임, 덱, 태그, 내보내기, 세션 종료를 한 번에 관리합니다."
       headerRight={<HeaderActions avatarUrl={display.avatarUrl} name={display.name} />}
     >
-      <div className="mx-auto flex max-w-md flex-col gap-4 pb-8">
-        <section className="rounded-3xl border border-line bg-surface p-4 shadow-sm">
-          <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-accent">
-            Control Room
-          </p>
-          <h2 className="mt-2 text-2xl font-bold tracking-tight">설정 허브</h2>
-          <p className="mt-2 text-sm leading-6 text-muted">
-            게임, 덱, 태그, 백업 내보내기, 세션 종료까지 한 번에 관리합니다.
-          </p>
-        </section>
-
-        <section className="grid gap-3 md:grid-cols-2">
-          <article className="rounded-3xl border border-line bg-surface p-4 shadow-sm">
-            <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-muted">Deck Ops</p>
-            <h3 className="mt-2 text-lg font-semibold">게임 관리</h3>
-            <p className="mt-2 text-sm leading-6 text-muted">
-              추적용 게임 카테고리를 정리합니다.
-            </p>
-            <Link
-              href="/settings/games"
-              className="mt-4 inline-flex rounded-full bg-accent px-4 py-2.5 text-sm font-bold text-white"
-            >
-              관리 화면
-            </Link>
-          </article>
-          <article className="rounded-3xl border border-line bg-surface p-4 shadow-sm">
-            <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-muted">Deck Ops</p>
-            <h3 className="mt-2 text-lg font-semibold">덱 관리</h3>
-            <p className="mt-2 text-sm leading-6 text-muted">
-              게임별로 사용하는 덱을 정리합니다.
-            </p>
-            <Link
-              href="/settings/decks"
-              className="mt-4 inline-flex rounded-full border border-line px-4 py-2.5 text-sm font-bold text-ink"
-            >
-              관리 화면
-            </Link>
-          </article>
+      <div className="mx-auto flex max-w-md flex-col gap-6 pb-8">
+        <section>
+          <h2 className="text-2xl font-bold tracking-tight text-ink">설정</h2>
         </section>
 
         <section className="overflow-hidden rounded-3xl border border-line bg-surface shadow-sm">
+          <SettingsLink
+            href="/settings/games"
+            label="게임 관리"
+            description="추적용 게임 카테고리를 정리합니다."
+          />
+          <SettingsLink
+            href="/settings/decks"
+            label="덱 관리"
+            description="게임별로 사용하는 덱을 정리합니다."
+          />
           <SettingsLink
             href="/settings/tags"
             label="태그 관리"
@@ -67,18 +41,27 @@ export default async function SettingsPage() {
             label="CSV 내보내기"
             description="조건에 맞는 기록을 CSV로 받습니다."
           />
+        </section>
+
+        <section className="overflow-hidden rounded-3xl border border-line bg-surface shadow-sm">
           <form action={signOut}>
             <button
               type="submit"
               className="flex w-full items-center justify-between px-5 py-4 text-left transition-colors hover:bg-paper"
             >
               <span>
-                <span className="block text-sm font-semibold text-ink">로그아웃</span>
+                <span className="block text-sm font-semibold text-danger">로그아웃</span>
                 <span className="mt-1 block text-xs text-muted">현재 세션을 종료합니다.</span>
               </span>
-              <span className="rounded-full bg-danger/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.24em] text-danger">
-                Exit
-              </span>
+              <svg viewBox="0 0 24 24" fill="none" className="size-4 shrink-0 text-danger" aria-hidden="true">
+                <path
+                  d="M9 18l6-6-6-6"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
             </button>
           </form>
         </section>

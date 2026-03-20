@@ -133,10 +133,7 @@ export default async function NewMatchPage({ searchParams }: NewMatchPageProps) 
 
         {isContinue && (isEndedTournament || hasInvalidTournamentContinuation) ? (
           <div className="rounded-3xl bg-surface-container-low p-4 shadow-sm">
-            <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-danger">
-              Tournament Notice
-            </p>
-            <p className="mt-2 text-sm font-semibold text-ink">대회 입력을 계속할 수 없습니다</p>
+            <p className="text-sm font-semibold text-danger">대회 입력을 계속할 수 없습니다</p>
             <p className="mt-1 text-sm leading-6 text-muted">
               {isEndedTournament
                 ? "종료된 대회입니다. 기존 경기 기록은 수정할 수 있지만, 새로운 라운드는 추가할 수 없습니다."
@@ -145,7 +142,7 @@ export default async function NewMatchPage({ searchParams }: NewMatchPageProps) 
           </div>
         ) : null}
 
-        <form action={createMatchResult} className="space-y-4">
+        <form action={createMatchResult} className="space-y-8">
           {isContinue && continueTournamentId ? (
             <>
               <input type="hidden" name="tournamentPhase" value={phase} />
@@ -153,38 +150,31 @@ export default async function NewMatchPage({ searchParams }: NewMatchPageProps) 
             </>
           ) : null}
 
-          <section className="grid gap-3 rounded-3xl bg-surface-container-low p-4 shadow-sm">
-            <div className="flex items-end justify-between gap-3">
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-accent">
-                  New Record
-                </p>
-                <h2 className="mt-1 text-xl font-bold tracking-tight">경기 입력</h2>
-              </div>
-              <span className="rounded-full bg-accent/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.24em] text-accent">
-                Tactical
-              </span>
-            </div>
-
-            <div className="grid gap-3 rounded-2xl bg-paper p-3">
-              <EventCategorySelect defaultValue={continueEvent ?? "friendly"} />
-              <label className="grid gap-2 text-sm font-semibold">
-                날짜
-                <input
-                  name="playedAt"
-                  type="date"
-                  required
-                  defaultValue={today}
-                  className="rounded-2xl bg-surface px-4 py-3 text-ink shadow-sm"
-                />
-              </label>
-            </div>
+          {/* 페이지 타이틀 — 카드 래퍼 없이 상단에 단순 배치 */}
+          <section>
+            <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-accent">
+              New Record
+            </p>
+            <h2 className="mt-1 text-xl font-bold tracking-tight">결과 입력</h2>
           </section>
 
-          <section className="grid gap-3 rounded-3xl bg-surface-container-low p-4 shadow-sm">
-            <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-muted">
-              Match Setup
-            </p>
+          {/* 대회 유형 + 날짜 — 플랫 레이아웃 */}
+          <section className="grid gap-3">
+            <EventCategorySelect defaultValue={continueEvent ?? "friendly"} />
+            <label className="grid gap-2 text-sm font-semibold">
+              날짜
+              <input
+                name="playedAt"
+                type="date"
+                required
+                defaultValue={today}
+                className="rounded-2xl bg-surface-container-high px-4 py-3 text-ink"
+              />
+            </label>
+          </section>
+
+          {/* 게임/덱/상대 덱 — 플랫 레이아웃 */}
+          <section className="grid gap-3">
             <GameDeckFields
               decks={decks.map((deck) => ({
                 id: deck.id,
@@ -195,35 +185,28 @@ export default async function NewMatchPage({ searchParams }: NewMatchPageProps) 
               defaultGameId={continueGame}
               defaultDeckId={continueDeck}
             />
-            <div className="grid gap-3">
-              <label className="grid gap-2 text-sm font-semibold">
-                상대 덱명
-                <input
-                  name="opponentDeckName"
-                  type="text"
-                  required
-                  className="rounded-2xl bg-surface px-4 py-3 text-ink shadow-sm"
-                />
-              </label>
-            </div>
+            <label className="grid gap-2 text-sm font-semibold">
+              상대 덱명
+              <input
+                name="opponentDeckName"
+                type="text"
+                required
+                className="rounded-2xl bg-surface-container-high px-4 py-3 text-ink"
+              />
+            </label>
           </section>
 
           <MatchResultInput />
           <MatchDetailControls />
 
-          <section className="grid gap-3 rounded-3xl bg-surface-container-low p-4 shadow-sm">
-            <div className="flex items-center justify-between">
-              <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-muted">Notes</p>
-              <span className="text-[10px] font-bold uppercase tracking-[0.24em] text-muted">
-                Optional
-              </span>
-            </div>
+          {/* 메모 — 플랫 레이아웃 */}
+          <section className="grid gap-3">
             <label className="grid gap-2 text-sm font-semibold">
               메모
               <textarea
                 name="memo"
                 rows={3}
-                className="min-h-28 rounded-2xl bg-surface px-4 py-3 text-ink shadow-sm"
+                className="min-h-28 rounded-2xl bg-surface-container-high px-4 py-3 text-ink"
               />
             </label>
             <TagSelector tags={tags} />

@@ -17,59 +17,63 @@ export function MatchResultInput({
   );
 
   return (
-    <section className="grid gap-4 rounded-3xl border border-line bg-surface p-4 shadow-sm">
+    <section className="space-y-6">
+      {/* 매치 형식 — pill-shaped 세그먼트 컨트롤 */}
       <div className="grid gap-2">
-        <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-muted">
-          Match Format
-        </p>
-        <div className="rounded-2xl border border-line bg-paper p-1.5">
+        <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-muted">매치 형식</p>
+        <div className="grid grid-cols-2 gap-1.5 rounded-full bg-surface-container-low p-1.5">
           <input type="hidden" name="matchFormat" value={format} />
-          <div className="grid grid-cols-2 gap-1.5">
-            <button
-              type="button"
-              onClick={() => setFormat("bo1")}
-              className={`rounded-xl px-4 py-3 text-sm font-bold transition-all ${
-                format === "bo1" ? "bg-surface text-accent shadow-sm" : "text-muted"
-              }`}
-            >
-              BO1
-            </button>
-            <button
-              type="button"
-              onClick={() => setFormat("bo3")}
-              className={`rounded-xl px-4 py-3 text-sm font-bold transition-all ${
-                format === "bo3" ? "bg-surface text-accent shadow-sm" : "text-muted"
-              }`}
-            >
-              BO3
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={() => setFormat("bo1")}
+            className={`rounded-full px-4 py-3 text-sm font-bold transition-all ${
+              format === "bo1" ? "bg-surface text-accent shadow-sm" : "text-muted"
+            }`}
+          >
+            BO1
+          </button>
+          <button
+            type="button"
+            onClick={() => setFormat("bo3")}
+            className={`rounded-full px-4 py-3 text-sm font-bold transition-all ${
+              format === "bo3" ? "bg-surface text-accent shadow-sm" : "text-muted"
+            }`}
+          >
+            BO3
+          </button>
         </div>
       </div>
 
+      {/* 매치 결과 — 큰 버튼, 아이콘 포함 */}
       <div className="grid gap-2">
-        <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-muted">Result</p>
+        <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-muted">매치 결과</p>
         <div className="grid grid-cols-2 gap-3">
           <button
             type="button"
             onClick={() => setResult("win")}
-            className={`rounded-2xl border px-4 py-4 text-base font-bold transition-all ${
+            className={`flex h-24 flex-col items-center justify-center gap-1 rounded-2xl border-2 text-base font-bold transition-all ${
               result === "win"
-                ? "border-accent bg-accent/10 text-accent shadow-sm"
-                : "border-line bg-paper text-muted"
+                ? "border-transparent bg-gradient-to-br from-primary to-primary-container text-on-primary shadow-md"
+                : "border-outline-variant/15 bg-surface-container-lowest text-outline"
             }`}
           >
+            <span className="material-symbols-outlined text-2xl" aria-hidden="true">
+              emoji_events
+            </span>
             승리
           </button>
           <button
             type="button"
             onClick={() => setResult("lose")}
-            className={`rounded-2xl border px-4 py-4 text-base font-bold transition-all ${
+            className={`flex h-24 flex-col items-center justify-center gap-1 rounded-2xl border-2 text-base font-bold transition-all ${
               result === "lose"
                 ? "border-danger bg-danger/10 text-danger shadow-sm"
-                : "border-line bg-paper text-muted"
+                : "border-outline-variant/15 bg-surface-container-lowest text-outline"
             }`}
           >
+            <span className="material-symbols-outlined text-2xl" aria-hidden="true">
+              sentiment_dissatisfied
+            </span>
             패배
           </button>
         </div>

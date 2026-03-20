@@ -380,36 +380,24 @@ export default async function MatchesPage({ searchParams }: MatchesPageProps) {
   return (
     <AppShell
       title="기록 목록"
-      description="필터 칩으로 빠르게 좁히고 카드로 읽는 기록 화면입니다."
       headerRight={<HeaderActions avatarUrl={display.avatarUrl} name={display.name} />}
     >
-      <section className="mb-5 overflow-hidden rounded-[32px] bg-surface-container-low p-6 shadow-sm">
-        <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-accent">Records</p>
-        <div className="mt-3 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div className="max-w-2xl space-y-3">
-            <h2 className="text-3xl font-black tracking-tight text-ink sm:text-4xl">기록을 카드로 읽습니다</h2>
-            <p className="max-w-xl text-sm leading-6 text-muted">
-              게임, 덱, 형식, 이벤트별 필터를 칩으로 전환하고, 토너먼트와 단일 매치를 같은 언어로 정렬합니다.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <span className="rounded-full bg-accent/10 px-3 py-1 text-xs font-semibold text-accent">
-              {formatNumber(totalCount)} 경기
-            </span>
-            <span className="rounded-full bg-line/40 px-3 py-1 text-xs font-semibold text-muted">
-              {currentPage} / {totalPages}
-            </span>
-            <Link
-              href="/matches/new"
-              className="rounded-full bg-paper px-3 py-1 text-xs font-semibold text-ink"
-            >
-              새 기록
-            </Link>
-          </div>
+      <section className="mb-5 flex items-center justify-between">
+        <h2 className="text-2xl font-bold tracking-tight text-ink">기록 목록</h2>
+        <div className="flex items-center gap-2">
+          <span className="rounded-full bg-accent/10 px-3 py-1 text-xs font-semibold text-accent">
+            {formatNumber(totalCount)} 경기
+          </span>
+          <Link
+            href="/matches/new"
+            className="rounded-full bg-paper px-3 py-1 text-xs font-semibold text-ink"
+          >
+            새 기록
+          </Link>
         </div>
       </section>
 
-      <section className="mb-5 space-y-4 rounded-[32px] bg-surface-container-low p-5 shadow-sm">
+      <section className="mb-5 space-y-4">
         <FilterRail title="게임" chips={gameChips} />
         <FilterRail title="덱" chips={deckChips} />
         <FilterRail title="형식" chips={formatChips} />
