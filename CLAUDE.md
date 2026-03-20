@@ -4,54 +4,6 @@ World Break는 TCG 전적 기록 모바일 PWA입니다.
 
 ---
 
-### 1. Plan Node Default
-- Enter plan mode for ANY non-trivial task (3+ steps or architectural decisions)
-- If something goes sideways, STOP and re-plan immediately - don't keep pushing
-- Use plan mode for verification steps, not just building
-- Write detailed specs upfront to reduce ambiguity
-
----
-
-### 2. Subagent Strategy
-- Use subagents liberally to keep main context window clean
-- Offload research, exploration, and parallel analysis to subagents
-- For complex problems, throw more compute at it via subagents
-- One task per subagent for focused execution
-
----
-
-### 3. Self-Improvement Loop
-- After ANY correction from the user: update `tasks/lessons.md` with the pattern
-- Write rules for yourself that prevent the same mistake
-- Ruthlessly iterate on these lessons until mistake rate drops
-- Review lessons at session start for relevant project
-
----
-
-### 4. Verification Before Done
-- Never mark a task complete without proving it works
-- Diff behavior between main and your changes when relevant
-- Ask yourself: "Would a staff engineer approve this?"
-- Run tests, check logs, demonstrate correctness
-
----
-
-### 5. Demand Elegance (Balanced)
-- For non-trivial changes: pause and ask "is there a more elegant way?"
-- If a fix feels hacky: "Knowing everything I know now, implement the elegant solution"
-- Skip this for simple, obvious fixes - don't over-engineer
-- Challenge your own work before presenting it
-
----
-
-### 6. Autonomous Bug Fixing
-- When given a bug report: just fix it. Don't ask for hand-holding
-- Point at logs, errors, failing tests - then resolve them
-- Zero context switching required from the user
-- Go fix failing CI tests without being told how
-
----
-
 ## Claude↔Codex 협업 규칙
 
 Webapp 개발은 **파일 기반 핸드오프**로 운영합니다. 상세 규칙: `.ai/PROJECT_RULES.md`
@@ -145,16 +97,56 @@ User → Game → Deck → MatchResult
 
 ---
 
-## Task Management
-1. **Plan First**: Write plan to `tasks/todo.md` with checkable items
-2. **Verify Plan**: Check in before starting implementation
-3. **Track Progress**: Mark items complete as you go
-4. **Explain Changes**: High-level summary at each step
-5. **Document Results**: Add review section to `tasks/todo.md`
-6. **Capture Lessons**: Update `tasks/lessons.md` after corrections
+## 디렉토리 구조
+
+```
+world-break/
+├── app/                   # Next.js App Router
+│   ├── dashboard/
+│   ├── matches/
+│   │   ├── [id]/edit/
+│   │   ├── new/
+│   │   ├── export/
+│   │   └── tournaments/end/
+│   ├── settings/
+│   │   ├── decks/
+│   │   ├── export/
+│   │   ├── games/
+│   │   ├── profile/
+│   │   └── tags/
+│   ├── login/
+│   └── offline/
+├── components/            # 재사용 UI 컴포넌트
+├── lib/                   # auth, prisma, supabase, dashboard, validation
+├── prisma/                # schema.prisma + migrations
+├── public/                # 정적 에셋 (icons, manifest, sw.js)
+├── supabase/              # RLS SQL
+├── types/
+├── middleware.ts
+├── .ai/                   # Claude↔Codex 핸드오프 시스템
+│   ├── TASKS.md
+│   ├── handoffs/
+│   ├── reviews/
+│   └── release/
+├── CLAUDE.md
+├── AGENTS.md
+└── DEPLOYMENT.md
+```
 
 ---
 
-## Core Principles
-- **Simplicity First**: Make every change as simple as possible. Impact minimal code
-- **No Laziness**: Find root causes. No temporary fixes. Senior developer standards
+## 운영 원칙
+
+### Plan Node Default
+- 3단계 이상 또는 아키텍처 결정이 필요한 작업은 plan mode 진입
+- 막히면 즉시 STOP → 재계획
+
+### Subagent Strategy
+- 리서치·탐색·병렬 분석은 subagent에게 위임해 메인 컨텍스트 보존
+
+### Verification Before Done
+- 작업 완료 전 반드시 동작 증명 (`npm run build` 통과 등)
+
+### Core Principles
+- **Simplicity First**: 변경 범위 최소화
+- **No Laziness**: 근본 원인 해결, 임시방편 금지
