@@ -16,13 +16,13 @@ const notoSansKR = Noto_Sans_KR({
 });
 
 export const metadata: Metadata = {
-  title: "TCG Match Tracker",
+  title: "World Break",
   description: "개인 TCG 대전 기록 및 통계 웹앱",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "TCG Tracker",
+    title: "World Break",
   },
   icons: {
     icon: [{ url: "/icon.png", sizes: "512x512", type: "image/png" }],

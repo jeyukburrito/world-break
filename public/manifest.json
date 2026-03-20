@@ -1,6 +1,6 @@
 {
-  "name": "TCG Match Tracker",
-  "short_name": "TCG Tracker",
+  "name": "World Break",
+  "short_name": "World Break",
   "description": "개인 TCG 대전 기록 및 통계 웹앱",
   "start_url": "/",
   "display": "standalone",

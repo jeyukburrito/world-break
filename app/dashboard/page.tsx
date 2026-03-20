@@ -1,10 +1,12 @@
+import { Suspense } from "react";
+
 import { AppShell } from "@/components/app-shell";
 import { CategoryFilter } from "@/components/category-filter";
 import { DashboardCharts } from "@/components/dashboard-charts";
 import { HeaderActions } from "@/components/header-actions";
 import { PeriodFilter } from "@/components/period-filter";
 import { getUserDisplayInfo, requireUser } from "@/lib/auth";
-import { getDashboardData, getMatchupMatrix } from "@/lib/dashboard";
+import { getDashboardData, getTopMatchups } from "@/lib/dashboard";
 
 type DashboardPageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -20,14 +22,14 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const to = typeof params?.to === "string" ? params.to : undefined;
   const category = typeof params?.category === "string" ? params.category : "all";
 
-  const [{ myDeckSlices, opponentSlices, totalMatches }, matchupCells] = await Promise.all([
+  const [{ myDeckSlices, opponentSlices, totalMatches }, topMatchups] = await Promise.all([
     getDashboardData(user.id, {
       period,
       from,
       to,
       category,
     }),
-    getMatchupMatrix(user.id, {
+    getTopMatchups(user.id, {
       period,
       from,
       to,
@@ -46,18 +48,22 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           <p className="text-[10px] font-bold uppercase tracking-widest text-accent">Overview</p>
           <h2 className="text-2xl font-bold tracking-tight text-ink">대시보드</h2>
         </div>
-        <PeriodFilter activePeriod={period} defaultFrom={from} defaultTo={to} />
+        <Suspense fallback={null}>
+          <PeriodFilter activePeriod={period} defaultFrom={from} defaultTo={to} />
+        </Suspense>
       </section>
 
       {/* 카테고리 필터: 카드 없이 pill 행만 */}
       <div className="mb-5">
-        <CategoryFilter activeCategory={category} />
+        <Suspense fallback={null}>
+          <CategoryFilter activeCategory={category} />
+        </Suspense>
       </div>
 
       <DashboardCharts
         myDeckSlices={myDeckSlices}
         opponentSlices={opponentSlices}
-        matchupCells={matchupCells}
+        topMatchups={topMatchups}
         totalMatches={totalMatches}
       />
     </AppShell>

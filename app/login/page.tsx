@@ -23,7 +23,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     <main className="flex min-h-screen items-center justify-center bg-paper px-6">
       <section className="w-full max-w-sm text-center">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">
-          TCG Match Tracker
+          World Break
         </p>
         <h1 className="mt-3 text-2xl font-semibold text-ink">로그인</h1>
         <div className="mt-8 rounded-3xl border border-line bg-surface p-6 shadow-sm">

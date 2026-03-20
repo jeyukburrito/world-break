@@ -19,7 +19,7 @@ const COLORS = [
 type DashboardChartsProps = {
   myDeckSlices: DonutSlice[];
   opponentSlices: DonutSlice[];
-  matchupCells: MatchupCell[];
+  topMatchups: MatchupCell[];
   totalMatches: number;
 };
 
@@ -160,16 +160,11 @@ function DistributionCard({
 export function DashboardCharts({
   myDeckSlices,
   opponentSlices,
-  matchupCells,
+  topMatchups,
   totalMatches,
 }: DashboardChartsProps) {
   const totalWins = myDeckSlices.reduce((sum, slice) => sum + slice.wins, 0);
   const winRate = totalMatches === 0 ? 0 : Math.round((totalWins / totalMatches) * 100);
-
-  // 승률 높은 순, 동점이면 경기수 많은 순
-  const topMatchups = [...matchupCells]
-    .sort((a, b) => b.rate - a.rate || b.total - a.total || a.opponentDeck.localeCompare(b.opponentDeck))
-    .slice(0, 6);
 
   return (
     <section className="space-y-4">
@@ -212,12 +207,9 @@ export function DashboardCharts({
         <div className="flex items-center gap-2.5">
           <span className="h-4 w-1 rounded-full bg-accent" />
           <h3 className="text-base font-semibold tracking-tight text-ink">상성 매트릭스</h3>
-          <Link
-            href="/matchups"
-            className="ml-auto text-xs font-semibold text-accent hover:underline"
-          >
-            전체 보기
-          </Link>
+          <span className="ml-auto rounded-full bg-accent/10 px-2.5 py-0.5 text-xs font-semibold text-accent">
+            Top {topMatchups.length}
+          </span>
         </div>
 
         {topMatchups.length > 0 ? (

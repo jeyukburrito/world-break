@@ -12,10 +12,10 @@ export function TopAppBar({ title, right }: TopAppBarProps) {
         <div className="min-w-0">
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-lg text-indigo-700" aria-hidden="true">
-              style
+              bolt
             </span>
             <p className="text-[10px] font-black uppercase tracking-[0.32em] text-indigo-700">
-              TCG Match Tracker
+              World Break
             </p>
           </div>
           <div className="mt-1">
