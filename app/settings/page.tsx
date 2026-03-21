@@ -18,11 +18,6 @@ export default async function SettingsPage() {
       <div className="mx-auto flex max-w-md flex-col gap-6 pb-8">
         <section className="overflow-hidden rounded-3xl border border-line bg-surface shadow-sm">
           <SettingsLink
-            href="/settings/games"
-            label="게임 관리"
-            description="추적용 게임 카테고리를 정리합니다."
-          />
-          <SettingsLink
             href="/settings/decks"
             label="덱 관리"
             description="게임별로 사용하는 덱을 정리합니다."

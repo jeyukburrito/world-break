@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const createDeckSchema = z.object({
-  gameId: z.string().uuid(),
+  gameName: z.string().trim().min(1).max(60),
   name: z.string().trim().min(1).max(60),
   color: z
     .string()

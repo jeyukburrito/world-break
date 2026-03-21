@@ -14,35 +14,29 @@ function withMessage(type: "error" | "message", value: string) {
 export async function createDeck(formData: FormData) {
   const user = await requireUser();
   const parsed = createDeckSchema.safeParse({
-    gameId: formData.get("gameId"),
+    gameName: formData.get("gameName"),
     name: formData.get("name"),
     color: formData.get("color"),
     memo: formData.get("memo"),
   });
 
   if (!parsed.success) {
-    redirect(withMessage("error", "덱 이름 또는 입력값을 확인해 주세요."));
+    redirect(withMessage("error", "카드게임과 덱 이름을 확인해 주세요."));
   }
 
-  const game = await prisma.game.findFirst({
-    where: {
-      id: parsed.data.gameId,
-      userId: user.id,
-    },
-    select: {
-      id: true,
-    },
+  // 프리셋 또는 직접 입력한 게임명으로 게임 레코드를 자동 생성/조회
+  const game = await prisma.game.upsert({
+    where: { userId_name: { userId: user.id, name: parsed.data.gameName } },
+    update: {},
+    create: { userId: user.id, name: parsed.data.gameName },
+    select: { id: true },
   });
-
-  if (!game) {
-    redirect(withMessage("error", "카드게임 카테고리를 먼저 선택해 주세요."));
-  }
 
   try {
     await prisma.deck.create({
       data: {
         userId: user.id,
-        gameId: parsed.data.gameId,
+        gameId: game.id,
         name: parsed.data.name,
         color: parsed.data.color || null,
         memo: parsed.data.memo || null,
@@ -63,7 +57,6 @@ export async function createDeck(formData: FormData) {
     );
   }
 
-  revalidatePath("/settings/games");
   revalidatePath("/settings/decks");
   revalidatePath("/matches/new");
   revalidatePath("/matches");

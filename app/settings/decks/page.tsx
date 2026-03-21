@@ -1,5 +1,6 @@
 import { AppShell } from "@/components/app-shell";
 import { ColorPicker } from "@/components/color-picker";
+import { GameNameField } from "@/components/game-name-field";
 import { HeaderActions } from "@/components/header-actions";
 import { SubmitButton } from "@/components/submit-button";
 import { getUserDisplayInfo, requireUser } from "@/lib/auth";
@@ -16,29 +17,19 @@ export default async function DeckSettingsPage({ searchParams }: DeckSettingsPag
   const display = getUserDisplayInfo(user);
   const params = searchParams ? await searchParams : undefined;
   const errorMessage = typeof params?.error === "string" ? params.error : undefined;
-  const [games, decks] = await Promise.all([
-    prisma.game.findMany({
-      where: {
-        userId: user.id,
-      },
-      orderBy: {
-        name: "asc",
-      },
-    }),
-    prisma.deck.findMany({
-      where: {
-        userId: user.id,
-      },
-      orderBy: [{ isActive: "desc" }, { updatedAt: "desc" }],
-      include: {
-        game: {
-          select: {
-            name: true,
-          },
+  const decks = await prisma.deck.findMany({
+    where: {
+      userId: user.id,
+    },
+    orderBy: [{ isActive: "desc" }, { updatedAt: "desc" }],
+    include: {
+      game: {
+        select: {
+          name: true,
         },
       },
-    }),
-  ]);
+    },
+  });
 
   return (
     <AppShell title="내 덱 관리" headerRight={<HeaderActions avatarUrl={display.avatarUrl} name={display.name} />}>
@@ -51,22 +42,7 @@ export default async function DeckSettingsPage({ searchParams }: DeckSettingsPag
             </div>
           ) : null}
           <form action={createDeck} className="mt-5 grid gap-4">
-            <label className="grid gap-2 text-sm font-medium">
-              카드게임
-              <select
-                name="gameId"
-                required
-                defaultValue=""
-                className="rounded-2xl border border-line bg-surface px-4 py-3 text-ink"
-              >
-                <option value="">카드게임을 선택하세요</option>
-                {games.map((game) => (
-                  <option key={game.id} value={game.id}>
-                    {game.name}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <GameNameField />
             <label className="grid gap-2 text-sm font-medium">
               덱 이름
               <input
@@ -88,14 +64,7 @@ export default async function DeckSettingsPage({ searchParams }: DeckSettingsPag
                 className="rounded-2xl border border-line bg-surface px-4 py-3 text-ink"
               />
             </label>
-            <div>
-              {games.length === 0 ? (
-                <p className="mb-3 text-sm text-danger">
-                  먼저 카드게임 카테고리를 1개 이상 등록해야 덱을 만들 수 있습니다.
-                </p>
-              ) : null}
-              <SubmitButton label="덱 저장" disabled={games.length === 0} />
-            </div>
+            <SubmitButton label="덱 저장" />
           </form>
         </article>
 

@@ -3,11 +3,11 @@ import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 
 export type MatchFilters = {
-  opponent: string;
-  gameId: string;
-  deckId: string;
-  format: string;
-  event: string;
+  opponent?: string;
+  gameId?: string;
+  deckId?: string;
+  format?: string;
+  event?: string;
 };
 
 export const MATCHES_PAGE_SIZE = 30;

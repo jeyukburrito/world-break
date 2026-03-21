@@ -9,9 +9,7 @@ import { groupMatchesForDisplay, type DisplayItem } from "@/lib/group-matches";
 import {
   MATCHES_PAGE_SIZE,
   countMatchesForUser,
-  listMatchFilterOptions,
   listMatchesForUser,
-  parseMatchFilters,
 } from "@/lib/matches";
 
 import { deleteMatchResult } from "./actions";
@@ -20,65 +18,12 @@ type MatchesPageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
-type ChipProps = {
-  href: string;
-  label: string;
-  active?: boolean;
-};
-
 function formatNumber(value: number) {
   return new Intl.NumberFormat("ko-KR").format(value);
 }
 
-function chipClassName(active?: boolean) {
-  return active
-    ? "bg-accent text-white shadow-[0_10px_20px_-8px_rgba(79,70,229,0.45)]"
-    : "bg-paper text-muted hover:bg-line/60";
-}
-
-function FilterRail({ title, chips }: { title: string; chips: ChipProps[] }) {
-  return (
-    <section className="space-y-2">
-      <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted">{title}</p>
-      <div className="flex gap-2 overflow-x-auto pb-1">
-        {chips.map((chip) => (
-          <Link
-            key={`${title}:${chip.href}:${chip.label}`}
-            href={chip.href}
-            className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition-colors ${chipClassName(chip.active)}`}
-          >
-            {chip.label}
-          </Link>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function buildMatchHref(
-  current: {
-    gameId: string | null;
-    deckId: string | null;
-    format: string | null;
-    event: string | null;
-  },
-  next: Partial<{ gameId: string | null; deckId: string | null; format: string | null; event: string | null; page: number }>,
-) {
-  const params = new URLSearchParams();
-  const gameId = next.gameId ?? current.gameId;
-  const deckId = next.deckId ?? current.deckId;
-  const format = next.format ?? current.format;
-  const event = next.event ?? current.event;
-  const page = next.page ?? 1;
-
-  if (gameId) params.set("gameId", gameId);
-  if (deckId) params.set("deckId", deckId);
-  if (format) params.set("format", format);
-  if (event) params.set("event", event);
-  if (page > 1) params.set("page", String(page));
-
-  const query = params.toString();
-  return `/matches${query ? `?${query}` : ""}`;
+function pageHref(page: number) {
+  return page > 1 ? `/matches?page=${page}` : "/matches";
 }
 
 function MatchStatusPill({ isWin }: { isWin: boolean }) {
@@ -314,68 +259,18 @@ export default async function MatchesPage({ searchParams }: MatchesPageProps) {
   const user = await requireUser();
   const display = getUserDisplayInfo(user);
   const params = searchParams ? await searchParams : undefined;
-  const filters = parseMatchFilters(params);
-  const gameIdQuery = filters.gameId;
-  const deckIdQuery = filters.deckId;
-  const formatQuery = filters.format;
-  const eventQuery = filters.event;
   const pageQuery = typeof params?.page === "string" ? Number(params.page) : 1;
   const currentPage = Number.isFinite(pageQuery) && pageQuery > 0 ? Math.floor(pageQuery) : 1;
-  const isFiltered = Boolean(gameIdQuery || deckIdQuery || formatQuery || eventQuery);
 
-  const [filterOptions, totalCount, rows] = await Promise.all([
-    listMatchFilterOptions(user.id),
-    countMatchesForUser(user.id, filters),
-    listMatchesForUser(user.id, filters, currentPage),
+  const [totalCount, rows] = await Promise.all([
+    countMatchesForUser(user.id, {}),
+    listMatchesForUser(user.id, {}, currentPage),
   ]);
 
-  const { games, decks } = filterOptions;
   const totalPages = Math.max(1, Math.ceil(totalCount / MATCHES_PAGE_SIZE));
   const prevPage = currentPage > 1 ? currentPage - 1 : null;
   const nextPage = currentPage < totalPages ? currentPage + 1 : null;
   const displayItems = groupMatchesForDisplay(rows);
-
-  const buildHref = (next: Partial<{ gameId: string | null; deckId: string | null; format: string | null; event: string | null; page: number }>) =>
-    buildMatchHref(
-      {
-        gameId: gameIdQuery,
-        deckId: deckIdQuery,
-        format: formatQuery,
-        event: eventQuery,
-      },
-      next,
-    );
-
-  const gameChips: ChipProps[] = [
-    { href: buildHref({ gameId: null, page: 1 }), label: "전체 게임", active: !gameIdQuery },
-    ...games.map((game) => ({
-      href: buildHref({ gameId: game.id, page: 1 }),
-      label: game.name,
-      active: gameIdQuery === game.id,
-    })),
-  ];
-
-  const deckChips: ChipProps[] = [
-    { href: buildHref({ deckId: null, page: 1 }), label: "전체 덱", active: !deckIdQuery },
-    ...decks.map((deck) => ({
-      href: buildHref({ deckId: deck.id, page: 1 }),
-      label: `${deck.game.name} · ${deck.name}`,
-      active: deckIdQuery === deck.id,
-    })),
-  ];
-
-  const formatChips: ChipProps[] = [
-    { href: buildHref({ format: null, page: 1 }), label: "전체 형식", active: !formatQuery },
-    { href: buildHref({ format: "bo1", page: 1 }), label: "BO1", active: formatQuery === "bo1" },
-    { href: buildHref({ format: "bo3", page: 1 }), label: "BO3", active: formatQuery === "bo3" },
-  ];
-
-  const eventChips: ChipProps[] = [
-    { href: buildHref({ event: null, page: 1 }), label: "전체 이벤트", active: !eventQuery },
-    { href: buildHref({ event: "friendly", page: 1 }), label: "친선", active: eventQuery === "friendly" },
-    { href: buildHref({ event: "shop", page: 1 }), label: "매장대회", active: eventQuery === "shop" },
-    { href: buildHref({ event: "cs", page: 1 }), label: "CS", active: eventQuery === "cs" },
-  ];
 
   return (
     <AppShell
@@ -394,13 +289,6 @@ export default async function MatchesPage({ searchParams }: MatchesPageProps) {
         </Link>
       </div>
 
-      <section className="mb-5 space-y-4">
-        <FilterRail title="게임" chips={gameChips} />
-        <FilterRail title="덱" chips={deckChips} />
-        <FilterRail title="형식" chips={formatChips} />
-        <FilterRail title="이벤트" chips={eventChips} />
-      </section>
-
       <section className="space-y-4">
         <div className="flex items-center justify-between px-1 text-sm text-muted">
           <p>총 {formatNumber(totalCount)}경기</p>
@@ -410,29 +298,16 @@ export default async function MatchesPage({ searchParams }: MatchesPageProps) {
         </div>
 
         {displayItems.length === 0 ? (
-          isFiltered ? (
-            <article className="rounded-[32px] bg-surface-container-low p-8 text-center shadow-sm">
-              <p className="text-lg font-semibold text-ink">조건에 맞는 기록이 없습니다.</p>
-              <p className="mt-2 text-sm text-muted">필터를 완화하거나 초기화해서 다시 확인해보세요.</p>
-              <Link
-                href="/matches"
-                className="mt-4 inline-flex rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white"
-              >
-                필터 초기화
-              </Link>
-            </article>
-          ) : (
-            <article className="rounded-[32px] bg-surface-container-low p-8 text-center shadow-sm">
-              <p className="text-lg font-semibold text-ink">아직 등록된 기록이 없습니다.</p>
-              <p className="mt-2 text-sm text-muted">첫 경기 결과를 입력하면 목록이 여기에 쌓입니다.</p>
-              <Link
-                href="/matches/new"
-                className="mt-4 inline-flex rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white"
-              >
-                첫 기록 입력
-              </Link>
-            </article>
-          )
+          <article className="rounded-[32px] bg-surface-container-low p-8 text-center shadow-sm">
+            <p className="text-lg font-semibold text-ink">아직 등록된 기록이 없습니다.</p>
+            <p className="mt-2 text-sm text-muted">첫 경기 결과를 입력하면 목록이 여기에 쌓입니다.</p>
+            <Link
+              href="/matches/new"
+              className="mt-4 inline-flex rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white"
+            >
+              첫 기록 입력
+            </Link>
+          </article>
         ) : null}
 
         {displayItems.map((item) =>
@@ -457,7 +332,7 @@ export default async function MatchesPage({ searchParams }: MatchesPageProps) {
             <div className="flex gap-2">
               {prevPage ? (
                 <Link
-                  href={buildHref({ page: prevPage })}
+                  href={pageHref(prevPage)}
                   className="rounded-full bg-paper px-4 py-2 text-sm font-semibold text-ink"
                 >
                   이전
@@ -469,7 +344,7 @@ export default async function MatchesPage({ searchParams }: MatchesPageProps) {
               )}
               {nextPage ? (
                 <Link
-                  href={buildHref({ page: nextPage })}
+                  href={pageHref(nextPage)}
                   className="rounded-full bg-paper px-4 py-2 text-sm font-semibold text-ink"
                 >
                   다음

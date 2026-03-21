@@ -224,7 +224,7 @@ export default async function NewMatchPage({ searchParams }: NewMatchPageProps) 
             </p>
           ) : null}
 
-          <div className="fixed inset-x-0 bottom-24 z-40 bg-surface/90 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur-lg">
+          <div className="fixed inset-x-0 bottom-20 z-40 bg-surface/90 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur-lg">
             <div className="mx-auto max-w-md">
               <SubmitButton label={submitLabel} disabled={submitDisabled} />
             </div>
