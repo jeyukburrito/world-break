@@ -19,17 +19,18 @@ export function GameNameField({ defaultValue }: { defaultValue?: string }) {
 
   return (
     <div className="grid gap-3">
-      <p className="text-sm font-medium">카드게임</p>
-      <div className="flex flex-wrap gap-2">
+      <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-muted">카드게임</p>
+      {/* 가로 스크롤 — -mx-4 px-4로 컨테이너 가장자리까지 확장 */}
+      <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 no-scrollbar">
         {PRESET_GAMES.map((game) => (
           <button
             key={game}
             type="button"
             onClick={() => setSelected(game)}
-            className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
+            className={`shrink-0 rounded px-3 py-2 text-sm font-semibold transition-colors ${
               selected === game
-                ? "bg-accent text-white"
-                : "bg-paper text-muted hover:bg-line/60"
+                ? "bg-primary-container text-on-primary"
+                : "bg-surface-container-high text-on-surface-variant"
             }`}
           >
             {game}
@@ -38,10 +39,10 @@ export function GameNameField({ defaultValue }: { defaultValue?: string }) {
         <button
           type="button"
           onClick={() => setSelected(CUSTOM_VALUE)}
-          className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
+          className={`shrink-0 rounded px-3 py-2 text-sm font-semibold transition-colors ${
             selected === CUSTOM_VALUE
-              ? "bg-accent text-white"
-              : "bg-paper text-muted hover:bg-line/60"
+              ? "bg-primary-container text-on-primary"
+              : "bg-surface-container-high text-on-surface-variant"
           }`}
         >
           직접 입력
