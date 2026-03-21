@@ -97,6 +97,7 @@ export async function listMatchesForUser(userId: string, filters: MatchFilters, 
       tournamentSession: {
         select: {
           id: true,
+          name: true,
           endedAt: true,
         },
       },

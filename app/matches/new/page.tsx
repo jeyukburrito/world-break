@@ -29,10 +29,10 @@ export default async function NewMatchPage({ searchParams }: NewMatchPageProps) 
   const continueTournamentId =
     typeof params?.tournamentId === "string" ? params.tournamentId : undefined;
   const phase = params?.phase === "elimination" ? "elimination" : "swiss";
-  const isContinue = continueEvent === "shop" || continueEvent === "cs";
+  const isContinue = continueEvent === "shop";
   const isElimination = phase === "elimination";
 
-  const eventLabel = continueEvent === "cs" ? "CS" : "매장대회";
+  const eventLabel = "대회";
   const phaseLabel = isElimination ? "본선" : "예선";
   const today = continueDate ?? new Date().toISOString().slice(0, 10);
 

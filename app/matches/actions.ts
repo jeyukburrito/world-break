@@ -91,6 +91,7 @@ function parseMatchForm(formData: FormData) {
     didChoosePlayOrder: formData.get("didChoosePlayOrder"),
     matchFormat: formData.get("matchFormat"),
     result: formData.get("result"),
+    tournamentDetail: formData.get("tournamentDetail") || undefined,
     memo: formData.get("memo"),
     tagIds,
   });
@@ -102,8 +103,9 @@ async function resolveTournamentSession(params: {
   playedAt: string;
   eventCategory: "shop" | "cs";
   tournamentSessionId?: string;
+  name?: string;
 }) {
-  const { userId, myDeckId, playedAt, eventCategory, tournamentSessionId } = params;
+  const { userId, myDeckId, playedAt, eventCategory, tournamentSessionId, name } = params;
   const { start } = dateRangeForDay(playedAt);
 
   if (tournamentSessionId) {
@@ -139,6 +141,7 @@ async function resolveTournamentSession(params: {
       userId,
       myDeckId,
       eventCategory,
+      name: name || null,
       playedOn: start,
     },
     select: {
@@ -152,7 +155,7 @@ async function resolveTournamentSession(params: {
 async function buildNextTournamentRedirect(params: {
   sessionId: string;
   userId: string;
-  eventCategory: "shop" | "cs";
+  eventCategory: "shop";
   playedAt: string;
   gameName: string;
   deckName: string;
@@ -208,6 +211,7 @@ export async function createMatchResult(formData: FormData) {
       playedAt: parsed.data.playedAt,
       eventCategory: parsed.data.eventCategory,
       tournamentSessionId: parsed.data.tournamentSessionId,
+      name: parsed.data.tournamentDetail || undefined,
     });
 
     if (!resolved.ok) {
@@ -251,15 +255,12 @@ export async function createMatchResult(formData: FormData) {
   revalidatePath("/matches/new");
   revalidatePath("/settings/tags");
 
-  if (
-    tournamentSessionId &&
-    (parsed.data.eventCategory === "shop" || parsed.data.eventCategory === "cs")
-  ) {
+  if (tournamentSessionId && parsed.data.eventCategory === "shop") {
     redirect(
       await buildNextTournamentRedirect({
         sessionId: tournamentSessionId,
         userId: user.id,
-        eventCategory: parsed.data.eventCategory,
+        eventCategory: "shop",
         playedAt: parsed.data.playedAt,
         gameName: parsed.data.gameName,
         deckName: parsed.data.myDeckName,

@@ -19,6 +19,7 @@ type MatchRow = {
   }>;
   tournamentSession: {
     id: string;
+    name: string | null;
     endedAt: Date | null;
   } | null;
   myDeckId: string;
@@ -34,6 +35,7 @@ export type TournamentGroup = {
   key: string;
   date: Date;
   eventCategory: string;
+  name: string | null;
   deckName: string;
   gameName: string;
   firstDeckId: string;
@@ -68,6 +70,7 @@ export function groupMatchesForDisplay(matches: MatchRow[]): DisplayItem[] {
         key,
         date: match.playedAt,
         eventCategory: match.eventCategory,
+        name: match.tournamentSession?.name ?? null,
         deckName: match.myDeck.name,
         gameName: match.myDeck.game.name,
         firstDeckId: match.myDeck.id,

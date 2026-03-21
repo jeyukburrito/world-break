@@ -51,11 +51,7 @@ function SingleMatchCard({
         <div className="min-w-0 space-y-3">
           <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-full bg-accent/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.24em] text-accent">
-              {match.eventCategory === "friendly"
-                ? "친선"
-                : match.eventCategory === "shop"
-                  ? "매장대회"
-                  : "CS"}
+              {match.eventCategory === "friendly" ? "친선" : "대회"}
             </span>
             <span className="rounded-full bg-paper px-3 py-1 text-xs font-semibold text-muted">
               {formatRelativeDate(match.playedAt)}
@@ -144,7 +140,7 @@ function TournamentMatchCard({
         <div className="space-y-3">
           <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-full bg-accent/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.24em] text-accent">
-              {group.eventCategory === "shop" ? "매장대회" : "CS"}
+              대회
             </span>
             <span className="rounded-full bg-paper px-3 py-1 text-xs font-semibold text-muted">
               {formatRelativeDate(group.date)}
@@ -160,8 +156,12 @@ function TournamentMatchCard({
             )}
           </div>
           <div>
-            <h2 className="text-lg font-semibold tracking-tight text-ink">{group.deckName}</h2>
-            <p className="mt-1 text-sm text-muted">{group.gameName}</p>
+            <h2 className="text-lg font-semibold tracking-tight text-ink">
+              {group.name ? group.name : group.deckName}
+            </h2>
+            <p className="mt-1 text-sm text-muted">
+              {group.name ? `${group.gameName} · ${group.deckName}` : group.gameName}
+            </p>
           </div>
         </div>
         <div className="text-right">

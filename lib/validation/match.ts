@@ -15,6 +15,7 @@ export const matchResultSchema = z
       .transform((value) => value === "true"),
     matchFormat: z.enum(["bo1", "bo3"]),
     result: z.enum(["win", "lose"]),
+    tournamentDetail: z.string().max(200).optional().or(z.literal("")),
     memo: z.string().max(1000).optional().or(z.literal("")),
     tagIds: z.array(z.string().uuid()).max(10).default([]),
   });
