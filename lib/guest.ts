@@ -27,14 +27,9 @@ export function getGuestCookieOptions() {
   };
 }
 
-async function getPrismaClient() {
-  const { prisma } = await import("@/lib/prisma");
-  return prisma;
-}
+import { prisma } from "@/lib/prisma";
 
 export async function findGuestUserByToken(token: string) {
-  const prisma = await getPrismaClient();
-
   return prisma.user.findUnique({
     where: {
       guestToken: token,
@@ -50,7 +45,6 @@ export async function findGuestUserByToken(token: string) {
 }
 
 export async function ensureGuestUserByToken(token: string): Promise<GuestUserRow> {
-  const prisma = await getPrismaClient();
   const existing = await findGuestUserByToken(token);
 
   if (existing) {
