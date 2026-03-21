@@ -1,15 +1,19 @@
 "use server";
 
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { getSafeRedirectPath, isSupabaseConfigured } from "@/lib/env";
+import { GUEST_COOKIE, createGuestToken, getGuestCookieOptions } from "@/lib/guest";
 import { createClient } from "@/lib/supabase/server";
 
 export async function signInWithGoogle(formData: FormData) {
   if (!isSupabaseConfigured) {
     redirect("/login?error=config_missing");
   }
+
+  const cookieStore = await cookies();
+  cookieStore.delete(GUEST_COOKIE);
 
   const supabase = await createClient();
   const headerStore = await headers();
@@ -37,12 +41,22 @@ export async function signInWithGoogle(formData: FormData) {
   redirect(data.url);
 }
 
+export async function startAsGuest() {
+  const cookieStore = await cookies();
+
+  cookieStore.set(GUEST_COOKIE, createGuestToken(), getGuestCookieOptions());
+
+  redirect("/matches/new");
+}
+
 export async function signOut() {
-  if (!isSupabaseConfigured) {
-    redirect("/login");
+  const cookieStore = await cookies();
+  cookieStore.delete(GUEST_COOKIE);
+
+  if (isSupabaseConfigured) {
+    const supabase = await createClient();
+    await supabase.auth.signOut();
   }
 
-  const supabase = await createClient();
-  await supabase.auth.signOut();
   redirect("/login");
 }

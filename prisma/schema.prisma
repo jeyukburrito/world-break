@@ -12,6 +12,8 @@ model User {
   id         String        @id @db.Uuid
   email      String        @unique
   name       String?
+  isGuest    Boolean       @default(false)
+  guestToken String?       @unique
   createdAt  DateTime      @default(now())
   updatedAt  DateTime      @updatedAt
   games      Game[]
