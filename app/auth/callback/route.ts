@@ -4,6 +4,9 @@ import { ensureUserProfile } from "@/lib/auth";
 import { getSafeRedirectPath, isSupabaseConfigured } from "@/lib/env";
 import { createClient } from "@/lib/supabase/server";
 
+// Inline to avoid bundling @/lib/guest (Prisma-heavy) into this route handler
+const GUEST_COOKIE = "wb_guest_token";
+
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
@@ -27,7 +30,10 @@ export async function GET(request: NextRequest) {
           await ensureUserProfile(user);
         }
 
-        return NextResponse.redirect(new URL(next, request.url));
+        // Clear guest session only after successful Google login
+        const response = NextResponse.redirect(new URL(next, request.url));
+        response.cookies.delete(GUEST_COOKIE);
+        return response;
       }
     } catch {
       return NextResponse.redirect(new URL("/login?error=oauth_callback_failed", request.url));
