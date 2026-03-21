@@ -35,8 +35,8 @@ export function PeriodFilter({ activePeriod, defaultFrom, defaultTo }: PeriodFil
   );
 
   return (
-    <div className="flex flex-col items-end gap-2">
-      {/* 프리셋 pill 토글 — 헤더에 인라인 배치 */}
+    <div className="flex flex-col items-start gap-2">
+      {/* 프리셋 pill 토글 */}
       <div className="flex items-center gap-1 rounded-full bg-paper p-1">
         {presets.map((p) => (
           <button
