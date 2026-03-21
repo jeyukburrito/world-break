@@ -11,57 +11,29 @@ import { createClient } from "@/lib/supabase/server";
 
 /**
  * Supabase 인증 유저를 Prisma users 테이블에 동기화한다.
- *
- * - createMany + skipDuplicates 대신 upsert를 사용:
- *   Transaction Pooler(pgbouncer) 환경에서 불필요한 INSERT 시도를 줄인다.
- * - email/name이 OAuth 재인증 등으로 바뀔 수 있으므로 update도 수행한다.
+ * email/name은 Supabase auth.users에만 저장 — public.users에는 id만 보관.
  */
 export async function ensureUserProfile(user: SupabaseUser) {
-  const name =
-    (user.user_metadata?.name as string | undefined) ??
-    (user.user_metadata?.full_name as string | undefined) ??
-    null;
-
   await prisma.user.upsert({
     where: { id: user.id },
-    create: {
-      id: user.id,
-      email: user.email ?? "",
-      name,
-    },
-    update: {
-      email: user.email ?? "",
-      name,
-    },
+    create: { id: user.id },
+    update: {},
   });
 }
 
 export async function ensureUserProfileExists(user: SupabaseUser) {
   const existingUser = await prisma.user.findUnique({
-    where: {
-      id: user.id,
-    },
-    select: {
-      id: true,
-    },
+    where: { id: user.id },
+    select: { id: true },
   });
 
   if (existingUser) {
     return;
   }
 
-  const name =
-    (user.user_metadata?.name as string | undefined) ??
-    (user.user_metadata?.full_name as string | undefined) ??
-    null;
-
   try {
     await prisma.user.create({
-      data: {
-        id: user.id,
-        email: user.email ?? "",
-        name,
-      },
+      data: { id: user.id },
     });
   } catch (error) {
     const isUniqueViolation =
@@ -105,16 +77,16 @@ function mapSupabaseUser(user: SupabaseUser): CurrentUser {
   };
 }
 
-function mapGuestUser(user: Awaited<ReturnType<typeof ensureGuestUserByToken>>): CurrentUser {
+function mapGuestUser(user: { id: string }): CurrentUser {
   return {
     id: user.id,
-    email: user.email,
-    name: user.name ?? "게스트",
+    email: null,
+    name: "게스트",
     avatarUrl: null,
     isGuest: true,
     user_metadata: {
-      name: user.name ?? "게스트",
-      full_name: user.name ?? "게스트",
+      name: "게스트",
+      full_name: "게스트",
       avatar_url: null,
     },
   };

@@ -135,9 +135,8 @@ export default async function ProfilePage() {
 
   const [profile, stats] = await Promise.all([
     prisma.user.findUnique({
-      where: {
-        id: authUser.id,
-      },
+      where: { id: authUser.id },
+      select: { createdAt: true },
     }),
     getProfileStats(authUser.id),
   ]);
@@ -167,9 +166,9 @@ export default async function ProfilePage() {
             <div className="min-w-0 flex-1">
               <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-accent">Profile</p>
               <h2 className="mt-1 truncate text-xl font-bold tracking-tight">
-                {profile?.name ?? display.name ?? "미설정"}
+                {display.name ?? "미설정"}
               </h2>
-              <p className="mt-1 truncate text-sm text-muted">{profile?.email ?? authUser.email ?? "-"}</p>
+              <p className="mt-1 truncate text-sm text-muted">{display.email ?? "-"}</p>
             </div>
           </div>
         </article>
