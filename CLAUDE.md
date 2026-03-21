@@ -140,7 +140,8 @@ npm run prisma:seed     # 개발용 시드 데이터 삽입
 
 **인증 흐름**
 - Supabase Auth (Google OAuth) → `middleware.ts`가 모든 요청에서 세션 갱신
-- `requireUser()` (`lib/auth.ts`) — `react.cache()` 래핑으로 렌더 트리 내 1회만 실행. 미인증 시 `/login` redirect. Supabase user를 Prisma `users` 테이블에 upsert 동기화.
+- `requireUser()` (`lib/auth.ts`) — `react.cache()` 래핑으로 렌더 트리 내 1회만 실행. Supabase 세션 우선 → 게스트 쿠키(`wb_guest_token`) fallback → 미인증 시 `/login` redirect. Supabase user는 Prisma `users` 테이블에 upsert 동기화.
+- **게스트 모드** (`lib/guest.ts`): Supabase 환경 변수 없이 쿠키 기반으로 동작. 게스트 세션은 `/matches/export`, `/matches/tournaments/end` 접근 불가 (미들웨어 차단). Google OAuth 성공 후에만 게스트 쿠키 삭제.
 - 모든 페이지 컴포넌트는 서버 컴포넌트로 작성, 상단에서 `await requireUser()` 호출.
 
 **Server Actions 패턴**
