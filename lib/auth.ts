@@ -141,14 +141,19 @@ export const requireUser = cache(async function requireUser(): Promise<CurrentUs
   const guestToken = cookieStore.get(GUEST_COOKIE)?.value ?? null;
 
   if (isSupabaseConfigured) {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    try {
+      const supabase = await createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
-    if (user) {
-      await ensureUserProfileExists(user);
-      return mapSupabaseUser(user);
+      if (user) {
+        await ensureUserProfileExists(user);
+        return mapSupabaseUser(user);
+      }
+    } catch (e) {
+      // Supabase auth 오류 (네트워크 실패, 프로젝트 일시정지 등) — 게스트/리다이렉트로 폴백
+      console.error("[requireUser] Supabase auth error:", e);
     }
   }
 
