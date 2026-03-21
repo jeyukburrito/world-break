@@ -4,8 +4,7 @@ import { ReactNode } from "react";
 import { BottomNav } from "@/components/bottom-nav";
 import { GuestBanner } from "@/components/guest-banner";
 import { TopAppBar } from "@/components/top-app-bar";
-
-const GUEST_COOKIE = "wb_guest_token";
+import { GUEST_COOKIE } from "@/lib/guest";
 
 type AppShellProps = {
   title: string;
