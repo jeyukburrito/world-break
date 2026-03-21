@@ -28,7 +28,7 @@ export default async function EditMatchPage({ params, searchParams }: EditMatchP
   const query = searchParams ? await searchParams : undefined;
   const errorMessage = typeof query?.error === "string" ? query.error : undefined;
 
-  const [match, decks, tags] = await Promise.all([
+  const [match, tags] = await Promise.all([
     prisma.matchResult.findFirst({
       where: {
         id,
@@ -37,7 +37,12 @@ export default async function EditMatchPage({ params, searchParams }: EditMatchP
       include: {
         myDeck: {
           select: {
-            gameId: true,
+            name: true,
+            game: {
+              select: {
+                name: true,
+              },
+            },
           },
         },
         tags: {
@@ -47,33 +52,10 @@ export default async function EditMatchPage({ params, searchParams }: EditMatchP
         },
       },
     }),
-    prisma.deck.findMany({
-      where: {
-        userId: user.id,
-        isActive: true,
-      },
-      orderBy: {
-        name: "asc",
-      },
-      include: {
-        game: {
-          select: {
-            name: true,
-          },
-        },
-      },
-    }),
     prisma.tag.findMany({
-      where: {
-        userId: user.id,
-      },
-      orderBy: {
-        name: "asc",
-      },
-      select: {
-        id: true,
-        name: true,
-      },
+      where: { userId: user.id },
+      orderBy: { name: "asc" },
+      select: { id: true, name: true },
     }),
   ]);
 
@@ -117,14 +99,8 @@ export default async function EditMatchPage({ params, searchParams }: EditMatchP
           />
         </label>
         <GameDeckFields
-          decks={decks.map((deck) => ({
-            id: deck.id,
-            name: deck.name,
-            gameId: deck.gameId,
-            gameName: deck.game.name,
-          }))}
-          defaultGameId={match.myDeck.gameId}
-          defaultDeckId={match.myDeckId}
+          defaultGameName={match.myDeck.game.name}
+          defaultDeckName={match.myDeck.name}
         />
         <label className="grid gap-2 text-sm font-medium">
           상대 덱

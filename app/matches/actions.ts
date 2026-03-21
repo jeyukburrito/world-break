@@ -28,18 +28,22 @@ function dateRangeForDay(value: string) {
   return { start, end };
 }
 
-async function ensureOwnedActiveDeck(userId: string, deckId: string) {
-  return prisma.deck.findFirst({
-    where: {
-      id: deckId,
-      userId,
-      isActive: true,
-    },
-    select: {
-      id: true,
-      gameId: true,
-    },
+async function resolveGameAndDeck(userId: string, gameName: string, deckName: string) {
+  const game = await prisma.game.upsert({
+    where: { userId_name: { userId, name: gameName } },
+    update: {},
+    create: { userId, name: gameName },
+    select: { id: true },
   });
+
+  const deck = await prisma.deck.upsert({
+    where: { userId_gameId_name: { userId, gameId: game.id, name: deckName } },
+    update: {},
+    create: { userId, gameId: game.id, name: deckName },
+    select: { id: true },
+  });
+
+  return { gameId: game.id, deckId: deck.id };
 }
 
 async function ensureOwnedTags(userId: string, tagIds: string[]) {
@@ -77,8 +81,8 @@ function parseMatchForm(formData: FormData) {
 
   return matchResultSchema.safeParse({
     playedAt: formData.get("playedAt"),
-    gameId: formData.get("gameId"),
-    myDeckId: formData.get("myDeckId"),
+    gameName: formData.get("gameName"),
+    myDeckName: formData.get("myDeckName"),
     tournamentSessionId: formData.get("tournamentSessionId") || undefined,
     opponentDeckName: formData.get("opponentDeckName"),
     eventCategory: formData.get("eventCategory"),
@@ -150,11 +154,11 @@ async function buildNextTournamentRedirect(params: {
   userId: string;
   eventCategory: "shop" | "cs";
   playedAt: string;
-  gameId: string;
-  myDeckId: string;
+  gameName: string;
+  deckName: string;
   tournamentPhase: "swiss" | "elimination";
 }) {
-  const { sessionId, userId, eventCategory, playedAt, gameId, myDeckId, tournamentPhase } = params;
+  const { sessionId, userId, eventCategory, playedAt, gameName, deckName, tournamentPhase } = params;
   const phaseCount = await prisma.matchResult.count({
     where: {
       userId,
@@ -167,8 +171,8 @@ async function buildNextTournamentRedirect(params: {
     message: "record_created",
     event: eventCategory,
     date: playedAt,
-    gameId,
-    deckId: myDeckId,
+    gameName,
+    deckName,
     round: String(phaseCount + 1),
     phase: tournamentPhase,
     tournamentId: sessionId,
@@ -185,18 +189,10 @@ export async function createMatchResult(formData: FormData) {
     redirect(newMatchRedirect("error", "입력값을 확인해 주세요."));
   }
 
-  const [ownedDeck, ownedTags] = await Promise.all([
-    ensureOwnedActiveDeck(user.id, parsed.data.myDeckId),
+  const [{ deckId }, ownedTags] = await Promise.all([
+    resolveGameAndDeck(user.id, parsed.data.gameName, parsed.data.myDeckName),
     ensureOwnedTags(user.id, parsed.data.tagIds),
   ]);
-
-  if (!ownedDeck) {
-    redirect(newMatchRedirect("error", "선택한 덱을 찾을 수 없거나 비활성 상태입니다."));
-  }
-
-  if (ownedDeck.gameId !== parsed.data.gameId) {
-    redirect(newMatchRedirect("error", "선택한 게임과 덱이 일치하지 않습니다."));
-  }
 
   if (ownedTags.length !== parsed.data.tagIds.length) {
     redirect(newMatchRedirect("error", "선택한 태그를 사용할 수 없습니다."));
@@ -208,7 +204,7 @@ export async function createMatchResult(formData: FormData) {
   if (parsed.data.eventCategory === "shop" || parsed.data.eventCategory === "cs") {
     const resolved = await resolveTournamentSession({
       userId: user.id,
-      myDeckId: parsed.data.myDeckId,
+      myDeckId: deckId,
       playedAt: parsed.data.playedAt,
       eventCategory: parsed.data.eventCategory,
       tournamentSessionId: parsed.data.tournamentSessionId,
@@ -224,7 +220,7 @@ export async function createMatchResult(formData: FormData) {
   await prisma.matchResult.create({
     data: {
       userId: user.id,
-      myDeckId: parsed.data.myDeckId,
+      myDeckId: deckId,
       tournamentSessionId,
       playedAt: new Date(parsed.data.playedAt),
       opponentDeckName: parsed.data.opponentDeckName,
@@ -265,8 +261,8 @@ export async function createMatchResult(formData: FormData) {
         userId: user.id,
         eventCategory: parsed.data.eventCategory,
         playedAt: parsed.data.playedAt,
-        gameId: parsed.data.gameId,
-        myDeckId: parsed.data.myDeckId,
+        gameName: parsed.data.gameName,
+        deckName: parsed.data.myDeckName,
         tournamentPhase: parsed.data.tournamentPhase ?? "swiss",
       }),
     );
@@ -288,8 +284,8 @@ export async function updateMatchResult(formData: FormData) {
     redirect(editRedirect(matchId, "error", "입력값을 확인해 주세요."));
   }
 
-  const [ownedDeck, existingMatch, ownedTags] = await Promise.all([
-    ensureOwnedActiveDeck(user.id, parsed.data.myDeckId),
+  const [{ deckId }, existingMatch, ownedTags] = await Promise.all([
+    resolveGameAndDeck(user.id, parsed.data.gameName, parsed.data.myDeckName),
     prisma.matchResult.findFirst({
       where: {
         id: matchId,
@@ -307,14 +303,6 @@ export async function updateMatchResult(formData: FormData) {
     redirect(matchesRedirect("error", "수정할 대전 기록을 찾을 수 없습니다."));
   }
 
-  if (!ownedDeck) {
-    redirect(editRedirect(matchId, "error", "선택한 덱을 찾을 수 없거나 비활성 상태입니다."));
-  }
-
-  if (ownedDeck.gameId !== parsed.data.gameId) {
-    redirect(editRedirect(matchId, "error", "선택한 게임과 덱이 일치하지 않습니다."));
-  }
-
   if (ownedTags.length !== parsed.data.tagIds.length) {
     redirect(editRedirect(matchId, "error", "선택한 태그를 사용할 수 없습니다."));
   }
@@ -325,7 +313,7 @@ export async function updateMatchResult(formData: FormData) {
   if (parsed.data.eventCategory === "shop" || parsed.data.eventCategory === "cs") {
     const resolved = await resolveTournamentSession({
       userId: user.id,
-      myDeckId: parsed.data.myDeckId,
+      myDeckId: deckId,
       playedAt: parsed.data.playedAt,
       eventCategory: parsed.data.eventCategory,
       tournamentSessionId:
@@ -348,7 +336,7 @@ export async function updateMatchResult(formData: FormData) {
         userId: user.id,
       },
       data: {
-        myDeckId: parsed.data.myDeckId,
+        myDeckId: deckId,
         tournamentSessionId,
         playedAt: new Date(parsed.data.playedAt),
         opponentDeckName: parsed.data.opponentDeckName,

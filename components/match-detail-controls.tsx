@@ -13,8 +13,8 @@ const PLAY_ORDER_OPTIONS = [
 ] as const;
 
 const DECISION_OPTIONS = [
-  { value: "true", label: "직접 결정" },
-  { value: "false", label: "랜덤/상대 결정" },
+  { value: "true", label: "자신" },
+  { value: "false", label: "상대" },
 ] as const;
 
 function SegmentedControl({

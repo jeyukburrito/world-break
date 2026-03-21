@@ -18,11 +18,11 @@ export function MatchResultInput({
 
   return (
     <section className="space-y-6">
-      {/* 매치 형식 — pill-shaped 세그먼트 컨트롤 */}
+      {/* 매치 형식 */}
       <div className="grid gap-2">
         <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-muted">매치 형식</p>
+        <input type="hidden" name="matchFormat" value={format} />
         <div className="grid grid-cols-2 gap-1.5 rounded-full bg-surface-container-low p-1.5">
-          <input type="hidden" name="matchFormat" value={format} />
           <button
             type="button"
             onClick={() => setFormat("bo1")}
@@ -44,40 +44,30 @@ export function MatchResultInput({
         </div>
       </div>
 
-      {/* 매치 결과 — 큰 버튼, 아이콘 포함 */}
+      {/* 매치 결과 */}
       <div className="grid gap-2">
         <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-muted">매치 결과</p>
-        <div className="grid grid-cols-2 gap-3">
+        <input type="hidden" name="result" value={result} />
+        <div className="grid grid-cols-2 gap-1.5 rounded-full bg-surface-container-low p-1.5">
           <button
             type="button"
             onClick={() => setResult("win")}
-            className={`flex h-24 flex-col items-center justify-center gap-1 rounded-2xl border-2 text-base font-bold transition-all ${
-              result === "win"
-                ? "border-transparent bg-gradient-to-br from-primary to-primary-container text-on-primary shadow-md"
-                : "border-outline-variant/15 bg-surface-container-lowest text-outline"
+            className={`rounded-full px-4 py-3 text-sm font-bold transition-all ${
+              result === "win" ? "bg-surface text-accent shadow-sm" : "text-muted"
             }`}
           >
-            <span className="material-symbols-outlined text-2xl" aria-hidden="true">
-              emoji_events
-            </span>
             승리
           </button>
           <button
             type="button"
             onClick={() => setResult("lose")}
-            className={`flex h-24 flex-col items-center justify-center gap-1 rounded-2xl border-2 text-base font-bold transition-all ${
-              result === "lose"
-                ? "border-danger bg-danger/10 text-danger shadow-sm"
-                : "border-outline-variant/15 bg-surface-container-lowest text-outline"
+            className={`rounded-full px-4 py-3 text-sm font-bold transition-all ${
+              result === "lose" ? "bg-surface text-danger shadow-sm" : "text-muted"
             }`}
           >
-            <span className="material-symbols-outlined text-2xl" aria-hidden="true">
-              sentiment_dissatisfied
-            </span>
             패배
           </button>
         </div>
-        <input type="hidden" name="result" value={result} />
       </div>
     </section>
   );

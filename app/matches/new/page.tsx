@@ -24,8 +24,8 @@ export default async function NewMatchPage({ searchParams }: NewMatchPageProps) 
 
   const continueEvent = typeof params?.event === "string" ? params.event : undefined;
   const continueDate = typeof params?.date === "string" ? params.date : undefined;
-  const continueDeck = typeof params?.deckId === "string" ? params.deckId : undefined;
-  const continueGame = typeof params?.gameId === "string" ? params.gameId : undefined;
+  const continueGameName = typeof params?.gameName === "string" ? params.gameName : undefined;
+  const continueDeckName = typeof params?.deckName === "string" ? params.deckName : undefined;
   const continueTournamentId =
     typeof params?.tournamentId === "string" ? params.tournamentId : undefined;
   const phase = params?.phase === "elimination" ? "elimination" : "swiss";
@@ -36,34 +36,11 @@ export default async function NewMatchPage({ searchParams }: NewMatchPageProps) 
   const phaseLabel = isElimination ? "본선" : "예선";
   const today = continueDate ?? new Date().toISOString().slice(0, 10);
 
-  const [decks, tags, continuedTournament, phaseCount] = await Promise.all([
-    prisma.deck.findMany({
-      where: {
-        userId: user.id,
-        isActive: true,
-      },
-      orderBy: {
-        name: "asc",
-      },
-      include: {
-        game: {
-          select: {
-            name: true,
-          },
-        },
-      },
-    }),
+  const [tags, continuedTournament, phaseCount] = await Promise.all([
     prisma.tag.findMany({
-      where: {
-        userId: user.id,
-      },
-      orderBy: {
-        name: "asc",
-      },
-      select: {
-        id: true,
-        name: true,
-      },
+      where: { userId: user.id },
+      orderBy: { name: "asc" },
+      select: { id: true, name: true },
     }),
     continueTournamentId
       ? prisma.tournamentSession.findFirst({
@@ -99,14 +76,13 @@ export default async function NewMatchPage({ searchParams }: NewMatchPageProps) 
       ? `/matches/new?${new URLSearchParams({
           event: continueEvent!,
           date: continueDate ?? today,
-          gameId: continueGame ?? "",
-          deckId: continueDeck ?? "",
+          gameName: continueGameName ?? "",
+          deckName: continueDeckName ?? "",
           phase: "elimination",
           tournamentId: continueTournamentId ?? "",
         }).toString()}`
       : null;
-  const submitDisabled =
-    decks.length === 0 || isEndedTournament || hasInvalidTournamentContinuation;
+  const submitDisabled = isEndedTournament || hasInvalidTournamentContinuation;
   const submitLabel =
     isContinue && roundNumber
       ? `${phaseLabel} R${roundNumber} 기록 저장`
@@ -150,7 +126,6 @@ export default async function NewMatchPage({ searchParams }: NewMatchPageProps) 
             </>
           ) : null}
 
-          {/* 페이지 타이틀 — 카드 래퍼 없이 상단에 단순 배치 */}
           <section>
             <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-accent">
               New Record
@@ -158,7 +133,6 @@ export default async function NewMatchPage({ searchParams }: NewMatchPageProps) 
             <h2 className="mt-1 text-xl font-bold tracking-tight">결과 입력</h2>
           </section>
 
-          {/* 대회 유형 + 날짜 — 플랫 레이아웃 */}
           <section className="grid gap-3">
             <EventCategorySelect defaultValue={continueEvent ?? "friendly"} />
             <label className="grid gap-2 text-sm font-semibold">
@@ -173,17 +147,10 @@ export default async function NewMatchPage({ searchParams }: NewMatchPageProps) 
             </label>
           </section>
 
-          {/* 게임/덱/상대 덱 — 플랫 레이아웃 */}
           <section className="grid gap-3">
             <GameDeckFields
-              decks={decks.map((deck) => ({
-                id: deck.id,
-                name: deck.name,
-                gameId: deck.gameId,
-                gameName: deck.game.name,
-              }))}
-              defaultGameId={continueGame}
-              defaultDeckId={continueDeck}
+              defaultGameName={continueGameName}
+              defaultDeckName={continueDeckName}
             />
             <label className="grid gap-2 text-sm font-semibold">
               상대 덱명
@@ -199,7 +166,6 @@ export default async function NewMatchPage({ searchParams }: NewMatchPageProps) 
           <MatchResultInput />
           <MatchDetailControls />
 
-          {/* 메모 — 플랫 레이아웃 */}
           <section className="grid gap-3">
             <label className="grid gap-2 text-sm font-semibold">
               메모
@@ -216,12 +182,6 @@ export default async function NewMatchPage({ searchParams }: NewMatchPageProps) 
             <div className="rounded-2xl border border-danger/30 bg-danger/5 p-4 text-sm text-danger">
               {errorMessage}
             </div>
-          ) : null}
-
-          {decks.length === 0 ? (
-            <p className="rounded-2xl border border-dashed border-line bg-paper p-4 text-sm text-danger">
-              먼저 설정에서 덱과 게임을 1개 이상 등록해야 경기를 기록할 수 있습니다.
-            </p>
           ) : null}
 
           <div className="fixed inset-x-0 bottom-20 z-40 bg-surface/90 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur-lg">
