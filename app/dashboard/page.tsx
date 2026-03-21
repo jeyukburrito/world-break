@@ -40,15 +40,14 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   return (
     <AppShell
       title="대시보드"
-      headerRight={
-        <div className="flex items-center gap-2">
-          <Suspense fallback={null}>
-            <PeriodFilter activePeriod={period} defaultFrom={from} defaultTo={to} />
-          </Suspense>
-          <HeaderActions avatarUrl={display.avatarUrl} name={display.name} />
-        </div>
-      }
+      headerRight={<HeaderActions avatarUrl={display.avatarUrl} name={display.name} />}
     >
+      {/* 기간 필터 */}
+      <div className="mb-3">
+        <Suspense fallback={null}>
+          <PeriodFilter activePeriod={period} defaultFrom={from} defaultTo={to} />
+        </Suspense>
+      </div>
       {/* 카테고리 필터: 카드 없이 pill 행만 */}
       <div className="mb-5">
         <Suspense fallback={null}>

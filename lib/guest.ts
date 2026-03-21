@@ -45,46 +45,23 @@ export async function findGuestUserByToken(token: string) {
 }
 
 export async function ensureGuestUserByToken(token: string): Promise<GuestUserRow> {
-  const existing = await findGuestUserByToken(token);
-
-  if (existing) {
-    return existing;
-  }
-
-  try {
-    return await prisma.user.create({
-      data: {
-        id: crypto.randomUUID(),
-        email: buildGuestEmail(token),
-        name: "게스트",
-        isGuest: true,
-        guestToken: token,
-      },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        isGuest: true,
-        guestToken: true,
-      },
-    });
-  } catch (error) {
-    const isUniqueViolation =
-      typeof error === "object" &&
-      error !== null &&
-      "code" in error &&
-      error.code === "P2002";
-
-    if (!isUniqueViolation) {
-      throw error;
-    }
-
-    const retry = await findGuestUserByToken(token);
-
-    if (retry) {
-      return retry;
-    }
-
-    throw error;
-  }
+  // upsert: atomic — pgbouncer(Transaction Pooler) 환경에서 create+retry 경쟁 조건 방지
+  return prisma.user.upsert({
+    where: { guestToken: token },
+    update: {},
+    create: {
+      id: crypto.randomUUID(),
+      email: buildGuestEmail(token),
+      name: "게스트",
+      isGuest: true,
+      guestToken: token,
+    },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      isGuest: true,
+      guestToken: true,
+    },
+  });
 }
