@@ -7,3 +7,11 @@ coverage
 *.log
 build.log
 tsconfig.tsbuildinfo
+.vercel
+
+# Claude Code
+.claude/
+
+# 임시 파일
+stitch_input_match_result/
+~/
