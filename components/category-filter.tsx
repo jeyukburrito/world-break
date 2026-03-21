@@ -9,8 +9,7 @@ type CategoryFilterProps = {
 const CATEGORIES = [
   { label: "전체", value: "all" },
   { label: "친선", value: "friendly" },
-  { label: "매장대회", value: "shop" },
-  { label: "CS", value: "cs" },
+  { label: "대회", value: "shop" },
 ] as const;
 
 export function CategoryFilter({ activeCategory = "all" }: CategoryFilterProps) {

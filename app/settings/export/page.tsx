@@ -46,9 +46,8 @@ export default async function ExportPage() {
             대회 분류
             <select name="event" className="rounded-2xl border border-line bg-surface px-4 py-3 text-ink">
               <option value="">전체</option>
-              <option value="friendly">친선전</option>
-              <option value="shop">매장대회</option>
-              <option value="cs">CS</option>
+              <option value="friendly">친선</option>
+              <option value="shop">대회</option>
             </select>
           </label>
           <label className="grid gap-2 text-sm font-medium">

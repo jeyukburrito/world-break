@@ -11,8 +11,8 @@ type TournamentTimelineProps = {
 };
 
 const EVENT_LABELS: Record<string, string> = {
-  shop: "매장대회",
-  cs: "CS",
+  shop: "대회",
+  cs: "대회",
 };
 
 export function TournamentTimeline({ group, deleteAction }: TournamentTimelineProps) {
