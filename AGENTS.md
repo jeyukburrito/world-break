@@ -51,6 +51,10 @@ The `.ai/` directory is the single source of truth for all collaboration.
 
 Do not use ad-hoc notes or chat-only instructions as collaboration sources of truth.
 
+## Review Responsibilities
+- Codex reviews Claude-owned implementation work when the work is executed in a remote environment.
+- When Codex performs a review task, it must call a dedicated review sub-agent and then integrate the final review judgment itself.
+
 ## Daily Work Log
 - Daily work logs must be written under `.ai/daily/`.
 - Use one file per day named `YYYY-MM-DD.md`.

@@ -16,10 +16,6 @@ export default async function SettingsPage() {
       headerRight={<HeaderActions avatarUrl={display.avatarUrl} name={display.name} />}
     >
       <div className="mx-auto flex max-w-md flex-col gap-6 pb-8">
-        <section>
-          <h2 className="text-2xl font-bold tracking-tight text-ink">설정</h2>
-        </section>
-
         <section className="overflow-hidden rounded-3xl border border-line bg-surface shadow-sm">
           <SettingsLink
             href="/settings/games"

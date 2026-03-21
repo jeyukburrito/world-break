@@ -22,6 +22,8 @@
 | T-005 | 프로필 페이지 개선 | `done` | [spec](handoffs/T-005-spec.md) | [result](handoffs/T-005-result.md) | [review](reviews/T-005-review.md) | 아바타 확대, 통계 그리드, 관리 링크, Danger Zone 분리 |
 | T-006 | 백엔드 안전성 개선 | `done` | [spec](handoffs/T-006-spec.md) | [result](handoffs/T-006-result.md) | [review](reviews/T-006-review.md) | 계정 삭제 순서, playedAt 검증, tournament end 결과 확인 |
 | T-007 | 앱 성능 최적화 | `done` | [spec](handoffs/T-007-spec.md) | [result](handoffs/T-007-result.md) | [review](reviews/T-007-review.md) | force-dynamic 제거, Recharts dynamic import, next/image 적용 |
-| T-008 | PWA 적용 | `ready` | [spec](handoffs/T-008-spec.md) | | | manifest, SW, 오프라인 페이지, 앱 아이콘 |
+| T-008 | PWA 적용 | `done` | [spec](handoffs/T-008-spec.md) | | | manifest, SW, 오프라인 페이지, 앱 아이콘 — 이미 구현 완료 확인 |
 | T-009 | Tactical Editorial UI 전면 개편 | `done` | [spec](handoffs/T-009-spec.md) | [result](handoffs/T-009-result.md) | [review](reviews/T-009-review.md) | Material You 디자인 시스템, 4개 주요 페이지 UI 개편 |
 | T-010 | GA4 이벤트 택소노미 설계 | `draft` | [spec](handoffs/T-010-spec.md) | | | Claude 직접 진행, 사용자와 협의 |
+| T-011 | PWA start_url 수정 + UI 중복 제목 제거 | `done` | [spec](handoffs/T-011-spec.md) | [result](handoffs/T-011-result.md) | [review](reviews/T-011-review.md) | manifest start_url 수정, dashboard/matches/settings 페이지 h2 중복 제거 |
+| T-012 | 게스트 모드 (비회원 체험 + 개발 편의) | `ready` | [spec](handoffs/T-012-spec.md) | | | 쿠키 기반 게스트 세션, Supabase 없이 로컬 실행 가능 |

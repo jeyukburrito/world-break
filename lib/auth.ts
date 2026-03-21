@@ -1,8 +1,10 @@
+import { cookies } from "next/headers";
 import { cache } from "react";
 import { redirect } from "next/navigation";
 
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 
+import { GUEST_COOKIE, ensureGuestUserByToken } from "@/lib/guest";
 import { isSupabaseConfigured } from "@/lib/env";
 import { prisma } from "@/lib/prisma";
 import { createClient } from "@/lib/supabase/server";
@@ -74,11 +76,56 @@ export async function ensureUserProfileExists(user: SupabaseUser) {
   }
 }
 
-export function getUserDisplayInfo(user: SupabaseUser) {
+export type CurrentUser = {
+  id: string;
+  email: string | null;
+  name: string | null;
+  avatarUrl: string | null;
+  isGuest: boolean;
+  user_metadata?: {
+    name?: string | null;
+    full_name?: string | null;
+    avatar_url?: string | null;
+  } | null;
+};
+
+function mapSupabaseUser(user: SupabaseUser): CurrentUser {
+  const name =
+    (user.user_metadata?.name as string | undefined) ??
+    (user.user_metadata?.full_name as string | undefined) ??
+    null;
+
   return {
-    name: (user.user_metadata?.name ?? user.user_metadata?.full_name ?? null) as string | null,
-    avatarUrl: (user.user_metadata?.avatar_url as string) ?? null,
+    id: user.id,
     email: user.email ?? null,
+    name,
+    avatarUrl: (user.user_metadata?.avatar_url as string | undefined) ?? null,
+    isGuest: false,
+    user_metadata: user.user_metadata as CurrentUser["user_metadata"],
+  };
+}
+
+function mapGuestUser(user: Awaited<ReturnType<typeof ensureGuestUserByToken>>): CurrentUser {
+  return {
+    id: user.id,
+    email: user.email,
+    name: user.name ?? "게스트",
+    avatarUrl: null,
+    isGuest: true,
+    user_metadata: {
+      name: user.name ?? "게스트",
+      full_name: user.name ?? "게스트",
+      avatar_url: null,
+    },
+  };
+}
+
+export function getUserDisplayInfo(user: CurrentUser) {
+  return {
+    name: user.name ?? user.user_metadata?.name ?? user.user_metadata?.full_name ?? null,
+    avatarUrl: user.avatarUrl ?? (user.user_metadata?.avatar_url as string) ?? null,
+    email: user.email ?? null,
+    isGuest: user.isGuest,
   };
 }
 
@@ -89,21 +136,25 @@ export function getUserDisplayInfo(user: SupabaseUser) {
  * requireUser()를 여러 번 호출해도 Supabase 세션 조회 + DB 동기화는
  * 단 한 번만 실행된다. (서버리스 connection 절약)
  */
-export const requireUser = cache(async function requireUser() {
-  if (!isSupabaseConfigured) {
-    redirect("/login?error=config_missing");
+export const requireUser = cache(async function requireUser(): Promise<CurrentUser> {
+  const cookieStore = await cookies();
+  const guestToken = cookieStore.get(GUEST_COOKIE)?.value ?? null;
+
+  if (isSupabaseConfigured) {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (user) {
+      await ensureUserProfileExists(user);
+      return mapSupabaseUser(user);
+    }
   }
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
+  if (guestToken) {
+    return mapGuestUser(await ensureGuestUserByToken(guestToken));
   }
 
-  await ensureUserProfileExists(user);
-
-  return user;
+  redirect("/login");
 });

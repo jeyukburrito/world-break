@@ -131,6 +131,7 @@ function SettingsLink({
 export default async function ProfilePage() {
   const authUser = await requireUser();
   const display = getUserDisplayInfo(authUser);
+  const isGuest = authUser.isGuest;
 
   const [profile, stats] = await Promise.all([
     prisma.user.findUnique({
@@ -210,8 +211,10 @@ export default async function ProfilePage() {
           <article className="rounded-3xl border border-line bg-surface p-5 shadow-sm">
             <dl className="space-y-0 divide-y divide-line">
               <div className="flex items-center justify-between py-2.5 text-sm">
-                <dt className="text-muted">가입일</dt>
-                <dd className="font-semibold text-ink">{formatDate(profile?.createdAt ?? null)}</dd>
+                <dt className="text-muted">{isGuest ? "모드" : "가입일"}</dt>
+                <dd className="font-semibold text-ink">
+                  {isGuest ? "게스트" : formatDate(profile?.createdAt ?? null)}
+                </dd>
               </div>
             </dl>
           </article>
@@ -224,7 +227,9 @@ export default async function ProfilePage() {
           <article className="rounded-3xl border border-danger/20 bg-danger/5 p-5 shadow-sm">
             <form action={deleteAccount}>
               <p className="mb-4 text-sm leading-6 text-muted">
-                회원 탈퇴 시 계정, 덱, 태그, 경기 기록이 모두 삭제되며 복구할 수 없습니다.
+                {isGuest
+                  ? "게스트 데이터와 세션을 이 기기에서 제거합니다."
+                  : "회원 탈퇴 시 계정, 덱, 태그, 경기 기록이 모두 삭제되며 복구할 수 없습니다."}
               </p>
               <DeleteAccountButton />
             </form>

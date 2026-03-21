@@ -1,9 +1,10 @@
 "use server";
 
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { getSafeRedirectPath, isSupabaseConfigured } from "@/lib/env";
+import { GUEST_COOKIE, createGuestToken, getGuestCookieOptions } from "@/lib/guest";
 import { createClient } from "@/lib/supabase/server";
 
 export async function signInWithGoogle(formData: FormData) {
@@ -37,12 +38,25 @@ export async function signInWithGoogle(formData: FormData) {
   redirect(data.url);
 }
 
-export async function signOut() {
-  if (!isSupabaseConfigured) {
-    redirect("/login");
+export async function startAsGuest() {
+  const cookieStore = await cookies();
+
+  // Reuse existing token to preserve previously saved guest data
+  if (!cookieStore.get(GUEST_COOKIE)?.value) {
+    cookieStore.set(GUEST_COOKIE, createGuestToken(), getGuestCookieOptions());
   }
 
-  const supabase = await createClient();
-  await supabase.auth.signOut();
+  redirect("/matches/new");
+}
+
+export async function signOut() {
+  const cookieStore = await cookies();
+  cookieStore.delete(GUEST_COOKIE);
+
+  if (isSupabaseConfigured) {
+    const supabase = await createClient();
+    await supabase.auth.signOut();
+  }
+
   redirect("/login");
 }
