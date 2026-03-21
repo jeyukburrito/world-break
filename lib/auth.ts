@@ -158,7 +158,12 @@ export const requireUser = cache(async function requireUser(): Promise<CurrentUs
   }
 
   if (guestToken) {
-    return mapGuestUser(await ensureGuestUserByToken(guestToken));
+    try {
+      return mapGuestUser(await ensureGuestUserByToken(guestToken));
+    } catch (e) {
+      console.error("[requireUser] guest upsert error:", e);
+      // 게스트 DB 오류 시 로그인으로 리다이렉트 (쿠키는 유지)
+    }
   }
 
   redirect("/login");
