@@ -12,9 +12,6 @@ export async function signInWithGoogle(formData: FormData) {
     redirect("/login?error=config_missing");
   }
 
-  const cookieStore = await cookies();
-  cookieStore.delete(GUEST_COOKIE);
-
   const supabase = await createClient();
   const headerStore = await headers();
   const origin = headerStore.get("origin");
@@ -44,7 +41,10 @@ export async function signInWithGoogle(formData: FormData) {
 export async function startAsGuest() {
   const cookieStore = await cookies();
 
-  cookieStore.set(GUEST_COOKIE, createGuestToken(), getGuestCookieOptions());
+  // Reuse existing token to preserve previously saved guest data
+  if (!cookieStore.get(GUEST_COOKIE)?.value) {
+    cookieStore.set(GUEST_COOKIE, createGuestToken(), getGuestCookieOptions());
+  }
 
   redirect("/matches/new");
 }
