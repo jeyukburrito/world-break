@@ -19,7 +19,7 @@ export function TopAppBar({ right }: TopAppBarProps) {
             className="rounded-md"
             priority
           />
-          <p className="text-[10px] font-black uppercase tracking-[0.32em] text-indigo-700">
+          <p className="text-[10px] font-black uppercase tracking-[0.32em] text-primary">
             World Break
           </p>
         </div>

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Noto_Sans_KR } from "next/font/google";
+import { Inter, Noto_Sans_KR } from "next/font/google";
 import { Suspense, type ReactNode } from "react";
 
 import { Analytics } from "@/components/analytics";
@@ -9,10 +9,18 @@ import { Toast } from "@/components/toast";
 
 import "./globals.css";
 
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+  variable: "--font-inter",
+});
+
 const notoSansKR = Noto_Sans_KR({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   display: "swap",
+  variable: "--font-noto",
 });
 
 export const metadata: Metadata = {
@@ -35,7 +43,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: "#4f46e5",
+  themeColor: "#12131d",
 };
 
 const themeScript = `(function(){try{var t=localStorage.getItem("theme");var d=t==="dark"||(t!=="light"&&matchMedia("(prefers-color-scheme:dark)").matches);if(d)document.documentElement.classList.add("dark")}catch(e){}})()`;
@@ -50,7 +58,7 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className={notoSansKR.className}>
+      <body className={`${inter.variable} ${notoSansKR.variable} font-sans`}>
         <ThemeProvider>
           <Suspense fallback={null}>
             <Analytics />
