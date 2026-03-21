@@ -11,7 +11,7 @@ Applied the `T-011-spec.md` changes for PWA entry behavior and duplicate page-ti
 
 ## Implemented
 - Changed PWA `start_url` from `/` to `/matches/new`.
-- Removed the duplicate in-body dashboard title block and kept the period filter right-aligned.
+- Removed the duplicate in-body dashboard title block and moved the period filter into `AppShell` `headerRight` beside `HeaderActions`.
 - Removed the duplicate in-body matches page title and kept the match count plus new-record CTA right-aligned.
 - Removed the duplicate in-body settings page title section.
 
