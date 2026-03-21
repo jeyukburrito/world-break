@@ -1,7 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-import { GUEST_COOKIE } from "@/lib/guest";
 import { isSupabaseConfigured } from "@/lib/env";
+
+// Inline to avoid bundling @/lib/guest (Prisma-heavy) into Edge runtime
+const GUEST_COOKIE = "wb_guest_token";
 import { updateSession } from "@/lib/supabase/middleware";
 
 const PUBLIC_PATHS = ["/", "/login", "/auth/callback"];
