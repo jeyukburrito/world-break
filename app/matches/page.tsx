@@ -382,20 +382,17 @@ export default async function MatchesPage({ searchParams }: MatchesPageProps) {
       title="기록 목록"
       headerRight={<HeaderActions avatarUrl={display.avatarUrl} name={display.name} />}
     >
-      <section className="mb-5 flex items-center justify-between">
-        <h2 className="text-2xl font-bold tracking-tight text-ink">기록 목록</h2>
-        <div className="flex items-center gap-2">
-          <span className="rounded-full bg-accent/10 px-3 py-1 text-xs font-semibold text-accent">
-            {formatNumber(totalCount)} 경기
-          </span>
-          <Link
-            href="/matches/new"
-            className="rounded-full bg-paper px-3 py-1 text-xs font-semibold text-ink"
-          >
-            새 기록
-          </Link>
-        </div>
-      </section>
+      <div className="mb-5 flex items-center justify-end gap-2">
+        <span className="rounded-full bg-accent/10 px-3 py-1 text-xs font-semibold text-accent">
+          {formatNumber(totalCount)} 경기
+        </span>
+        <Link
+          href="/matches/new"
+          className="rounded-full bg-paper px-3 py-1 text-xs font-semibold text-ink"
+        >
+          새 기록
+        </Link>
+      </div>
 
       <section className="mb-5 space-y-4">
         <FilterRail title="게임" chips={gameChips} />

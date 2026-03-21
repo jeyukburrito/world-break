@@ -42,16 +42,11 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       title="대시보드"
       headerRight={<HeaderActions avatarUrl={display.avatarUrl} name={display.name} />}
     >
-      {/* 컴팩트 헤더: 라벨 + 제목 + 기간 필터 인라인 배치 */}
-      <section className="mb-5 flex items-end justify-between gap-4">
-        <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-accent">Overview</p>
-          <h2 className="text-2xl font-bold tracking-tight text-ink">대시보드</h2>
-        </div>
+      <div className="mb-5 flex justify-end">
         <Suspense fallback={null}>
           <PeriodFilter activePeriod={period} defaultFrom={from} defaultTo={to} />
         </Suspense>
-      </section>
+      </div>
 
       {/* 카테고리 필터: 카드 없이 pill 행만 */}
       <div className="mb-5">
