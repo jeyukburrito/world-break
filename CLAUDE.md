@@ -59,8 +59,9 @@ Available skills: /office-hours, /plan-ceo-review, /plan-eng-review, /plan-desig
 
 Webapp 개발은 **파일 기반 핸드오프**로 운영합니다. 상세 규칙: `.ai/PROJECT_RULES.md`
 
-- **Claude 역할**: PM + QA — spec 작성 (`handoffs/T-xxx-spec.md`), 리뷰 (`daily/T-xxx-review.md`). 직접 구현 금지.
+- **Claude 역할**: PM + 최종 승인 — spec 작성 (`handoffs/T-xxx-spec.md`), Gemini 리뷰 확인 후 최종 승인. 직접 구현 금지.
 - **Codex 역할**: 구현 담당 — spec 기준으로만 코드 작성, result 작성 (`handoffs/T-xxx-result.md`). 범위 임의 확장 금지.
+- **Gemini 역할**: 코드 리뷰 — 구현 결과 리뷰 (`daily/T-xxx-review-gemini.md`). 코드 직접 수정 금지.
 - **티켓 흐름**: spec → 구현 → result → review → 승인
 - **티켓 현황**: `.ai/TASKS.md`
 - **협업 문서 허브**: `.ai/handoffs/`, `.ai/daily/`

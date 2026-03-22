@@ -61,13 +61,22 @@ The `.ai/` directory is the single source of truth for all collaboration.
 Do not use ad-hoc notes or chat-only instructions as collaboration sources of truth.
 Do not create a parallel `tasks/` workflow for planning or lessons unless a dedicated project ticket explicitly introduces it; use the `.ai/` system instead.
 
+## Role Assignment
+| AI | Role | Responsibility |
+|----|------|---------------|
+| Claude | PM + Final Approval | Spec writing, final review approval, deployment |
+| Codex | Implementation | Feature development based on spec |
+| Gemini | Code Reviewer | Code review, quality/security/performance checks |
+
 ## Review Responsibilities
-- Codex reviews Claude-owned implementation work when the work is executed in a remote environment.
-- When Codex performs a review task, it must call a dedicated review sub-agent and then integrate the final review judgment itself.
+- Gemini reviews all implementation work (both Codex and Claude-authored).
+- Gemini writes review documents as `daily/T-xxx-review-gemini.md`.
+- Claude reviews Gemini's findings and makes the final approval/rejection decision.
+- When Gemini performs a review, the review scope is limited to the ticket's spec/result and actual diff. Adding new requirements is prohibited.
 
 ## Daily Work Log
 - Daily work logs must be written under `.ai/daily/`.
-- Use one file per day named `YYYY-MM-DD.md`.
+- Use one file per day per agent, named `YYYY-MM-DD-{agent}.md` (e.g., `2026-03-22-codex.md`).
 - After each completed work session, append or update that day's log with:
   - summary of changes
   - files touched

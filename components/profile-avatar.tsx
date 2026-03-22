@@ -10,7 +10,7 @@ export function ProfileAvatar({ avatarUrl, name }: ProfileAvatarProps) {
 
   return (
     <Link
-      href="/settings/profile"
+      href="/settings"
       className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary-fixed text-primary transition-all hover:scale-[0.98] hover:bg-primary-fixed-dim/70"
       aria-label="프로필"
     >

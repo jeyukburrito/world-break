@@ -20,7 +20,7 @@ export function GameDeckFields({ defaultGameName, defaultDeckName }: GameDeckFie
           maxLength={60}
           defaultValue={defaultDeckName}
           className="rounded-2xl bg-surface-container-high px-4 py-3 text-ink"
-          placeholder="예: 어그로 덱"
+          placeholder="내 덱명을 입력해주세요"
         />
       </label>
     </>

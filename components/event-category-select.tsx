@@ -44,7 +44,7 @@ export function EventCategorySelect({
         <input
           type="text"
           name="tournamentDetail"
-          placeholder="대회 세부 내용 (예: 카드냥 역삼 섀도우버스 이볼브)"
+          placeholder="대회 세부 내용을 입력해주세요"
           value={tournamentDetail}
           onChange={(e) => setTournamentDetail(e.target.value)}
           maxLength={200}

@@ -30,4 +30,6 @@ Author: Claude (PM/QA)
 | T-011 | PWA start_url 수정 + UI 중복 제목 제거 | `done` | [spec](handoffs/T-011-spec.md) | [result](handoffs/T-011-result.md) | [review](daily/T-011-review.md) | manifest start_url 수정, dashboard/matches/settings 페이지 h2 중복 제거 |
 | T-012 | 게스트 모드 (비회원 체험 + 개발 편의) | `ready` | [spec](handoffs/T-012-spec.md) | | | 쿠키 기반 게스트 세션, Supabase 없이 로컬 실행 가능 |
 | T-013 | 백엔드 & DB 전수 검수 (Audit) | `ready` | [spec](handoffs/T-013-spec.md) | | | 읽기 전용 검수 — 스키마·액션·인증·SQL 정합성 점검 |
+| T-014 | 프로필+설정 페이지 통합 | `done` | [spec](handoffs/T-014-spec.md) | [result](handoffs/T-014-result.md) | | 프로필→설정 통합, 게임 관리·마지막 경기 삭제 |
+| T-015 | UI 마이크로카피 & 정보 설계 정비 | `done` | [spec](handoffs/T-015-spec.md) | [result](handoffs/T-015-result.md) | | 날짜 절대표기, 중복 텍스트 제거, 스탯카드 차별화 |
 

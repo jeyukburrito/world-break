@@ -120,13 +120,6 @@ export default async function NewMatchPage({ searchParams }: NewMatchPageProps) 
             </>
           ) : null}
 
-          <section>
-            <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-accent">
-              New Record
-            </p>
-            <h2 className="mt-1 text-xl font-bold tracking-tight">결과 입력</h2>
-          </section>
-
           <section className="grid gap-3">
             <EventCategorySelect defaultValue={continueEvent ?? "friendly"} />
             <label className="grid gap-2 text-sm font-semibold">

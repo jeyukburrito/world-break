@@ -1,15 +1,12 @@
-export function formatRelativeDate(date: Date): string {
+export function formatDate(date: Date): string {
   const now = new Date();
-  now.setHours(0, 0, 0, 0);
-  const target = new Date(date);
-  target.setHours(0, 0, 0, 0);
+  const isSameYear = now.getFullYear() === date.getFullYear();
 
-  const diffMs = now.getTime() - target.getTime();
-  const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+  if (isSameYear) {
+    return `${date.getMonth() + 1}월 ${date.getDate()}일`;
+  }
 
-  if (diffDays === 0) return "오늘";
-  if (diffDays === 1) return "어제";
-  if (diffDays <= 30) return `${diffDays}일 전`;
-
-  return date.toLocaleDateString("ko-KR");
+  return `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`;
 }
+
+export const formatRelativeDate = formatDate;

@@ -171,12 +171,15 @@ export function DashboardCharts({
         <StatCard
           label="승률"
           value={`${winRate}%`}
-          subtext={totalMatches > 0 ? `${formatNumber(totalWins)}승 포함` : "데이터가 더 필요합니다"}
         />
         <StatCard
-          label="총 전적"
-          value={formatNumber(totalMatches)}
-          subtext={totalMatches > 0 ? `${formatNumber(totalWins)}승 · ${formatNumber(totalMatches - totalWins)}패` : "기록 없음"}
+          label="전적"
+          value={
+            totalMatches > 0
+              ? `${formatNumber(totalWins)}승 ${formatNumber(totalMatches - totalWins)}패`
+              : "0승 0패"
+          }
+          subtext={totalMatches > 0 ? `총 ${formatNumber(totalMatches)}경기` : "기록 없음"}
         />
       </div>
 

@@ -27,13 +27,13 @@ Scaffolding / 보일러플레이트                       ✓
 
 ---
 
-### Claude (PM + QA + 경량 구현)
+### Claude (PM + 최종 승인)
 
 **책임:**
 - 요구사항 정리 및 MVP 범위 확정
 - 작업 분해 (티켓 단위)
 - Done Definition이 포함된 spec 작성 (`handoffs/T-xxx-spec.md`)
-- Codex 구현 결과 검수 (`daily/T-xxx-review.md`)
+- Gemini 리뷰 결과 확인 및 최종 승인/반려
 - 배포 전 체크리스트 작성
 - 위 라우팅 원칙에 따른 직접 구현 (Config, Docs, 소규모 즉각 수정)
 
@@ -50,14 +50,28 @@ Scaffolding / 보일러플레이트                       ✓
 - 구현 후 lint/test/build 결과 기록 (`handoffs/T-xxx-result.md`)
 - 수정 파일 목록, 미완료 항목, 리스크를 솔직히 기록
 - 범위 외 개선은 제안만 (자동 반영 금지)
-- 원격 환경에서 Claude가 직접 수행한 구현 작업의 리뷰 담당
 
 **금지:**
 - PRD를 임의 재해석하여 기능 추가
 - spec에 없는 라이브러리 도입
 - 대규모 리팩터링을 몰래 수행
 - 실패한 테스트 숨기기
-- Claude 리뷰 없이 "완료" 선언
+- Gemini 리뷰 없이 "완료" 선언
+
+### Gemini (Code Reviewer)
+
+**책임:**
+- Codex 구현 결과 코드 리뷰 (`daily/T-xxx-review-gemini.md`)
+- spec 대비 구현 충족도 검증
+- 코드 품질, 보안, 성능 관점 검토
+- 버그 및 누락 사항 식별
+- 원격 환경에서 Claude가 직접 수행한 구현 작업의 리뷰 담당
+
+**금지:**
+- 리뷰 중 새 요구사항 추가
+- 코드 직접 수정 (리뷰만 담당)
+- spec에 없는 기준으로 구현 거부
+- 리뷰 결과를 Claude 승인 없이 최종 확정
 
 ### Orchestrator (사용자)
 
@@ -87,28 +101,31 @@ Scaffolding / 보일러플레이트                       ✓
 
 | 담당 | 파일 |
 |------|------|
-| Claude | `PRD.md`, `TASKS.md`, `handoffs/T-xxx-spec.md`, `daily/T-xxx-review.md` |
-| Codex | `webapp/app/*`, `webapp/lib/*`, `webapp/components/*`, `webapp/prisma/*`, `handoffs/T-xxx-result.md` |
+| Claude | `PRD.md`, `TASKS.md`, `handoffs/T-xxx-spec.md` |
+| Codex | `app/*`, `lib/*`, `components/*`, `prisma/*`, `handoffs/T-xxx-result.md` |
+| Gemini | `daily/T-xxx-review-gemini.md` |
 
 ---
 
 ## 티켓 라이프사이클
 
 ```
-1. Claude → spec 작성      (handoffs/T-xxx-spec.md)
-2. 사용자 → spec 승인 후 Codex에 구현 지시
-3. Codex  → 구현 + result 작성 (handoffs/T-xxx-result.md)
-4. Claude → 리뷰 작성         (daily/T-xxx-review.md)
-5. 사용자 → 승인 or 재작업 지시
+1. Claude  → spec 작성       (handoffs/T-xxx-spec.md)
+2. 사용자  → spec 승인 후 Codex에 구현 지시
+3. Codex   → 구현 + result 작성 (handoffs/T-xxx-result.md)
+4. Gemini  → 코드 리뷰 작성     (daily/T-xxx-review-gemini.md)
+5. Claude  → 최종 승인/반려
+6. 사용자  → merge 결정
 ```
 
 **완료 = "코드 작성"이 아니라 "검수 통과"**
 
 ### 리뷰 라우팅
 
-- 기본적으로 Claude는 Codex 구현 결과를 리뷰한다.
-- 단, 원격 환경에서 Claude가 직접 수행한 구현 작업은 Codex가 리뷰한다.
-- Codex가 리뷰를 맡을 때도 기준 문서는 해당 티켓의 spec/result와 실제 diff이며, 새 요구사항 추가는 금지한다.
+- 기본적으로 Gemini가 Codex 구현 결과를 리뷰한다.
+- 원격 환경에서 Claude가 직접 수행한 구현 작업도 Gemini가 리뷰한다.
+- Gemini 리뷰 후 Claude가 최종 승인/반려를 결정한다.
+- 리뷰 기준 문서는 해당 티켓의 spec/result와 실제 diff이며, 새 요구사항 추가는 금지한다.
 
 ---
 
@@ -127,9 +144,21 @@ Scaffolding / 보일러플레이트                       ✓
 
 ---
 
-## 작성 원칙
+## 파일 네이밍 규칙
 
-- **작성자 명시 필수**: 모든 문서(`.md`) 상단에 `Author: [작성자명/역할]`을 기재한다.
+리뷰 문서와 일일 작업 로그는 파일 이름에 작성자 이름을 포함한다.
+
+| 문서 유형 | 네이밍 패턴 | 예시 |
+|-----------|------------|------|
+| 리뷰 | `T-xxx-review-{작성자}.md` | `T-014-review-gemini.md`, `T-014-review-claude.md` |
+| 일일 로그 | `YYYY-MM-DD-{작성자}.md` | `2026-03-22-codex.md`, `2026-03-22-claude.md` |
+| Spec / Result | 변경 없음 (작성자 고정) | `T-014-spec.md`, `T-014-result.md` |
+
+여러 AI가 같은 날 작업하면 각자의 로그 파일을 따로 작성한다.
+
+---
+
+## 작성 원칙
 - 구체적으로 쓸 것 — "적당히", "잘 처리" 같은 모호한 표현 금지
 - 완료 기준은 관찰 가능한 형태로 정의
 - 완료와 추정을 구분

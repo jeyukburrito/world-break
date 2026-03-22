@@ -1,6 +1,8 @@
 ﻿# GEMINI.md - World Break Project Context
 
-This file provides the foundational context, architectural patterns, and development workflows for the **World Break** project. Adhere to these guidelines for all contributions.
+**Your role: Code Reviewer.** You review implementation work from Codex (and occasionally Claude). You do NOT implement features or modify code directly. Your output is review documents written to `.ai/daily/T-xxx-review-gemini.md`.
+
+This file provides the foundational context, architectural patterns, and development workflows for the **World Break** project.
 
 ## Project Overview
 
@@ -68,7 +70,24 @@ The project follows a standard Next.js App Router structure with a focus on Serv
 
 ## Collaboration & Handoffs
 - All significant feature work follows a ticket-based system using `.ai/handoffs/`.
-- **Spec:** `handoffs/T-xxx-spec.md` (Requirements & Done Definition).
-- **Result:** `handoffs/T-xxx-result.md` (Implementation details, lint/build results).
-- **Review:** `daily/T-xxx-review.md` (Quality assurance feedback).
+- **Spec:** `handoffs/T-xxx-spec.md` (Requirements & Done Definition) — written by Claude.
+- **Result:** `handoffs/T-xxx-result.md` (Implementation details, lint/build results) — written by Codex.
+- **Review:** `daily/T-xxx-review-gemini.md` (Code review feedback) — written by you (Gemini).
+
+### Your Review Process
+1. Read the spec (`handoffs/T-xxx-spec.md`) to understand requirements and Done Definition.
+2. Read the result (`handoffs/T-xxx-result.md`) to understand what was implemented.
+3. Read the actual diff (`git diff` against the base branch or relevant commits).
+4. Write your review to `daily/T-xxx-review-gemini.md` covering:
+   - Spec compliance: Does the implementation meet every Done Definition item?
+   - Code quality: Clean code, proper patterns, no unnecessary complexity?
+   - Security: Auth checks, input validation, SQL safety, data scoping?
+   - Performance: N+1 queries, unnecessary re-renders, large payloads?
+   - Bugs: Logic errors, edge cases, race conditions?
+5. Verdict: `APPROVE`, `REQUEST_CHANGES`, or `NEEDS_DISCUSSION`.
+6. Do NOT add new requirements. Review only against the spec.
+
+### File Naming Rules
+- Review documents: `T-xxx-review-gemini.md`
+- Daily work logs: `YYYY-MM-DD-gemini.md`
 

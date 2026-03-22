@@ -4,7 +4,7 @@ import { AppShell } from "@/components/app-shell";
 import { DeleteMatchButton } from "@/components/delete-match-button";
 import { HeaderActions } from "@/components/header-actions";
 import { getUserDisplayInfo, requireUser } from "@/lib/auth";
-import { formatRelativeDate } from "@/lib/format-date";
+import { formatDate } from "@/lib/format-date";
 import { groupMatchesForDisplay, type DisplayItem } from "@/lib/group-matches";
 import {
   MATCHES_PAGE_SIZE,
@@ -54,7 +54,7 @@ function SingleMatchCard({
               {match.eventCategory === "friendly" ? "친선" : "대회"}
             </span>
             <span className="rounded-full bg-paper px-3 py-1 text-xs font-semibold text-muted">
-              {formatRelativeDate(match.playedAt)}
+              {formatDate(match.playedAt)}
             </span>
             <span className="rounded-full bg-line/40 px-3 py-1 text-xs font-semibold text-muted">
               {match.matchFormat.toUpperCase()}
@@ -130,7 +130,7 @@ function TournamentMatchCard({
               대회
             </span>
             <span className="rounded-full bg-paper px-3 py-1 text-xs font-semibold text-muted">
-              {formatRelativeDate(group.date)}
+              {formatDate(group.date)}
             </span>
             {isEnded ? (
               <span className="rounded-full bg-surface px-3 py-1 text-xs font-semibold text-muted">
@@ -251,18 +251,6 @@ export default async function MatchesPage({ searchParams }: MatchesPageProps) {
       title="기록 목록"
       headerRight={<HeaderActions avatarUrl={display.avatarUrl} name={display.name} />}
     >
-      <div className="mb-5 flex items-center justify-end gap-2">
-        <span className="rounded-full bg-accent/10 px-3 py-1 text-xs font-semibold text-accent">
-          {formatNumber(totalCount)} 경기
-        </span>
-        <Link
-          href="/matches/new"
-          className="rounded-full bg-paper px-3 py-1 text-xs font-semibold text-ink"
-        >
-          새 기록
-        </Link>
-      </div>
-
       <section className="space-y-4">
         <div className="flex items-center justify-between px-1 text-sm text-muted">
           <p>총 {formatNumber(totalCount)}경기</p>
