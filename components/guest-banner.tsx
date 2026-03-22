@@ -12,7 +12,7 @@ export function GuestBanner({ actionHref = "/login?guest=upgrade" }: GuestBanner
       </p>
       <Link
         href={actionHref}
-        className="shrink-0 rounded-full bg-amber-700 px-3 py-1.5 text-[11px] font-semibold text-white"
+        className="shrink-0 rounded-full bg-amber-700 px-4 py-2.5 text-xs font-semibold text-white"
       >
         로그인
       </Link>
