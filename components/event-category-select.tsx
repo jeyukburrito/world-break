@@ -16,9 +16,7 @@ export function EventCategorySelect({
   defaultValue = "friendly",
   defaultTournamentDetail = "",
 }: EventCategorySelectProps) {
-  // Map legacy "cs" to "shop" for UI
-  const initial = defaultValue === "cs" ? "shop" : defaultValue;
-  const [selected, setSelected] = useState(initial);
+  const [selected, setSelected] = useState(defaultValue);
   const [tournamentDetail, setTournamentDetail] = useState(defaultTournamentDetail);
 
   return (

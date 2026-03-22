@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 
 import { prisma } from "@/lib/prisma";
 import { createClient } from "@/lib/supabase/server";
+import { tournamentSessionIdSchema } from "@/lib/validation/match";
 
 export const runtime = "nodejs";
 
@@ -19,7 +20,7 @@ export async function POST(request: Request) {
   const formData = await request.formData();
   const tournamentSessionId = String(formData.get("tournamentSessionId") || "");
 
-  if (!tournamentSessionId) {
+  if (!tournamentSessionIdSchema.safeParse(tournamentSessionId).success) {
     return NextResponse.redirect(new URL("/matches?error=tournament_not_found", request.url));
   }
 

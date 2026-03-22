@@ -86,7 +86,7 @@ function buildWhereSql(userId: string, opts: FilterOptions) {
   const { category } = opts;
   const clauses = [Prisma.sql`m."userId" = CAST(${userId} AS uuid)`, ...buildPlayedAtSql(opts)];
 
-  if (category === "friendly" || category === "shop" || category === "cs") {
+  if (category === "friendly" || category === "shop") {
     clauses.push(Prisma.sql`m."eventCategory" = ${category}::"EventCategory"`);
   }
 

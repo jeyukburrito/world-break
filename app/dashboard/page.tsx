@@ -18,8 +18,10 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const display = getUserDisplayInfo(user);
   const params = searchParams ? await searchParams : undefined;
   const period = typeof params?.period === "string" ? params.period : "all";
-  const from = typeof params?.from === "string" ? params.from : undefined;
-  const to = typeof params?.to === "string" ? params.to : undefined;
+  const isDateString = (v: unknown): v is string =>
+    typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v);
+  const from = isDateString(params?.from) ? params.from : undefined;
+  const to = isDateString(params?.to) ? params.to : undefined;
   const category = typeof params?.category === "string" ? params.category : "all";
 
   const [{ myDeckSlices, opponentSlices, totalMatches }, topMatchups] = await Promise.all([

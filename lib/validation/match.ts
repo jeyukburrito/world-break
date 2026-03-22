@@ -7,7 +7,7 @@ export const matchResultSchema = z
     myDeckName: z.string().trim().min(1).max(60),
     tournamentSessionId: z.string().uuid().optional(),
     opponentDeckName: z.string().trim().min(1).max(120),
-    eventCategory: z.enum(["friendly", "shop", "cs"]),
+    eventCategory: z.enum(["friendly", "shop"]),
     tournamentPhase: z.enum(["swiss", "elimination"]).optional(),
     playOrder: z.enum(["first", "second"]),
     didChoosePlayOrder: z
@@ -21,3 +21,6 @@ export const matchResultSchema = z
   });
 
 export type MatchResultInput = z.infer<typeof matchResultSchema>;
+
+export const matchIdSchema = z.string().uuid("올바른 경기 ID 형식이 아닙니다.");
+export const tournamentSessionIdSchema = z.string().uuid("올바른 대회 세션 ID 형식이 아닙니다.");

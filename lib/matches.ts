@@ -49,7 +49,7 @@ export function buildMatchWhere(userId: string, filters: MatchFilters): Prisma.M
       : {}),
     ...(filters.deckId ? { myDeckId: filters.deckId } : {}),
     ...(filters.format === "bo1" || filters.format === "bo3" ? { matchFormat: filters.format } : {}),
-    ...(filters.event === "friendly" || filters.event === "shop" || filters.event === "cs"
+    ...(filters.event === "friendly" || filters.event === "shop"
       ? { eventCategory: filters.event }
       : {}),
   };

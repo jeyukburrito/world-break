@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { isUniqueViolation } from "@/lib/prisma-helpers";
 import { createGameSchema, deleteGameSchema, updateGameSchema } from "@/lib/validation/game";
 
 function withMessage(type: "error" | "message", value: string) {
@@ -29,16 +30,10 @@ export async function createGame(formData: FormData) {
       },
     });
   } catch (error) {
-    const isUniqueViolation =
-      typeof error === "object" &&
-      error !== null &&
-      "code" in error &&
-      error.code === "P2002";
-
     redirect(
       withMessage(
         "error",
-        isUniqueViolation ? "같은 이름의 카드게임이 이미 있습니다." : "카드게임 저장에 실패했습니다.",
+        isUniqueViolation(error) ? "같은 이름의 카드게임이 이미 있습니다." : "카드게임 저장에 실패했습니다.",
       ),
     );
   }
@@ -76,16 +71,10 @@ export async function updateGame(formData: FormData) {
       redirect(withMessage("error", "수정할 카드게임을 찾을 수 없습니다."));
     }
   } catch (error) {
-    const isUniqueViolation =
-      typeof error === "object" &&
-      error !== null &&
-      "code" in error &&
-      error.code === "P2002";
-
     redirect(
       withMessage(
         "error",
-        isUniqueViolation ? "같은 이름의 카드게임이 이미 있습니다." : "카드게임 수정에 실패했습니다.",
+        isUniqueViolation(error) ? "같은 이름의 카드게임이 이미 있습니다." : "카드게임 수정에 실패했습니다.",
       ),
     );
   }

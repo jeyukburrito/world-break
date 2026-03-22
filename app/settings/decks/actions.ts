@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { isUniqueViolation } from "@/lib/prisma-helpers";
 import { createDeckSchema, toggleDeckSchema } from "@/lib/validation/deck";
 
 function withMessage(type: "error" | "message", value: string) {
@@ -43,16 +44,10 @@ export async function createDeck(formData: FormData) {
       },
     });
   } catch (error) {
-    const isUniqueViolation =
-      typeof error === "object" &&
-      error !== null &&
-      "code" in error &&
-      error.code === "P2002";
-
     redirect(
       withMessage(
         "error",
-        isUniqueViolation ? "같은 카드게임 안에 같은 이름의 덱이 이미 있습니다." : "덱 저장에 실패했습니다.",
+        isUniqueViolation(error) ? "같은 카드게임 안에 같은 이름의 덱이 이미 있습니다." : "덱 저장에 실패했습니다.",
       ),
     );
   }
@@ -74,7 +69,7 @@ export async function toggleDeckState(formData: FormData) {
     redirect(withMessage("error", "덱 상태 변경 요청이 올바르지 않습니다."));
   }
 
-  await prisma.deck.updateMany({
+  const result = await prisma.deck.updateMany({
     where: {
       id: parsed.data.deckId,
       userId: user.id,
@@ -83,6 +78,10 @@ export async function toggleDeckState(formData: FormData) {
       isActive: parsed.data.nextState === "active",
     },
   });
+
+  if (result.count === 0) {
+    redirect(withMessage("error", "덱을 찾을 수 없거나 변경 권한이 없습니다."));
+  }
 
   revalidatePath("/settings/decks");
   revalidatePath("/matches/new");

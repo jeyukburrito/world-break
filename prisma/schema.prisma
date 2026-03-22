@@ -143,7 +143,6 @@ enum MatchFormat {
 enum EventCategory {
   friendly
   shop
-  cs
 }
 
 enum TournamentPhase {

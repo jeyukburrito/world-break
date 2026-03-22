@@ -3,10 +3,14 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { Prisma } from "@prisma/client";
+
 import { requireUser } from "@/lib/auth";
 import { revalidateDashboard } from "@/lib/dashboard";
 import { prisma } from "@/lib/prisma";
-import { matchResultSchema } from "@/lib/validation/match";
+import { matchIdSchema, matchResultSchema } from "@/lib/validation/match";
+
+type TxClient = Prisma.TransactionClient;
 
 function matchesRedirect(type: "error" | "message", value: string) {
   return `/matches?${type}=${encodeURIComponent(value)}`;
@@ -28,15 +32,15 @@ function dateRangeForDay(value: string) {
   return { start, end };
 }
 
-async function resolveGameAndDeck(userId: string, gameName: string, deckName: string) {
-  const game = await prisma.game.upsert({
+async function resolveGameAndDeck(tx: TxClient, userId: string, gameName: string, deckName: string) {
+  const game = await tx.game.upsert({
     where: { userId_name: { userId, name: gameName } },
     update: {},
     create: { userId, name: gameName },
     select: { id: true },
   });
 
-  const deck = await prisma.deck.upsert({
+  const deck = await tx.deck.upsert({
     where: { userId_gameId_name: { userId, gameId: game.id, name: deckName } },
     update: {},
     create: { userId, gameId: game.id, name: deckName },
@@ -46,12 +50,12 @@ async function resolveGameAndDeck(userId: string, gameName: string, deckName: st
   return { gameId: game.id, deckId: deck.id };
 }
 
-async function ensureOwnedTags(userId: string, tagIds: string[]) {
+async function ensureOwnedTags(tx: TxClient, userId: string, tagIds: string[]) {
   if (tagIds.length === 0) {
     return [];
   }
 
-  return prisma.tag.findMany({
+  return tx.tag.findMany({
     where: {
       userId,
       id: {
@@ -97,11 +101,11 @@ function parseMatchForm(formData: FormData) {
   });
 }
 
-async function resolveTournamentSession(params: {
+async function resolveTournamentSession(tx: TxClient, params: {
   userId: string;
   myDeckId: string;
   playedAt: string;
-  eventCategory: "shop" | "cs";
+  eventCategory: "shop";
   tournamentSessionId?: string;
   name?: string;
 }) {
@@ -109,7 +113,7 @@ async function resolveTournamentSession(params: {
   const { start } = dateRangeForDay(playedAt);
 
   if (tournamentSessionId) {
-    const existing = await prisma.tournamentSession.findFirst({
+    const existing = await tx.tournamentSession.findFirst({
       where: {
         id: tournamentSessionId,
         userId,
@@ -136,7 +140,7 @@ async function resolveTournamentSession(params: {
     return { ok: true as const, sessionId: existing.id };
   }
 
-  const created = await prisma.tournamentSession.create({
+  const created = await tx.tournamentSession.create({
     data: {
       userId,
       myDeckId,
@@ -192,62 +196,75 @@ export async function createMatchResult(formData: FormData) {
     redirect(newMatchRedirect("error", "입력값을 확인해 주세요."));
   }
 
-  const [{ deckId }, ownedTags] = await Promise.all([
-    resolveGameAndDeck(user.id, parsed.data.gameName, parsed.data.myDeckName),
-    ensureOwnedTags(user.id, parsed.data.tagIds),
-  ]);
-
-  if (ownedTags.length !== parsed.data.tagIds.length) {
-    redirect(newMatchRedirect("error", "선택한 태그를 사용할 수 없습니다."));
-  }
-
   const score = deriveScore(parsed.data.matchFormat, parsed.data.result);
-  let tournamentSessionId: string | null = null;
 
-  if (parsed.data.eventCategory === "shop" || parsed.data.eventCategory === "cs") {
-    const resolved = await resolveTournamentSession({
-      userId: user.id,
-      myDeckId: deckId,
-      playedAt: parsed.data.playedAt,
-      eventCategory: parsed.data.eventCategory,
-      tournamentSessionId: parsed.data.tournamentSessionId,
-      name: parsed.data.tournamentDetail || undefined,
-    });
+  const { tournamentSessionId } = await prisma.$transaction(async (tx) => {
+    const [{ deckId }, ownedTags] = await Promise.all([
+      resolveGameAndDeck(tx, user.id, parsed.data.gameName, parsed.data.myDeckName),
+      ensureOwnedTags(tx, user.id, parsed.data.tagIds),
+    ]);
 
-    if (!resolved.ok) {
-      redirect(newMatchRedirect("error", resolved.error));
+    if (ownedTags.length !== parsed.data.tagIds.length) {
+      throw new Error("TAG_MISMATCH");
     }
 
-    tournamentSessionId = resolved.sessionId;
-  }
+    let sessionId: string | null = null;
 
-  await prisma.matchResult.create({
-    data: {
-      userId: user.id,
-      myDeckId: deckId,
-      tournamentSessionId,
-      playedAt: new Date(parsed.data.playedAt),
-      opponentDeckName: parsed.data.opponentDeckName,
-      eventCategory: parsed.data.eventCategory,
-      tournamentPhase:
-        parsed.data.eventCategory === "shop" || parsed.data.eventCategory === "cs"
-          ? parsed.data.tournamentPhase ?? "swiss"
-          : null,
-      playOrder: parsed.data.playOrder,
-      didChoosePlayOrder: parsed.data.didChoosePlayOrder,
-      matchFormat: parsed.data.matchFormat,
-      wins: score.wins,
-      losses: score.losses,
-      isMatchWin: parsed.data.result === "win",
-      memo: parsed.data.memo || null,
-      tags: parsed.data.tagIds.length
-        ? {
-            createMany: {
-              data: parsed.data.tagIds.map((tagId) => ({ tagId })),
-            },
-          }
-        : undefined,
-    },
+    if (parsed.data.eventCategory === "shop") {
+      const resolved = await resolveTournamentSession(tx, {
+        userId: user.id,
+        myDeckId: deckId,
+        playedAt: parsed.data.playedAt,
+        eventCategory: parsed.data.eventCategory,
+        tournamentSessionId: parsed.data.tournamentSessionId,
+        name: parsed.data.tournamentDetail || undefined,
+      });
+
+      if (!resolved.ok) {
+        throw new Error(`TOURNAMENT_ERROR:${resolved.error}`);
+      }
+
+      sessionId = resolved.sessionId;
+    }
+
+    await tx.matchResult.create({
+      data: {
+        userId: user.id,
+        myDeckId: deckId,
+        tournamentSessionId: sessionId,
+        playedAt: new Date(parsed.data.playedAt),
+        opponentDeckName: parsed.data.opponentDeckName,
+        eventCategory: parsed.data.eventCategory,
+        tournamentPhase:
+          parsed.data.eventCategory === "shop"
+            ? parsed.data.tournamentPhase ?? "swiss"
+            : null,
+        playOrder: parsed.data.playOrder,
+        didChoosePlayOrder: parsed.data.didChoosePlayOrder,
+        matchFormat: parsed.data.matchFormat,
+        wins: score.wins,
+        losses: score.losses,
+        isMatchWin: parsed.data.result === "win",
+        memo: parsed.data.memo || null,
+        tags: parsed.data.tagIds.length
+          ? {
+              createMany: {
+                data: parsed.data.tagIds.map((tagId) => ({ tagId })),
+              },
+            }
+          : undefined,
+      },
+    });
+
+    return { tournamentSessionId: sessionId };
+  }).catch((error: Error) => {
+    if (error.message === "TAG_MISMATCH") {
+      redirect(newMatchRedirect("error", "선택한 태그를 사용할 수 없습니다."));
+    }
+    if (error.message.startsWith("TOURNAMENT_ERROR:")) {
+      redirect(newMatchRedirect("error", error.message.slice("TOURNAMENT_ERROR:".length)));
+    }
+    throw error;
   });
 
   revalidatePath("/matches");
@@ -277,60 +294,61 @@ export async function updateMatchResult(formData: FormData) {
   const matchId = String(formData.get("matchId") || "");
   const parsed = parseMatchForm(formData);
 
-  if (!matchId) {
-    redirect(matchesRedirect("error", "수정할 경기 ID가 없습니다."));
+  if (!matchIdSchema.safeParse(matchId).success) {
+    redirect(matchesRedirect("error", "수정할 경기 ID가 올바르지 않습니다."));
   }
 
   if (!parsed.success) {
     redirect(editRedirect(matchId, "error", "입력값을 확인해 주세요."));
   }
 
-  const [{ deckId }, existingMatch, ownedTags] = await Promise.all([
-    resolveGameAndDeck(user.id, parsed.data.gameName, parsed.data.myDeckName),
-    prisma.matchResult.findFirst({
-      where: {
-        id: matchId,
-        userId: user.id,
-      },
-      select: {
-        id: true,
-        tournamentSessionId: true,
-      },
-    }),
-    ensureOwnedTags(user.id, parsed.data.tagIds),
-  ]);
-
-  if (!existingMatch) {
-    redirect(matchesRedirect("error", "수정할 대전 기록을 찾을 수 없습니다."));
-  }
-
-  if (ownedTags.length !== parsed.data.tagIds.length) {
-    redirect(editRedirect(matchId, "error", "선택한 태그를 사용할 수 없습니다."));
-  }
-
   const score = deriveScore(parsed.data.matchFormat, parsed.data.result);
-  let tournamentSessionId = existingMatch.tournamentSessionId;
-
-  if (parsed.data.eventCategory === "shop" || parsed.data.eventCategory === "cs") {
-    const resolved = await resolveTournamentSession({
-      userId: user.id,
-      myDeckId: deckId,
-      playedAt: parsed.data.playedAt,
-      eventCategory: parsed.data.eventCategory,
-      tournamentSessionId:
-        parsed.data.tournamentSessionId ?? existingMatch.tournamentSessionId ?? undefined,
-    });
-
-    if (!resolved.ok) {
-      redirect(editRedirect(matchId, "error", resolved.error));
-    }
-
-    tournamentSessionId = resolved.sessionId;
-  } else {
-    tournamentSessionId = null;
-  }
 
   const result = await prisma.$transaction(async (tx) => {
+    const [{ deckId }, existingMatch, ownedTags] = await Promise.all([
+      resolveGameAndDeck(tx, user.id, parsed.data.gameName, parsed.data.myDeckName),
+      tx.matchResult.findFirst({
+        where: {
+          id: matchId,
+          userId: user.id,
+        },
+        select: {
+          id: true,
+          tournamentSessionId: true,
+        },
+      }),
+      ensureOwnedTags(tx, user.id, parsed.data.tagIds),
+    ]);
+
+    if (!existingMatch) {
+      throw new Error("MATCH_NOT_FOUND");
+    }
+
+    if (ownedTags.length !== parsed.data.tagIds.length) {
+      throw new Error("TAG_MISMATCH");
+    }
+
+    let tournamentSessionId = existingMatch.tournamentSessionId;
+
+    if (parsed.data.eventCategory === "shop") {
+      const resolved = await resolveTournamentSession(tx, {
+        userId: user.id,
+        myDeckId: deckId,
+        playedAt: parsed.data.playedAt,
+        eventCategory: parsed.data.eventCategory,
+        tournamentSessionId:
+          parsed.data.tournamentSessionId ?? existingMatch.tournamentSessionId ?? undefined,
+      });
+
+      if (!resolved.ok) {
+        throw new Error(`TOURNAMENT_ERROR:${resolved.error}`);
+      }
+
+      tournamentSessionId = resolved.sessionId;
+    } else {
+      tournamentSessionId = null;
+    }
+
     const updated = await tx.matchResult.updateMany({
       where: {
         id: matchId,
@@ -343,7 +361,7 @@ export async function updateMatchResult(formData: FormData) {
         opponentDeckName: parsed.data.opponentDeckName,
         eventCategory: parsed.data.eventCategory,
         tournamentPhase:
-          parsed.data.eventCategory === "shop" || parsed.data.eventCategory === "cs"
+          parsed.data.eventCategory === "shop"
             ? parsed.data.tournamentPhase ?? "swiss"
             : null,
         playOrder: parsed.data.playOrder,
@@ -372,6 +390,17 @@ export async function updateMatchResult(formData: FormData) {
     }
 
     return updated;
+  }).catch((error: Error) => {
+    if (error.message === "MATCH_NOT_FOUND") {
+      redirect(matchesRedirect("error", "수정할 대전 기록을 찾을 수 없습니다."));
+    }
+    if (error.message === "TAG_MISMATCH") {
+      redirect(editRedirect(matchId, "error", "선택한 태그를 사용할 수 없습니다."));
+    }
+    if (error.message.startsWith("TOURNAMENT_ERROR:")) {
+      redirect(editRedirect(matchId, "error", error.message.slice("TOURNAMENT_ERROR:".length)));
+    }
+    throw error;
   });
 
   if (result.count === 0) {
@@ -390,16 +419,20 @@ export async function deleteMatchResult(formData: FormData) {
   const user = await requireUser();
   const matchId = String(formData.get("matchId") || "");
 
-  if (!matchId) {
-    redirect(matchesRedirect("error", "삭제할 경기 ID가 없습니다."));
+  if (!matchIdSchema.safeParse(matchId).success) {
+    redirect(matchesRedirect("error", "삭제할 경기 ID가 올바르지 않습니다."));
   }
 
-  await prisma.matchResult.deleteMany({
+  const result = await prisma.matchResult.deleteMany({
     where: {
       id: matchId,
       userId: user.id,
     },
   });
+
+  if (result.count === 0) {
+    redirect(matchesRedirect("error", "삭제 권한이 없거나 대전 기록을 찾을 수 없습니다."));
+  }
 
   revalidatePath("/matches");
   revalidateDashboard(user.id);

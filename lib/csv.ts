@@ -1,5 +1,9 @@
 function escapeCsvCell(value: string) {
-  return `"${value.replace(/"/g, '""')}"`;
+  let safe = value.replace(/"/g, '""');
+  if (/^[=+\-@\t\r]/.test(safe)) {
+    safe = `'${safe}`;
+  }
+  return `"${safe}"`;
 }
 
 export function buildCsv(header: string[], rows: string[][]) {

@@ -27,3 +27,4 @@
 | T-010 | GA4 이벤트 택소노미 설계 | `draft` | [spec](handoffs/T-010-spec.md) | | | Claude 직접 진행, 사용자와 협의 |
 | T-011 | PWA start_url 수정 + UI 중복 제목 제거 | `done` | [spec](handoffs/T-011-spec.md) | [result](handoffs/T-011-result.md) | [review](reviews/T-011-review.md) | manifest start_url 수정, dashboard/matches/settings 페이지 h2 중복 제거 |
 | T-012 | 게스트 모드 (비회원 체험 + 개발 편의) | `ready` | [spec](handoffs/T-012-spec.md) | | | 쿠키 기반 게스트 세션, Supabase 없이 로컬 실행 가능 |
+| T-013 | 백엔드 & DB 전수 검수 (Audit) | `ready` | [spec](handoffs/T-013-spec.md) | | | 읽기 전용 검수 — 스키마·액션·인증·SQL 정합성 점검 |
