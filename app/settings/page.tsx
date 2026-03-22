@@ -31,10 +31,10 @@ export default async function SettingsPage() {
               className="flex w-full items-center justify-between px-5 py-4 text-left transition-colors hover:bg-paper"
             >
               <span>
-                <span className="block text-sm font-semibold text-danger">로그아웃</span>
+                <span className="block text-sm font-semibold text-ink">로그아웃</span>
                 <span className="mt-1 block text-xs text-muted">현재 세션을 종료합니다.</span>
               </span>
-              <svg viewBox="0 0 24 24" fill="none" className="size-4 shrink-0 text-danger" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" className="size-4 shrink-0 text-muted" aria-hidden="true">
                 <path
                   d="M9 18l6-6-6-6"
                   stroke="currentColor"
