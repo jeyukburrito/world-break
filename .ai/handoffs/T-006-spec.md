@@ -1,3 +1,5 @@
+Author: Claude (PM/QA)
+
 # T-006 Spec — 백엔드 안전성 개선
 
 ## 목적
@@ -136,3 +138,4 @@ return NextResponse.redirect(
 - revalidatePath 정리 (별도 티켓)
 - Tournament end를 Server Action으로 전환
 - Soft delete 도입
+

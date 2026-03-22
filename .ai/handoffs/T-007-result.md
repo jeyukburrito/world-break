@@ -1,3 +1,5 @@
+Author: Codex (Implementer)
+
 # T-007 Result
 
 ## Summary
@@ -34,3 +36,4 @@ Applied the performance cleanup from `T-007-spec.md` in `webapp/`.
 
 ## Remaining Work
 - None for this ticket.
+

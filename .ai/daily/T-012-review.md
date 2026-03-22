@@ -1,3 +1,5 @@
+Author: Claude (PM/QA)
+
 # T-012 Review - 게스트 모드
 
 **리뷰어**: Codex  
@@ -36,3 +38,4 @@
 
 ## Decision
 - `APPROVE`
+

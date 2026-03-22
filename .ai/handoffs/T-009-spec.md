@@ -1,3 +1,5 @@
+Author: Claude (PM/QA)
+
 # T-009 Spec — "Tactical Editorial" UI 전면 개편
 
 ## 목적
@@ -412,3 +414,4 @@ Material Symbols Outlined 사용:
 - 아바타 편집 기능
 - Lighthouse PWA 점수 최적화 (T-008에서 처리)
 - 메모(Match Notes) 필드 신규 추가 (기존 DB 스키마 변경 없음)
+

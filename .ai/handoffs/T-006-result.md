@@ -1,3 +1,5 @@
+Author: Codex (Implementer)
+
 # T-006 Result
 
 ## Summary
@@ -28,3 +30,4 @@ Implemented backend safety fixes defined in `T-006-spec.md` without changing fea
 ## Risks
 - Production build verification is incomplete due to environment-level `spawn EPERM`.
 - `playedAt` format validation now rejects malformed input earlier; this is intended but may surface hidden client-side invalid submissions that previously slipped through.
+

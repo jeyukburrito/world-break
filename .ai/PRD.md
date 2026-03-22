@@ -1,3 +1,5 @@
+Author: Claude (PM/QA)
+
 # Product Requirements
 
 `webapp/` 전반에 적용되는 제품 범위 및 사용자 요구사항을 정의한다.
@@ -10,3 +12,4 @@
 - 주요 UX/워크플로 제약
 
 Claude가 관리하며, Orchestrator 지시가 없는 한 Codex가 수정하지 않는다.
+

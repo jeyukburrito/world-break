@@ -1,3 +1,5 @@
+Author: Claude (PM/QA)
+
 # T-005 Spec — 프로필 페이지 개선
 
 ## 목적
@@ -224,3 +226,4 @@ function SettingsLink({ href, label, count }: { href: string; label: string; cou
 - 연속 승리 스트릭
 - 월별 활동 히트맵
 - 게임별 탭 분리
+

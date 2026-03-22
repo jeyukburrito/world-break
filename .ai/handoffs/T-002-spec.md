@@ -1,3 +1,5 @@
+Author: Claude (PM/QA)
+
 # T-002 Spec — 대시보드 이벤트 카테고리 필터 + 상성 매트릭스
 
 ## 목적
@@ -186,3 +188,4 @@ ORDER BY d."name" ASC, m."opponentDeckName" ASC
 - 상성 매트릭스 내 정렬 기능
 - 매트릭스 셀 클릭 → 해당 매치 목록 drill-down
 - 모바일 전용 대체 뷰 (가로 스크롤로 대응)
+

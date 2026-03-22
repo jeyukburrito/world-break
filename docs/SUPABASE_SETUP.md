@@ -1,3 +1,5 @@
+﻿Author: Legacy / Unknown
+
 # Supabase Setup Guide
 
 ## Goal
@@ -131,3 +133,4 @@ Then verify:
 - Supabase redirect URLs: https://supabase.com/docs/guides/auth/redirect-urls
 - Supabase service role guidance: https://supabase.com/docs/guides/troubleshooting/performing-administration-tasks-on-the-server-side-with-the-servicerole-secret-BYM4Fa
 - Prisma + Supabase: https://www.prisma.io/docs/v6/orm/overview/databases/supabase
+

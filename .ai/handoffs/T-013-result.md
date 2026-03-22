@@ -1,4 +1,6 @@
-﻿# T-013 Result
+Author: Codex (Implementer)
+
+# T-013 Result
 
 ## Summary
 - Completed a read-only audit of the Prisma schema, server actions, API routes, auth/guest flows, and dashboard raw SQL.
@@ -127,3 +129,4 @@
 - Add UUID validation + `count === 0` handling for the remaining match/tournament/deck mutation paths.
 - Harden CSV export with formula neutralization and a streaming / chunked response path.
 - Revisit multi-step transactional boundaries around tournament-session creation if duplicate-session reports appear in production.
+

@@ -1,3 +1,5 @@
+Author: Claude (PM/QA)
+
 # T-004 Review — 기록 페이지 버그·UIUX 개선
 
 ## 결론: 승인
@@ -18,3 +20,4 @@
 ## 빌드
 
 로컬 `npm run build` PASS
+

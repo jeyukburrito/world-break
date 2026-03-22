@@ -1,3 +1,5 @@
+Author: Claude (PM/QA)
+
 # Handoff Documents
 
 티켓당 spec 1개 + result 1개를 작성한다.
@@ -24,3 +26,8 @@
 - Risks
 
 Codex가 result를 작성해도 완료가 아님 — review 후 승인으로 결정된다.
+
+모든 handoff 문서는 첫 줄에 `Author: [Role/Name]`을 포함한다.
+
+
+

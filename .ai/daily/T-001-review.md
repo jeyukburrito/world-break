@@ -1,3 +1,5 @@
+Author: Claude (PM/QA)
+
 # T-001 Review — Tag 연동
 
 ## Review Summary
@@ -46,3 +48,4 @@ Codex가 T-001 spec을 기반으로 태그 연동 기능을 구현함. 전체 Do
 ## Decision
 
 **승인** — Done Definition 전항목 충족, lint/build 통과, 소유권 검증 정상, 기존 코드 패턴과 일관성 유지. Minor 이슈는 기능에 영향 없으며 별도 티켓으로 관리 가능.
+

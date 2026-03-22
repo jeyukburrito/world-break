@@ -1,3 +1,5 @@
+﻿Author: Codex
+
 # World Break — Agent Coordination Guide
 
 ## Overview
@@ -22,8 +24,8 @@ world-break/
   lib/           # Utilities, Supabase client, Prisma client
   prisma/        # Prisma schema and migrations
   public/        # Static assets
-  .ai/           # Claude↔Codex handoff system
-    daily/       # Daily work logs (append/update every workday)
+  .ai/           # Multi-CLI collaboration system
+    daily/       # Daily logs, reviews, retrospectives, release notes/checklists
 ```
 
 ## Prisma Models
@@ -49,14 +51,14 @@ world-break/
 - Before calling work done, run the relevant verification commands and record the result, including failures.
 - Use sub-agents only for clearly bounded work; keep one focused task per sub-agent and preserve file ownership boundaries.
 
-## Claude↔Codex Coordination
+## Multi-CLI Coordination
 The `.ai/` directory is the single source of truth for all collaboration.
 
 - `.ai/PROJECT_RULES.md`: role boundaries and operating rules
 - `.ai/TASKS.md`: ticket index and status
 - `.ai/handoffs/`: spec and result documents
-- `.ai/reviews/`: review documents
-- `.ai/release/`: release checklist and deploy notes
+- `.ai/daily/`: daily logs, reviews, retrospectives, release notes, and release checklists
+
 
 Do not use ad-hoc notes or chat-only instructions as collaboration sources of truth.
 Do not create a parallel `tasks/` workflow for planning or lessons unless a dedicated project ticket explicitly introduces it; use the `.ai/` system instead.
@@ -77,3 +79,5 @@ Do not create a parallel `tasks/` workflow for planning or lessons unless a dedi
 ## Verification Standard
 - Prefer the strongest relevant verification for the task, typically `npm run lint`, `npm run build`, and Prisma validation/generation commands when schema or data-access code changes.
 - If an environment limitation blocks verification, record the exact command and failure reason in the result document and daily log.
+
+

@@ -1,3 +1,5 @@
+Author: Claude (PM/QA)
+
 # T-009 Review - Tactical Editorial UI 전면 개편
 
 **리뷰어**: Claude (PM/QA)  
@@ -40,3 +42,4 @@
 
 ## Notes
 - 설정/프로필 화면의 추가 시각 polish 여지는 남아 있으나, 현재 QA reject 범위에는 포함되지 않음.
+

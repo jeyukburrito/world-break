@@ -1,3 +1,5 @@
+Author: Claude (PM/QA)
+
 # T-001 Tag 연동
 
 ## Goal
@@ -72,3 +74,4 @@ Prisma 스키마에 이미 존재하는 `Tag`/`MatchResultTag` 모델을 실제 
 - 수정/생성 파일 목록
 - lint/build 결과
 - 알려진 이슈 및 리스크
+

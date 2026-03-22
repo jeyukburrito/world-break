@@ -1,3 +1,5 @@
+Author: Codex (Implementer)
+
 # T-011 Result
 
 ## Summary
@@ -23,3 +25,4 @@ Applied the `T-011-spec.md` changes for PWA entry behavior and duplicate page-ti
 
 ## Risks
 - None identified within spec scope.
+

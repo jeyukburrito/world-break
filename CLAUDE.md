@@ -1,4 +1,4 @@
-# CLAUDE.md — World Break
+﻿# CLAUDE.md — World Break
 
 World Break는 TCG 전적 기록 모바일 PWA입니다.
 아키텍처 상세: `docs/ARCHITECTURE.md`
@@ -59,11 +59,12 @@ Available skills: /office-hours, /plan-ceo-review, /plan-eng-review, /plan-desig
 
 Webapp 개발은 **파일 기반 핸드오프**로 운영합니다. 상세 규칙: `.ai/PROJECT_RULES.md`
 
-- **Claude 역할**: PM + QA — spec 작성 (`handoffs/T-xxx-spec.md`), 리뷰 (`reviews/T-xxx-review.md`). 직접 구현 금지.
+- **Claude 역할**: PM + QA — spec 작성 (`handoffs/T-xxx-spec.md`), 리뷰 (`daily/T-xxx-review.md`). 직접 구현 금지.
 - **Codex 역할**: 구현 담당 — spec 기준으로만 코드 작성, result 작성 (`handoffs/T-xxx-result.md`). 범위 임의 확장 금지.
 - **티켓 흐름**: spec → 구현 → result → review → 승인
 - **티켓 현황**: `.ai/TASKS.md`
-- **핸드오프 파일**: `.ai/handoffs/`, `.ai/reviews/`
+- **협업 문서 허브**: `.ai/handoffs/`, `.ai/daily/`
+- **문서 메타 규칙**: 모든 프로젝트 문서는 상단에 Author: [Role/Name] 필수
 
 ---
 
@@ -105,3 +106,6 @@ npm run prisma:seed     # 개발용 시드 데이터 삽입
 | `SUPABASE_SERVICE_ROLE_KEY` | 계정 삭제 등 admin 작업 (optional) |
 
 > `DATABASE_URL`과 `DIRECT_URL` 둘 다 없으면 Prisma 마이그레이션 실패.
+
+
+

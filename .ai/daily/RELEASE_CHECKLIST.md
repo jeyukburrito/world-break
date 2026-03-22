@@ -1,3 +1,5 @@
+Author: Claude (PM/QA)
+
 # Release Checklist
 
 `webapp/` 배포 관련 변경 승인 전 확인 사항:
@@ -11,3 +13,4 @@
 - [ ] 알려진 리스크가 result 또는 review에 기록됨
 - [ ] 롤백 영향도 파악 완료
 - [ ] Orchestrator 최종 승인 기록
+

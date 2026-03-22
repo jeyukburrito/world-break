@@ -1,3 +1,5 @@
+Author: Claude (PM/QA)
+
 # T-007 Spec — 앱 성능 최적화
 
 ## 목적
@@ -138,3 +140,4 @@ import Image from "next/image";
 - `revalidatePath` → `revalidateTag` 전환 (별도 티켓)
 - 불필요한 `"use client"` 제거 (개별 컴포넌트 리팩터링, 별도 티켓)
 - `listMatchFilterOptions` 최적화 (별도 티켓)
+

@@ -1,3 +1,5 @@
+﻿Author: Legacy / Unknown
+
 # Deployment Guide
 
 ## Stack
@@ -44,3 +46,4 @@ npx prisma migrate deploy
 - [ ] `/matches` filters records
 - [ ] CSV export downloads a file
 - [ ] `/dashboard` loads stats without errors
+

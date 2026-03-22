@@ -1,3 +1,5 @@
+Author: Claude (PM/QA)
+
 # T-008 Spec — PWA 적용
 
 ## 목적
@@ -225,3 +227,4 @@ export default function OfflinePage() {
 - 아이콘 디자인 (placeholder만 생성, 추후 교체)
 - apple-touch-icon 별도 생성
 - Lighthouse PWA 점수 최적화 (별도 티켓)
+

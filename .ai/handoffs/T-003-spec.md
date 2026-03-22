@@ -1,3 +1,5 @@
+Author: Claude (PM/QA)
+
 # T-003 Spec — UI 일관성 개선
 
 ## 목적
@@ -168,3 +170,4 @@
 - 승/패 색상 외 추가 시각 표시 (패턴, 아이콘) — 별도 티켓
 - 다크모드 chart 색상 대비 검증 — 별도 티켓
 - 날짜 input native picker 스타일링
+

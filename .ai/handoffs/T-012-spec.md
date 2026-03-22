@@ -1,3 +1,5 @@
+Author: Claude (PM/QA)
+
 # T-012 Spec — 게스트 모드 (비회원 체험 + 개발 편의)
 
 ## 목적
@@ -285,3 +287,4 @@ datasource db {
 - 게스트 데이터 자동 만료/삭제 cron
 - 게스트 계정 간 데이터 공유
 - SQLite ↔ Postgres 자동 전환 (개발자가 env var로 수동 설정)
+

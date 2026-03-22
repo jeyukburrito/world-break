@@ -1,3 +1,5 @@
+Author: Codex (Implementer)
+
 # T-005 Result
 
 ## Summary
@@ -40,4 +42,5 @@ Implemented the profile page UX improvement spec from `T-005-spec.md` in the sco
 
 ## Risks
 - Build verification is incomplete due to environment-level permission issue (`spawn EPERM`), not a deterministic code-level error from this change.
+
 

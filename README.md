@@ -1,3 +1,5 @@
+﻿Author: Codex
+
 # World Break
 
 TCG 전적 기록 모바일 PWA — 덱별 승률, 상성 분석, 대회 세션을 한 곳에서 관리합니다.
@@ -84,10 +86,14 @@ User → Game → Deck → MatchResult
 
 Vercel + Supabase 조합으로 배포합니다. 상세 절차는 [DEPLOYMENT.md](./docs/DEPLOYMENT.md)를 참고하세요.
 
-## 개발 협업 (Claude ↔ Codex)
+## 개발 협업 (Multi-CLI)
 
 기능 개발은 파일 기반 핸드오프로 운영합니다.
 
 - 티켓 현황: [`.ai/TASKS.md`](./.ai/TASKS.md)
 - 협업 규칙: [`.ai/PROJECT_RULES.md`](./.ai/PROJECT_RULES.md)
+- 리뷰 / 일일 로그 / 릴리스 문서: [`.ai/daily/`](./.ai/daily/)
 - Spec / Result 문서: [`.ai/handoffs/`](./.ai/handoffs/)
+
+
+

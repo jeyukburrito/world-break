@@ -1,3 +1,5 @@
+Author: Codex (Implementer)
+
 # T-004 Result
 
 ## Summary
@@ -38,3 +40,4 @@ Implemented record-page bug fixes and UI/UX improvements from `T-004-spec.md` in
 ## Risks
 - Build validation is incomplete due to environment-level `spawn EPERM`.
 - This ticket intentionally does not change backend/data logic; only UI and interaction surface were updated.
+

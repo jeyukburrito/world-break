@@ -1,10 +1,12 @@
+Author: Claude (PM/QA)
+
 # PROJECT_RULES.md — Webapp 협업 운영 규칙
 
 ## 역할 분담
 
 ### 라우팅 원칙: 작업 유형 기반
 
-구현 담당을 파일 수가 아닌 **작업 유형**으로 결정한다.
+구현 담당을 파일 수가 아닌 **작업 유형**으로 결정한다. 모든 프로젝트 문서는 상단에 `Author: [Role/Name]` 형식을 필수로 포함한다.
 
 ```
 작업 유형                        Claude 직접   Codex 위임
@@ -31,7 +33,7 @@ Scaffolding / 보일러플레이트                       ✓
 - 요구사항 정리 및 MVP 범위 확정
 - 작업 분해 (티켓 단위)
 - Done Definition이 포함된 spec 작성 (`handoffs/T-xxx-spec.md`)
-- Codex 구현 결과 검수 (`reviews/T-xxx-review.md`)
+- Codex 구현 결과 검수 (`daily/T-xxx-review.md`)
 - 배포 전 체크리스트 작성
 - 위 라우팅 원칙에 따른 직접 구현 (Config, Docs, 소규모 즉각 수정)
 
@@ -75,16 +77,17 @@ Scaffolding / 보일러플레이트                       ✓
 
 ## 소통 방식
 
-**핵심 원칙: 두 CLI가 서로 직접 대화하지 않고, 반드시 파일을 통해 구조화된 방식으로만 소통한다.**
+**핵심 원칙: 여러 CLI가 서로 직접 대화하지 않고, 반드시 파일을 통해 구조화된 방식으로만 소통한다.**
 
 - MCP 사용하지 않음
 - 맥락 드리프트 방지, 책임 추적 가능, 리뷰 가능, 재현 가능
+- 리뷰, 세션 회고, 릴리스 로그/체크리스트는 모두 `.ai/daily/` 아래에 둔다.
 
 ### 파일 소유권
 
 | 담당 | 파일 |
 |------|------|
-| Claude | `PRD.md`, `TASKS.md`, `handoffs/T-xxx-spec.md`, `reviews/T-xxx-review.md` |
+| Claude | `PRD.md`, `TASKS.md`, `handoffs/T-xxx-spec.md`, `daily/T-xxx-review.md` |
 | Codex | `webapp/app/*`, `webapp/lib/*`, `webapp/components/*`, `webapp/prisma/*`, `handoffs/T-xxx-result.md` |
 
 ---
@@ -95,7 +98,7 @@ Scaffolding / 보일러플레이트                       ✓
 1. Claude → spec 작성      (handoffs/T-xxx-spec.md)
 2. 사용자 → spec 승인 후 Codex에 구현 지시
 3. Codex  → 구현 + result 작성 (handoffs/T-xxx-result.md)
-4. Claude → 리뷰 작성         (reviews/T-xxx-review.md)
+4. Claude → 리뷰 작성         (daily/T-xxx-review.md)
 5. 사용자 → 승인 or 재작업 지시
 ```
 
@@ -126,6 +129,7 @@ Scaffolding / 보일러플레이트                       ✓
 
 ## 작성 원칙
 
+- **작성자 명시 필수**: 모든 문서(`.md`) 상단에 `Author: [작성자명/역할]`을 기재한다.
 - 구체적으로 쓸 것 — "적당히", "잘 처리" 같은 모호한 표현 금지
 - 완료 기준은 관찰 가능한 형태로 정의
 - 완료와 추정을 구분
@@ -139,7 +143,7 @@ Scaffolding / 보일러플레이트                       ✓
 - `.ai/` 문서와 `webapp/` 코드 파일은 UTF-8 기준으로 다룬다.
 - 문서 작성 또는 코드 수정 시 한글이 깨진 상태로 저장하지 않는다.
 - 터미널 출력에서 문자열이 깨져 보여도, 파일 저장 전 실제 파일 내용과 인코딩을 다시 확인한다.
-- 결과 문서(`handoffs/T-xxx-result.md`)와 리뷰 문서(`reviews/T-xxx-review.md`)는 사람이 바로 읽을 수 있는 정상 한글 상태를 유지한다.
+- 결과 문서(`handoffs/T-xxx-result.md`)와 리뷰 문서(`daily/T-xxx-review.md`)는 사람이 바로 읽을 수 있는 정상 한글 상태를 유지한다.
 - 인코딩이 불명확한 기존 파일을 수정할 때는 변경 범위를 최소화하고, 필요하면 해당 파일 전체를 UTF-8 기준으로 정리한 뒤 수정한다.
 
 ## Sub-Agent 호출 지침
@@ -161,3 +165,6 @@ Scaffolding / 보일러플레이트                       ✓
 - review sub-agent를 호출할 때는 읽기 전용 검토인지, 수정 권한이 있는 재작업 검토인지 명시한다.
 - 보조 탐색 agent는 읽기 전용으로 사용하고, 구현 agent와 파일 소유권을 겹치게 두지 않는다.
 - sub-agent를 호출했더라도 최종 통합 책임은 메인 Codex에게 있다.
+
+
+

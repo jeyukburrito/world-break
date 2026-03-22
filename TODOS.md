@@ -1,3 +1,5 @@
+﻿Author: Legacy / Unknown
+
 # TODOS.md
 
 ## Server Action 통합 테스트 도입
@@ -32,3 +34,4 @@ Server Action의 DB 연동 테스트는 별도 설정이 필요함.
 - CASCADE 삭제로 관련 데이터 자동 정리
 
 **Depends on:** 없음 (독립 작업)
+

@@ -1,3 +1,5 @@
+Author: Claude (PM/QA)
+
 # T-011 Spec — PWA start_url 수정 + UI 중복 제목 제거
 
 ## 목적
@@ -175,3 +177,4 @@ matches/page.tsx 내 카드의 `h2` (`{match.myDeck.name} vs {match.opponentDeck
 - `matches/new`, `matches/[id]/edit` 등 다른 페이지 제목 변경
 - TopAppBar 디자인 변경
 - iOS/Android PWA 설치 프로세스 안내 UI
+

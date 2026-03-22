@@ -1,3 +1,5 @@
+Author: Claude (PM/QA)
+
 # T-004 Spec — 기록 페이지 버그 수정 및 UIUX 개선
 
 ## 목적
@@ -207,3 +209,4 @@ BO1 · 승 · 선공 · 선후공 결정 O
 - 필터 바텀 시트 전환
 - 삭제 `window.confirm` → 커스텀 확인 UI
 - 카드 시각 계층 재설계 (accent bar 등)
+

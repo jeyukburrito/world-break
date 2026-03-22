@@ -1,3 +1,5 @@
+Author: Codex (Implementer)
+
 # T-001 Result
 
 ## Summary
@@ -57,3 +59,4 @@
   - `/matches/new`에서 0~10개 태그 선택 후 저장
   - `/matches/[id]/edit`에서 기존 태그 표시 및 변경 반영
   - `/matches` 목록과 토너먼트 타임라인에서 태그 표시
+

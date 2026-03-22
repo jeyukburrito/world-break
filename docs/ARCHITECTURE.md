@@ -1,3 +1,5 @@
+﻿Author: Legacy / Unknown
+
 # Architecture — World Break
 
 > 이 문서는 앱의 아키텍처 패턴, 데이터 모델, 디렉토리 구조를 설명합니다.
@@ -87,7 +89,7 @@ world-break/
 │   ├── ARCHITECTURE.md    # 이 문서
 │   ├── DEPLOYMENT.md
 │   └── SUPABASE_SETUP.md
-├── .ai/                   # Claude↔Codex 핸드오프 시스템
+├── .ai/                   # Multi-CLI 협업 시스템
 │   ├── TASKS.md
 │   ├── handoffs/
 │   ├── reviews/
@@ -95,3 +97,5 @@ world-break/
 ├── CLAUDE.md
 └── AGENTS.md
 ```
+
+

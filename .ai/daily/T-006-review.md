@@ -1,3 +1,5 @@
+Author: Claude (PM/QA)
+
 # T-006 Review — 백엔드 안전성 개선
 
 ## 결론: 승인
@@ -18,3 +20,4 @@
 ## 빌드
 
 로컬 `npm run build` PASS
+

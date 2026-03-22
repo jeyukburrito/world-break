@@ -1,3 +1,5 @@
+Author: Claude (PM/QA)
+
 # T-007 Review — 앱 성능 최적화
 
 **상태**: APPROVE
@@ -19,3 +21,4 @@
 
 - `ssr: false` 옵션은 Next.js 15 Server Component 제약으로 사용 불가하여 생략됨
 - Recharts 번들 lazy-load는 옵션 없이도 정상 작동 → 성능 목표 달성
+

@@ -1,3 +1,5 @@
+Author: Claude (PM/QA)
+
 # T-011 Review - PWA start_url 수정 + UI 중복 제목 제거
 
 **리뷰어**: Codex  
@@ -34,3 +36,4 @@
 
 ## Decision
 - `APPROVE`
+

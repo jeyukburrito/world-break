@@ -1,3 +1,5 @@
+Author: Codex (Implementer)
+
 # T-012 Result
 
 ## Summary
@@ -39,4 +41,5 @@ Implemented guest mode across login, auth, middleware, and profile flows so the 
 ## Risks
 - Starting Google login from guest mode clears the guest cookie and begins a separate authenticated account; guest data is not transferred automatically.
 - If a guest cookie is manually replaced with a new valid-looking token, the app can create a new guest row for that token on demand. This is acceptable within the current anonymous-device model.
+
 

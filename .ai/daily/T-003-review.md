@@ -1,3 +1,5 @@
+Author: Claude (PM/QA)
+
 # T-003 Review — UI 일관성 개선
 
 ## 결론: 승인
@@ -17,3 +19,4 @@
 - [x] PeriodFilter: aria-pressed, useSearchParams category 보존
 - [x] AppShell: 브랜드명 `<span aria-hidden="true">`
 - [x] DashboardCharts: 빈 상태 `/matches/new` CTA 링크, 범례 첫 색상 bg-accent
+
