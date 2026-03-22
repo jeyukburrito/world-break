@@ -73,19 +73,6 @@ function SingleMatchCard({
         <MatchStatusPill isWin={match.isMatchWin} />
       </div>
 
-      {match.tags.length > 0 ? (
-        <div className="mt-4 flex flex-wrap gap-2">
-          {match.tags.map(({ tag }) => (
-            <span
-              key={tag.id}
-              className="rounded-full bg-paper px-3 py-1 text-xs font-medium text-muted"
-            >
-              #{tag.name}
-            </span>
-          ))}
-        </div>
-      ) : null}
-
       <div className="mt-5 flex items-center gap-2">
         <Link
           href={`/matches/${match.id}/edit`}
@@ -210,19 +197,6 @@ function TournamentMatchCard({
                 </div>
                 <MatchStatusPill isWin={match.isMatchWin} />
               </div>
-
-              {match.tags.length > 0 ? (
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {match.tags.map(({ tag }) => (
-                    <span
-                      key={tag.id}
-                      className="rounded-full bg-surface px-2.5 py-1 text-[11px] font-medium text-muted"
-                    >
-                      #{tag.name}
-                    </span>
-                  ))}
-                </div>
-              ) : null}
 
               <div className="mt-4 flex items-center gap-2">
                 <Link

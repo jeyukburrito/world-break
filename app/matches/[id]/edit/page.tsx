@@ -8,7 +8,6 @@ import { HeaderActions } from "@/components/header-actions";
 import { MatchDetailControls } from "@/components/match-detail-controls";
 import { MatchResultInput } from "@/components/match-result-input";
 import { SubmitButton } from "@/components/submit-button";
-import { TagSelector } from "@/components/tag-selector";
 import { getUserDisplayInfo, requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -28,36 +27,24 @@ export default async function EditMatchPage({ params, searchParams }: EditMatchP
   const query = searchParams ? await searchParams : undefined;
   const errorMessage = typeof query?.error === "string" ? query.error : undefined;
 
-  const [match, tags] = await Promise.all([
-    prisma.matchResult.findFirst({
-      where: {
-        id,
-        userId: user.id,
-      },
-      include: {
-        myDeck: {
-          select: {
-            name: true,
-            game: {
-              select: {
-                name: true,
-              },
+  const match = await prisma.matchResult.findFirst({
+    where: {
+      id,
+      userId: user.id,
+    },
+    include: {
+      myDeck: {
+        select: {
+          name: true,
+          game: {
+            select: {
+              name: true,
             },
           },
         },
-        tags: {
-          select: {
-            tagId: true,
-          },
-        },
       },
-    }),
-    prisma.tag.findMany({
-      where: { userId: user.id },
-      orderBy: { name: "asc" },
-      select: { id: true, name: true },
-    }),
-  ]);
+    },
+  });
 
   if (!match) {
     notFound();
@@ -130,7 +117,6 @@ export default async function EditMatchPage({ params, searchParams }: EditMatchP
             className="rounded-2xl border border-line bg-surface px-4 py-3 text-ink"
           />
         </label>
-        <TagSelector tags={tags} defaultSelectedIds={match.tags.map((tag) => tag.tagId)} />
         <div className="md:col-span-2">
           <SubmitButton label="수정 저장" />
         </div>

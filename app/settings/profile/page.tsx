@@ -17,8 +17,6 @@ type ProfileStats = {
   wins: number;
   rate: number | null;
   lastPlayedAt: Date | null;
-  deckCount: number;
-  tagCount: number;
   gameCount: number;
 };
 
@@ -43,7 +41,7 @@ function formatDate(value: Date | null) {
 }
 
 async function getProfileStats(userId: string): Promise<ProfileStats> {
-  const [matchRows, deckCount, tagCount, gameCount] = await Promise.all([
+  const [matchRows, gameCount] = await Promise.all([
     prisma.$queryRaw<MatchStatsRow[]>(Prisma.sql`
       SELECT
         COUNT(*)::bigint AS total,
@@ -52,12 +50,6 @@ async function getProfileStats(userId: string): Promise<ProfileStats> {
       FROM "match_results"
       WHERE "userId" = CAST(${userId} AS uuid)
     `),
-    prisma.deck.count({
-      where: { userId, isActive: true },
-    }),
-    prisma.tag.count({
-      where: { userId },
-    }),
     prisma.game.count({
       where: { userId },
     }),
@@ -69,7 +61,7 @@ async function getProfileStats(userId: string): Promise<ProfileStats> {
   const lastPlayedAt = row?.lastPlayedAt ?? null;
   const rate = total === 0 ? null : Math.round((wins / total) * 100);
 
-  return { total, wins, rate, lastPlayedAt, deckCount, tagCount, gameCount };
+  return { total, wins, rate, lastPlayedAt, gameCount };
 }
 
 function StatCard({
@@ -184,7 +176,6 @@ export default async function ProfilePage() {
               value={stats.rate !== null ? `${stats.rate}%` : "-"}
               accent={stats.rate !== null && stats.rate >= 50}
             />
-            <StatCard label="덱" value={`${stats.deckCount}개`} />
             <StatCard
               label="마지막 경기"
               value={stats.lastPlayedAt ? formatRelativeDate(stats.lastPlayedAt) : "-"}
@@ -197,9 +188,7 @@ export default async function ProfilePage() {
             Control
           </p>
           <article className="overflow-hidden rounded-3xl border border-line bg-surface shadow-sm">
-            <SettingsLink href="/settings/decks" label="덱 관리" count={stats.deckCount} />
             <SettingsLink href="/settings/games" label="게임 관리" count={stats.gameCount} />
-            <SettingsLink href="/settings/tags" label="태그 관리" count={stats.tagCount} />
           </article>
         </section>
 
@@ -228,7 +217,7 @@ export default async function ProfilePage() {
               <p className="mb-4 text-sm leading-6 text-muted">
                 {isGuest
                   ? "게스트 데이터와 세션을 이 기기에서 제거합니다."
-                  : "회원 탈퇴 시 계정, 덱, 태그, 경기 기록이 모두 삭제되며 복구할 수 없습니다."}
+                  : "회원 탈퇴 시 계정과 경기 기록이 모두 삭제되며 복구할 수 없습니다."}
               </p>
               <DeleteAccountButton />
             </form>

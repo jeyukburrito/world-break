@@ -1,7 +1,7 @@
 // components/dashboard-charts.tsx
 import Link from "next/link";
 
-import type { DonutSlice, MatchupCell } from "@/lib/dashboard";
+import type { DonutSlice } from "@/lib/dashboard";
 
 const COLORS = [
   "#4f46e5",
@@ -19,7 +19,6 @@ const COLORS = [
 type DashboardChartsProps = {
   myDeckSlices: DonutSlice[];
   opponentSlices: DonutSlice[];
-  topMatchups: MatchupCell[];
   totalMatches: number;
 };
 
@@ -160,7 +159,6 @@ function DistributionCard({
 export function DashboardCharts({
   myDeckSlices,
   opponentSlices,
-  topMatchups,
   totalMatches,
 }: DashboardChartsProps) {
   const totalWins = myDeckSlices.reduce((sum, slice) => sum + slice.wins, 0);
@@ -202,68 +200,6 @@ export function DashboardCharts({
         </div>
       </div>
 
-      {/* 상성 매트릭스 */}
-      <article className="rounded-[32px] bg-surface p-5 shadow-[0_4px_20px_-4px_rgba(25,28,30,0.06)]">
-        <div className="flex items-center gap-2.5">
-          <span className="h-4 w-1 rounded-full bg-accent" />
-          <h3 className="text-base font-semibold tracking-tight text-ink">상성 매트릭스</h3>
-          <span className="ml-auto rounded-full bg-accent/10 px-2.5 py-0.5 text-xs font-semibold text-accent">
-            Top {topMatchups.length}
-          </span>
-        </div>
-
-        {topMatchups.length > 0 ? (
-          <div className="mt-4 space-y-2">
-            {topMatchups.map((cell) => {
-              const losses = cell.total - cell.wins;
-              const isFavored = cell.rate >= 55;
-              const isUnfavored = cell.rate < 45;
-
-              return (
-                <div
-                  key={`${cell.myDeck}:${cell.opponentDeck}`}
-                  className="flex items-center justify-between rounded-xl bg-surface-container-lowest p-4 shadow-[0_2px_8px_rgba(25,28,30,0.04)]"
-                >
-                  <div className="min-w-0 flex-1">
-                    {/* 덱명 */}
-                    <p className="truncate text-sm font-semibold text-ink">
-                      {cell.myDeck}
-                      <span className="mx-1.5 font-normal text-muted">vs</span>
-                      {cell.opponentDeck}
-                    </p>
-                    {/* 승률 텍스트 */}
-                    <p className="mt-0.5 text-xs text-muted">
-                      {cell.rate}% 승률 · {formatNumber(cell.total)}경기
-                    </p>
-                  </div>
-
-                  {/* W/L 뱃지 */}
-                  <div className="ml-4 flex items-center gap-1.5 shrink-0">
-                    <span
-                      className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${
-                        isFavored
-                          ? "bg-success/15 text-success"
-                          : isUnfavored
-                            ? "bg-error-container/40 text-error"
-                            : "bg-accent/10 text-accent"
-                      }`}
-                    >
-                      {formatNumber(cell.wins)}W
-                    </span>
-                    <span className="rounded-full bg-paper px-2.5 py-0.5 text-xs font-bold text-muted">
-                      {formatNumber(losses)}L
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="mt-4 rounded-[20px] bg-paper px-5 py-8 text-center text-sm text-muted">
-            상성 데이터를 만들 기록이 아직 없습니다.
-          </div>
-        )}
-      </article>
     </section>
   );
 }

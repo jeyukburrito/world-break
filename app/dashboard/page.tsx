@@ -6,7 +6,7 @@ import { DashboardCharts } from "@/components/dashboard-charts";
 import { HeaderActions } from "@/components/header-actions";
 import { PeriodFilter } from "@/components/period-filter";
 import { getUserDisplayInfo, requireUser } from "@/lib/auth";
-import { getDashboardData, getTopMatchups } from "@/lib/dashboard";
+import { getDashboardData } from "@/lib/dashboard";
 
 type DashboardPageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -24,20 +24,12 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const to = isDateString(params?.to) ? params.to : undefined;
   const category = typeof params?.category === "string" ? params.category : "all";
 
-  const [{ myDeckSlices, opponentSlices, totalMatches }, topMatchups] = await Promise.all([
-    getDashboardData(user.id, {
-      period,
-      from,
-      to,
-      category,
-    }),
-    getTopMatchups(user.id, {
-      period,
-      from,
-      to,
-      category,
-    }),
-  ]);
+  const { myDeckSlices, opponentSlices, totalMatches } = await getDashboardData(user.id, {
+    period,
+    from,
+    to,
+    category,
+  });
 
   return (
     <AppShell
@@ -60,7 +52,6 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       <DashboardCharts
         myDeckSlices={myDeckSlices}
         opponentSlices={opponentSlices}
-        topMatchups={topMatchups}
         totalMatches={totalMatches}
       />
     </AppShell>

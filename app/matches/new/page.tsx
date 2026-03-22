@@ -5,7 +5,6 @@ import { HeaderActions } from "@/components/header-actions";
 import { MatchDetailControls } from "@/components/match-detail-controls";
 import { MatchResultInput } from "@/components/match-result-input";
 import { SubmitButton } from "@/components/submit-button";
-import { TagSelector } from "@/components/tag-selector";
 import { TournamentBanner } from "@/components/tournament-banner";
 import { getUserDisplayInfo, requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -36,12 +35,7 @@ export default async function NewMatchPage({ searchParams }: NewMatchPageProps) 
   const phaseLabel = isElimination ? "본선" : "예선";
   const today = continueDate ?? new Date().toISOString().slice(0, 10);
 
-  const [tags, continuedTournament, phaseCount] = await Promise.all([
-    prisma.tag.findMany({
-      where: { userId: user.id },
-      orderBy: { name: "asc" },
-      select: { id: true, name: true },
-    }),
+  const [continuedTournament, phaseCount] = await Promise.all([
     continueTournamentId
       ? prisma.tournamentSession.findFirst({
           where: {
@@ -175,7 +169,6 @@ export default async function NewMatchPage({ searchParams }: NewMatchPageProps) 
                 className="min-h-28 rounded-2xl bg-surface-container-high px-4 py-3 text-ink"
               />
             </label>
-            <TagSelector tags={tags} />
           </section>
 
           {errorMessage ? (

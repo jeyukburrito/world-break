@@ -18,16 +18,6 @@ export default async function SettingsPage() {
       <div className="mx-auto flex max-w-md flex-col gap-6 pb-8">
         <section className="overflow-hidden rounded-3xl border border-line bg-surface shadow-sm">
           <SettingsLink
-            href="/settings/decks"
-            label="덱 관리"
-            description="게임별로 사용하는 덱을 정리합니다."
-          />
-          <SettingsLink
-            href="/settings/tags"
-            label="태그 관리"
-            description="경기 분류용 태그를 생성하고 정리합니다."
-          />
-          <SettingsLink
             href="/settings/export"
             label="CSV 내보내기"
             description="조건에 맞는 기록을 CSV로 받습니다."
