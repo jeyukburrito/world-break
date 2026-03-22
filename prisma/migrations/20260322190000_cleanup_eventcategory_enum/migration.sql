@@ -1,49 +1,79 @@
--- Cleanup migration: fix partial-apply state from 20260322180000_migrate_cs_to_shop
--- Handles all possible states:
---   1. Both old migration fully applied (EventCategory has friendly+shop, no _old type)
---   2. Partial apply: EventCategory renamed to _old, new EventCategory may or may not exist
---   3. Columns may be typed as EventCategory or EventCategory_old
+-- Cleanup migration: finish removing `cs` from EventCategory.
+-- This migration is intentionally resilient to both states below:
+--   1. `20260322180000_migrate_cs_to_shop` was marked applied but never executed.
+--   2. `20260322180000_migrate_cs_to_shop` partially ran and left EventCategory_old behind.
 
--- Step 1: Ensure no defaults reference the old type
+-- Step 1: remove defaults / constraints that still reference the old enum shape.
 ALTER TABLE "match_results" ALTER COLUMN "eventCategory" DROP DEFAULT;
 ALTER TABLE "tournament_sessions" ALTER COLUMN "eventCategory" DROP DEFAULT;
+ALTER TABLE "match_results" DROP CONSTRAINT IF EXISTS "chk_tournament_phase_category";
 
--- Step 2: If columns are still typed as EventCategory_old, cast them through text
-DO $$ BEGIN
-  -- Check if match_results.eventCategory uses EventCategory_old
-  IF EXISTS (
-    SELECT 1 FROM information_schema.columns c
-    JOIN pg_type t ON c.udt_name = t.typname
-    WHERE c.table_name = 'match_results'
-      AND c.column_name = 'eventCategory'
-      AND c.udt_name = 'EventCategory_old'
-  ) THEN
-    -- Need to ensure new EventCategory type exists first
+-- Step 2: normalize any remaining cs data before recreating the enum.
+UPDATE "match_results"
+SET "eventCategory" = 'shop'
+WHERE "eventCategory"::text = 'cs';
+
+UPDATE "tournament_sessions"
+SET "eventCategory" = 'shop'
+WHERE "eventCategory"::text = 'cs';
+
+-- Step 3: ensure both columns point at an enum that only contains friendly/shop.
+DO $$
+DECLARE
+  match_type text;
+  tournament_type text;
+  current_eventcategory_has_cs boolean;
+BEGIN
+  SELECT c.udt_name
+  INTO match_type
+  FROM information_schema.columns c
+  WHERE c.table_schema = 'public'
+    AND c.table_name = 'match_results'
+    AND c.column_name = 'eventCategory';
+
+  SELECT c.udt_name
+  INTO tournament_type
+  FROM information_schema.columns c
+  WHERE c.table_schema = 'public'
+    AND c.table_name = 'tournament_sessions'
+    AND c.column_name = 'eventCategory';
+
+  SELECT EXISTS (
+    SELECT 1
+    FROM pg_enum e
+    JOIN pg_type t ON e.enumtypid = t.oid
+    WHERE t.typname = 'EventCategory'
+      AND e.enumlabel = 'cs'
+  )
+  INTO current_eventcategory_has_cs;
+
+  IF match_type = 'EventCategory_old' OR tournament_type = 'EventCategory_old' THEN
     IF NOT EXISTS (
-      SELECT 1 FROM pg_type WHERE typname = 'EventCategory'
+      SELECT 1
+      FROM pg_type
+      WHERE typname = 'EventCategory'
     ) THEN
       CREATE TYPE "EventCategory" AS ENUM ('friendly', 'shop');
     END IF;
+
+    IF match_type = 'EventCategory_old' THEN
+      ALTER TABLE "match_results"
+        ALTER COLUMN "eventCategory" TYPE "EventCategory"
+        USING ("eventCategory"::text::"EventCategory");
+    END IF;
+
+    IF tournament_type = 'EventCategory_old' THEN
+      ALTER TABLE "tournament_sessions"
+        ALTER COLUMN "eventCategory" TYPE "EventCategory"
+        USING ("eventCategory"::text::"EventCategory");
+    END IF;
+  ELSIF current_eventcategory_has_cs THEN
+    ALTER TYPE "EventCategory" RENAME TO "EventCategory_old";
+    CREATE TYPE "EventCategory" AS ENUM ('friendly', 'shop');
 
     ALTER TABLE "match_results"
       ALTER COLUMN "eventCategory" TYPE "EventCategory"
       USING ("eventCategory"::text::"EventCategory");
-  END IF;
-END $$;
-
-DO $$ BEGIN
-  IF EXISTS (
-    SELECT 1 FROM information_schema.columns c
-    JOIN pg_type t ON c.udt_name = t.typname
-    WHERE c.table_name = 'tournament_sessions'
-      AND c.column_name = 'eventCategory'
-      AND c.udt_name = 'EventCategory_old'
-  ) THEN
-    IF NOT EXISTS (
-      SELECT 1 FROM pg_type WHERE typname = 'EventCategory'
-    ) THEN
-      CREATE TYPE "EventCategory" AS ENUM ('friendly', 'shop');
-    END IF;
 
     ALTER TABLE "tournament_sessions"
       ALTER COLUMN "eventCategory" TYPE "EventCategory"
@@ -51,30 +81,15 @@ DO $$ BEGIN
   END IF;
 END $$;
 
--- Step 3: Ensure EventCategory enum has correct values (friendly, shop — no cs)
--- If the type exists but still has 'cs', we need to recreate it
-DO $$ BEGIN
-  IF EXISTS (
-    SELECT 1 FROM pg_enum e
-    JOIN pg_type t ON e.enumtypid = t.oid
-    WHERE t.typname = 'EventCategory' AND e.enumlabel = 'cs'
-  ) THEN
-    -- cs still exists in the enum — need full recreation
-    ALTER TABLE "match_results" ALTER COLUMN "eventCategory" TYPE text USING "eventCategory"::text;
-    ALTER TABLE "tournament_sessions" ALTER COLUMN "eventCategory" TYPE text USING "eventCategory"::text;
-    DROP TYPE "EventCategory";
-    CREATE TYPE "EventCategory" AS ENUM ('friendly', 'shop');
-    ALTER TABLE "match_results" ALTER COLUMN "eventCategory" TYPE "EventCategory" USING "eventCategory"::"EventCategory";
-    ALTER TABLE "tournament_sessions" ALTER COLUMN "eventCategory" TYPE "EventCategory" USING "eventCategory"::"EventCategory";
-  END IF;
-END $$;
+-- Step 4: restore the intended schema contract.
+ALTER TABLE "match_results"
+  ALTER COLUMN "eventCategory" SET DEFAULT 'friendly'::"EventCategory";
 
--- Step 4: Migrate any remaining cs values (should be done already, but be safe)
-UPDATE "match_results" SET "eventCategory" = 'shop'::"EventCategory" WHERE "eventCategory"::text = 'cs';
-UPDATE "tournament_sessions" SET "eventCategory" = 'shop'::"EventCategory" WHERE "eventCategory"::text = 'cs';
+ALTER TABLE "match_results"
+  ADD CONSTRAINT "chk_tournament_phase_category" CHECK (
+    ("eventCategory" = 'shop' AND "tournamentPhase" IS NOT NULL)
+    OR ("eventCategory" = 'friendly' AND "tournamentPhase" IS NULL)
+  );
 
--- Step 5: Re-add default on match_results
-ALTER TABLE "match_results" ALTER COLUMN "eventCategory" SET DEFAULT 'friendly'::"EventCategory";
-
--- Step 6: Drop old type if it still exists
+-- Step 5: clean up any leftover legacy enum type.
 DROP TYPE IF EXISTS "EventCategory_old";
