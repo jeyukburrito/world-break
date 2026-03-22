@@ -47,7 +47,7 @@ export function PeriodFilter({ activePeriod, defaultFrom, defaultTo }: PeriodFil
               setShowCustom(false);
               navigate({ period: p.value });
             }}
-            className={`whitespace-nowrap rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
+            className={`whitespace-nowrap rounded-full px-3 py-2.5 text-xs font-semibold transition-colors ${
               activePeriod === p.value
                 ? "bg-accent text-white shadow-[0_4px_12px_-2px_rgba(79,70,229,0.35)]"
                 : "text-muted hover:text-ink"
@@ -61,7 +61,7 @@ export function PeriodFilter({ activePeriod, defaultFrom, defaultTo }: PeriodFil
           type="button"
           aria-pressed={activePeriod === "custom"}
           onClick={() => setShowCustom((v) => !v)}
-          className={`whitespace-nowrap rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
+          className={`whitespace-nowrap rounded-full px-3 py-2.5 text-xs font-semibold transition-colors ${
             activePeriod === "custom"
               ? "bg-accent text-white shadow-[0_4px_12px_-2px_rgba(79,70,229,0.35)]"
               : "text-muted hover:text-ink"
