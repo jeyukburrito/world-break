@@ -1,6 +1,7 @@
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
+import { encodeJsonBase64Url } from "@/lib/base64url";
 import { prisma } from "@/lib/prisma";
 import { createClient } from "@/lib/supabase/server";
 import { tournamentSessionIdSchema } from "@/lib/validation/match";
@@ -46,11 +47,11 @@ export async function POST(request: Request) {
     _sum: { wins: true, losses: true },
   });
 
-  const ep = btoa(JSON.stringify({
+  const ep = encodeJsonBase64Url({
     total_rounds: String(stats._count.id),
     wins: String(stats._sum.wins ?? 0),
     losses: String(stats._sum.losses ?? 0),
-  }));
+  });
 
   revalidatePath("/matches");
   revalidatePath("/matches/new");

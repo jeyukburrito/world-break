@@ -4,6 +4,8 @@ import Script from "next/script";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
+import { decodeJsonBase64Url } from "@/lib/base64url";
+
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
 
 const FLASH_EVENT_MAP: Record<string, string> = {
@@ -36,7 +38,7 @@ const FLASH_EVENT_MAP: Record<string, string> = {
 function decodeEventParams(ep: string | null): Record<string, string> | undefined {
   if (!ep) return undefined;
   try {
-    const json = JSON.parse(atob(ep));
+    const json = decodeJsonBase64Url(ep);
     if (typeof json === "object" && json !== null) return json;
   } catch {
     // malformed ep — skip params silently

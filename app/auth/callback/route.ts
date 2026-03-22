@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 import { ensureUserProfile } from "@/lib/auth";
+import { encodeJsonBase64Url } from "@/lib/base64url";
 import { getSafeRedirectPath, isSupabaseConfigured } from "@/lib/env";
 import { prisma } from "@/lib/prisma";
 import { createClient } from "@/lib/supabase/server";
@@ -9,7 +10,7 @@ import { createClient } from "@/lib/supabase/server";
 const GUEST_COOKIE = "wb_guest_token";
 
 function encodeParams(obj: Record<string, string>): string {
-  return btoa(JSON.stringify(obj));
+  return encodeJsonBase64Url(obj);
 }
 
 function bucketMatchCount(count: number): string {

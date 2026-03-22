@@ -4,13 +4,14 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { requireUser } from "@/lib/auth";
+import { encodeJsonBase64Url } from "@/lib/base64url";
 import { prisma } from "@/lib/prisma";
 import { isUniqueViolation } from "@/lib/prisma-helpers";
 import { createDeckSchema, toggleDeckSchema } from "@/lib/validation/deck";
 
 function withMessage(type: "error" | "message", value: string, ep?: Record<string, string>) {
   const sp = new URLSearchParams({ [type]: value });
-  if (ep) sp.set("ep", btoa(JSON.stringify(ep)));
+  if (ep) sp.set("ep", encodeJsonBase64Url(ep));
   return `/settings/decks?${sp.toString()}`;
 }
 

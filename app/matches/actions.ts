@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { Prisma } from "@prisma/client";
 
 import { requireUser } from "@/lib/auth";
+import { encodeJsonBase64Url } from "@/lib/base64url";
 import { revalidateDashboard } from "@/lib/dashboard";
 import { prisma } from "@/lib/prisma";
 import { matchIdSchema, matchResultSchema } from "@/lib/validation/match";
@@ -13,7 +14,7 @@ import { matchIdSchema, matchResultSchema } from "@/lib/validation/match";
 type TxClient = Prisma.TransactionClient;
 
 function encodeParams(obj: Record<string, string>): string {
-  return btoa(JSON.stringify(obj));
+  return encodeJsonBase64Url(obj);
 }
 
 function matchesRedirect(type: "error" | "message", value: string, ep?: Record<string, string>) {
