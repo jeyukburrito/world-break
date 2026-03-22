@@ -6,6 +6,7 @@ import { Analytics } from "@/components/analytics";
 import { ServiceWorkerRegistration } from "@/components/service-worker";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toast } from "@/components/toast";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 import "./globals.css";
 
@@ -66,6 +67,7 @@ export default function RootLayout({
             <ServiceWorkerRegistration />
           </Suspense>
           {children}
+          <SpeedInsights />
         </ThemeProvider>
       </body>
     </html>
