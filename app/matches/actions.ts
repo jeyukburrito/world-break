@@ -12,8 +12,14 @@ import { matchIdSchema, matchResultSchema } from "@/lib/validation/match";
 
 type TxClient = Prisma.TransactionClient;
 
-function matchesRedirect(type: "error" | "message", value: string) {
-  return `/matches?${type}=${encodeURIComponent(value)}`;
+function encodeParams(obj: Record<string, string>): string {
+  return btoa(JSON.stringify(obj));
+}
+
+function matchesRedirect(type: "error" | "message", value: string, ep?: Record<string, string>) {
+  const sp = new URLSearchParams({ [type]: value });
+  if (ep) sp.set("ep", encodeParams(ep));
+  return `/matches?${sp.toString()}`;
 }
 
 function newMatchRedirect(type: "error" | "message", value: string) {
@@ -164,8 +170,9 @@ async function buildNextTournamentRedirect(params: {
   gameName: string;
   deckName: string;
   tournamentPhase: "swiss" | "elimination";
+  matchEp: Record<string, string>;
 }) {
-  const { sessionId, userId, eventCategory, playedAt, gameName, deckName, tournamentPhase } = params;
+  const { sessionId, userId, eventCategory, playedAt, gameName, deckName, tournamentPhase, matchEp } = params;
   const phaseCount = await prisma.matchResult.count({
     where: {
       userId,
@@ -176,6 +183,7 @@ async function buildNextTournamentRedirect(params: {
 
   const sp = new URLSearchParams({
     message: "record_created",
+    ep: encodeParams(matchEp),
     event: eventCategory,
     date: playedAt,
     gameName,
@@ -272,6 +280,16 @@ export async function createMatchResult(formData: FormData) {
   revalidatePath("/matches/new");
   revalidatePath("/settings/tags");
 
+  const matchEp = {
+    event_category: parsed.data.eventCategory,
+    match_format: parsed.data.matchFormat,
+    result: parsed.data.result,
+    has_memo: parsed.data.memo ? "true" : "false",
+    has_tags: parsed.data.tagIds.length > 0 ? "true" : "false",
+    is_tournament: parsed.data.eventCategory === "shop" ? "true" : "false",
+    game_name: parsed.data.gameName,
+  };
+
   if (tournamentSessionId && parsed.data.eventCategory === "shop") {
     redirect(
       await buildNextTournamentRedirect({
@@ -282,11 +300,12 @@ export async function createMatchResult(formData: FormData) {
         gameName: parsed.data.gameName,
         deckName: parsed.data.myDeckName,
         tournamentPhase: parsed.data.tournamentPhase ?? "swiss",
+        matchEp,
       }),
     );
   }
 
-  redirect("/matches?message=record_created");
+  redirect(matchesRedirect("message", "record_created", matchEp));
 }
 
 export async function updateMatchResult(formData: FormData) {
@@ -412,7 +431,7 @@ export async function updateMatchResult(formData: FormData) {
   revalidateDashboard(user.id);
   revalidatePath("/matches/new");
   revalidatePath("/settings/tags");
-  redirect("/matches?message=record_updated");
+  redirect(matchesRedirect("message", "record_updated", { match_id: matchId }));
 }
 
 export async function deleteMatchResult(formData: FormData) {
@@ -437,5 +456,5 @@ export async function deleteMatchResult(formData: FormData) {
   revalidatePath("/matches");
   revalidateDashboard(user.id);
   revalidatePath("/settings/tags");
-  redirect("/matches?message=record_deleted");
+  redirect(matchesRedirect("message", "record_deleted", { match_id: matchId }));
 }

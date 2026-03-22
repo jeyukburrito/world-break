@@ -8,8 +8,10 @@ import { prisma } from "@/lib/prisma";
 import { isUniqueViolation } from "@/lib/prisma-helpers";
 import { createDeckSchema, toggleDeckSchema } from "@/lib/validation/deck";
 
-function withMessage(type: "error" | "message", value: string) {
-  return `/settings/decks?${type}=${encodeURIComponent(value)}`;
+function withMessage(type: "error" | "message", value: string, ep?: Record<string, string>) {
+  const sp = new URLSearchParams({ [type]: value });
+  if (ep) sp.set("ep", btoa(JSON.stringify(ep)));
+  return `/settings/decks?${sp.toString()}`;
 }
 
 export async function createDeck(formData: FormData) {
@@ -55,7 +57,10 @@ export async function createDeck(formData: FormData) {
   revalidatePath("/settings/decks");
   revalidatePath("/matches/new");
   revalidatePath("/matches");
-  redirect(withMessage("message", "덱을 추가했습니다."));
+  redirect(withMessage("message", "덱을 추가했습니다.", {
+    game_name: parsed.data.gameName,
+    has_color: parsed.data.color ? "true" : "false",
+  }));
 }
 
 export async function toggleDeckState(formData: FormData) {
@@ -91,6 +96,7 @@ export async function toggleDeckState(formData: FormData) {
       parsed.data.nextState === "active"
         ? "덱을 다시 활성화했습니다."
         : "덱을 비활성화했습니다.",
+      { is_active: parsed.data.nextState === "active" ? "true" : "false" },
     ),
   );
 }

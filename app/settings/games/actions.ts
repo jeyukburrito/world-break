@@ -8,8 +8,10 @@ import { prisma } from "@/lib/prisma";
 import { isUniqueViolation } from "@/lib/prisma-helpers";
 import { createGameSchema, deleteGameSchema, updateGameSchema } from "@/lib/validation/game";
 
-function withMessage(type: "error" | "message", value: string) {
-  return `/settings/games?${type}=${encodeURIComponent(value)}`;
+function withMessage(type: "error" | "message", value: string, ep?: Record<string, string>) {
+  const sp = new URLSearchParams({ [type]: value });
+  if (ep) sp.set("ep", btoa(JSON.stringify(ep)));
+  return `/settings/games?${sp.toString()}`;
 }
 
 export async function createGame(formData: FormData) {
@@ -42,7 +44,9 @@ export async function createGame(formData: FormData) {
   revalidatePath("/settings/decks");
   revalidatePath("/matches/new");
   revalidatePath("/matches");
-  redirect(withMessage("message", "카드게임 카테고리를 추가했습니다."));
+  redirect(withMessage("message", "카드게임 카테고리를 추가했습니다.", {
+    game_name: parsed.data.name,
+  }));
 }
 
 export async function updateGame(formData: FormData) {

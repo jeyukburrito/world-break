@@ -11,7 +11,10 @@ export function AutoSubmitSelect(props: ComponentProps<"select">) {
       ref={ref}
       onChange={(e) => {
         props.onChange?.(e);
-        window.gtag?.("event", "match_filter", { filter_type: props.name });
+        window.gtag?.("event", "match_filter", {
+          filter_type: props.name,
+          filter_value: e.target.value,
+        });
         ref.current?.form?.requestSubmit();
       }}
     />

@@ -25,6 +25,7 @@ export function CategoryFilter({ activeCategory = "all" }: CategoryFilterProps) 
       sp.set("category", nextCategory);
     }
 
+    window.gtag?.("event", "dashboard_filter", { category: nextCategory });
     router.push(`/dashboard${sp.toString() ? `?${sp.toString()}` : ""}`);
   };
 

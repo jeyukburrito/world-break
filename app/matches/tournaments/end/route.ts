@@ -39,8 +39,25 @@ export async function POST(request: Request) {
     return NextResponse.redirect(new URL("/matches?error=tournament_not_found", request.url));
   }
 
+  // Fetch tournament stats for GA4 event params
+  const stats = await prisma.matchResult.aggregate({
+    where: { tournamentSessionId, userId: user.id },
+    _count: { id: true },
+    _sum: { wins: true, losses: true },
+  });
+
+  const ep = btoa(JSON.stringify({
+    total_rounds: String(stats._count.id),
+    wins: String(stats._sum.wins ?? 0),
+    losses: String(stats._sum.losses ?? 0),
+  }));
+
   revalidatePath("/matches");
   revalidatePath("/matches/new");
 
-  return NextResponse.redirect(new URL("/matches?message=tournament_ended", request.url));
+  const redirectUrl = new URL("/matches", request.url);
+  redirectUrl.searchParams.set("message", "tournament_ended");
+  redirectUrl.searchParams.set("ep", ep);
+
+  return NextResponse.redirect(redirectUrl);
 }

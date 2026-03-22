@@ -46,7 +46,7 @@ export async function startAsGuest() {
     cookieStore.set(GUEST_COOKIE, createGuestToken(), getGuestCookieOptions());
   }
 
-  redirect("/matches/new");
+  redirect("/matches/new?message=guest_start");
 }
 
 export async function signOut() {
@@ -58,5 +58,5 @@ export async function signOut() {
     await supabase.auth.signOut();
   }
 
-  redirect("/login");
+  redirect("/login?message=logout");
 }
