@@ -87,8 +87,8 @@ ALTER TABLE "match_results"
 
 ALTER TABLE "match_results"
   ADD CONSTRAINT "chk_tournament_phase_category" CHECK (
-    ("eventCategory" = 'shop' AND "tournamentPhase" IS NOT NULL)
-    OR ("eventCategory" = 'friendly' AND "tournamentPhase" IS NULL)
+    ("eventCategory" = 'shop'::"EventCategory" AND "tournamentPhase" IS NOT NULL)
+    OR ("eventCategory" = 'friendly'::"EventCategory" AND "tournamentPhase" IS NULL)
   );
 
 -- Step 5: clean up any leftover legacy enum type.
