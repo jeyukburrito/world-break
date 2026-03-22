@@ -1,6 +1,4 @@
-﻿Author: Legacy / Unknown
-
-# Architecture — World Break
+﻿# Architecture — World Break
 
 > 이 문서는 앱의 아키텍처 패턴, 데이터 모델, 디렉토리 구조를 설명합니다.
 > 행동 지침과 협업 규칙은 `CLAUDE.md`를 참조하세요.
@@ -71,11 +69,9 @@ world-break/
 │   │   ├── export/
 │   │   └── tournaments/end/
 │   ├── settings/
-│   │   ├── decks/
 │   │   ├── export/
 │   │   ├── games/
-│   │   ├── profile/
-│   │   └── tags/
+│   │   └── profile/
 │   ├── login/
 │   └── offline/
 ├── components/            # 재사용 UI 컴포넌트
@@ -92,8 +88,7 @@ world-break/
 ├── .ai/                   # Multi-CLI 협업 시스템
 │   ├── TASKS.md
 │   ├── handoffs/
-│   ├── reviews/
-│   └── release/
+│   └── daily/
 ├── CLAUDE.md
 └── AGENTS.md
 ```

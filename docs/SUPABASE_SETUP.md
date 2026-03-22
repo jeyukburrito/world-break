@@ -1,9 +1,7 @@
-﻿Author: Legacy / Unknown
-
-# Supabase Setup Guide
+﻿# Supabase Setup Guide
 
 ## Goal
-Connect the `webapp/` project to an existing Supabase project safely, then enable Google login, Prisma migrations, RLS, and local verification.
+Connect the World Break project to an existing Supabase project safely, then enable Google login, Prisma migrations, RLS, and local verification.
 
 ## 1. Collect Project Credentials
 In the Supabase Dashboard:
@@ -21,13 +19,13 @@ In the Supabase Dashboard:
 Use the pooled URL for the app runtime and the direct URL for Prisma CLI work. Prisma recommends pooled runtime connections plus a direct URL for migrations.
 
 ## 2. Create Local Environment Files
-From `webapp/`, create both `.env.local` and `.env`.
+From the project root, create both `.env.local` and `.env`.
 
 Reason:
 - Next.js reads `.env.local`
 - Prisma CLI reads `.env`
 
-Use [`.env.example`](/home/oo/work/sve_meta/webapp/.env.example) as the template.
+Use `.env.local.example` as the template.
 
 Required values:
 - `DATABASE_URL`
@@ -77,7 +75,7 @@ Supabase requires Google OAuth to be configured in Google Auth Platform / Google
 3. Save.
 
 ## 5. Run Prisma Setup
-From `/home/oo/work/sve_meta/webapp`:
+From the project root:
 
 ```bash
 npm run prisma:generate
@@ -87,13 +85,13 @@ npm run prisma:seed
 
 Expected result:
 - Prisma client generated
-- `users`, `decks`, `match_results`, `tags`, `match_result_tags` created
+- `users`, `games`, `decks`, `match_results`, `tournament_sessions` created
 - one local dev user and three sample decks inserted
 
 ## 6. Apply RLS Policies
 Open Supabase `SQL Editor` and run:
 
-- [rls.sql](/home/oo/work/sve_meta/webapp/supabase/rls.sql)
+- [rls.sql](../supabase/rls.sql)
 
 This enables row-level security so each user can only access records tied to their `user_id`.
 

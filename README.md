@@ -1,6 +1,4 @@
-﻿Author: Codex
-
-# World Break
+﻿# World Break
 
 TCG 전적 기록 모바일 PWA — 덱별 승률, 상성 분석, 대회 세션을 한 곳에서 관리합니다.
 

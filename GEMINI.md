@@ -1,6 +1,4 @@
-﻿Author: Codex
-
-# GEMINI.md - World Break Project Context
+﻿# GEMINI.md - World Break Project Context
 
 This file provides the foundational context, architectural patterns, and development workflows for the **World Break** project. Adhere to these guidelines for all contributions.
 
@@ -38,7 +36,6 @@ The project follows a standard Next.js App Router structure with a focus on Serv
 - **Data Isolation:** **Every** database query must include a `userId` filter to ensure users can only access their own data.
 
 ### 2. Documentation Standards
-- **Author Attribution:** All markdown files in `.ai/` and project documentation MUST include `Author: [Role/Name]` at the very top.
 - **Consolidated Logs:** All reviews, session retrospectives, and daily logs are consolidated into the `.ai/daily/` directory.
 
 ### 3. Data Mutation (Server Actions)
@@ -50,7 +47,7 @@ The project follows a standard Next.js App Router structure with a focus on Serv
 - For dashboard statistics and complex queries, prefer raw SQL via `prisma.$queryRaw` in `lib/dashboard.ts` to optimize performance over multiple Prisma model calls.
 
 ### 5. Codebase Navigation
-- Check `.ai/ARCHITECTURE.md` for high-level design decisions.
+- Check `docs/ARCHITECTURE.md` for high-level design decisions.
 - Follow `.ai/PROJECT_RULES.md` for collaboration between AI agents.
 - Review `.ai/TASKS.md` for current development status and ticket tracking.
 - All session logs, reviews, and checklists are located in `.ai/daily/`.

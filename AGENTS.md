@@ -1,6 +1,4 @@
-﻿Author: Codex
-
-# World Break — Agent Coordination Guide
+﻿# World Break — Agent Coordination Guide
 
 ## Overview
 Mobile-first PWA for personal TCG match result tracking.

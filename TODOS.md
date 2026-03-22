@@ -1,6 +1,4 @@
-﻿Author: Legacy / Unknown
-
-# TODOS.md
+﻿# TODOS.md
 
 ## Server Action 통합 테스트 도입
 
@@ -32,6 +30,23 @@ Server Action의 DB 연동 테스트는 별도 설정이 필요함.
 - 조건: `guestTokenHash IS NOT NULL` AND `updatedAt < NOW() - INTERVAL '60 days'`
 - 60일 유예 (쿠키 30일 + 30일 버퍼)
 - CASCADE 삭제로 관련 데이터 자동 정리
+
+**Depends on:** 없음 (독립 작업)
+
+---
+
+## 미사용 Tag/MatchResultTag 테이블 정리
+
+**Priority:** P3
+**Effort:** human: ~2h / CC: ~15min
+
+T-012 리팩터링으로 태그 관련 UI(settings/tags, tag-selector)가 제거되었지만,
+Prisma 스키마에 `Tag`, `MatchResultTag` 모델과 DB 테이블이 남아있음.
+
+- Prisma 스키마에서 `Tag`, `MatchResultTag` 모델 삭제
+- 마이그레이션 생성 (`DROP TABLE`)
+- 시드 데이터에서 태그 관련 코드 제거
+- AGENTS.md Prisma Models 섹션에서 Tag/MatchResultTag 항목 제거
 
 **Depends on:** 없음 (독립 작업)
 

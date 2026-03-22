@@ -1,6 +1,4 @@
-﻿Author: Legacy / Unknown
-
-# Deployment Guide
+﻿# Deployment Guide
 
 ## Stack
 - **Hosting**: Vercel
