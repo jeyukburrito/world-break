@@ -67,31 +67,12 @@ export default async function SettingsPage() {
     >
       <div className="mx-auto flex max-w-md flex-col gap-6 pb-8">
         <section className="rounded-3xl border border-line bg-surface p-5 shadow-sm">
-          <div className="flex items-center gap-4">
-            <div className="flex size-20 items-center justify-center overflow-hidden rounded-full bg-accent/10 text-accent ring-4 ring-accent/10">
-              {display.avatarUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={display.avatarUrl}
-                  alt=""
-                  width={80}
-                  height={80}
-                  className="size-full object-cover"
-                  referrerPolicy="no-referrer"
-                />
-              ) : (
-                <span className="text-2xl font-bold">
-                  {display.name?.charAt(0)?.toUpperCase() ?? "?"}
-                </span>
-              )}
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-accent">Profile</p>
-              <h2 className="mt-1 truncate text-xl font-bold tracking-tight text-ink">
-                {display.name ?? "미설정"}
-              </h2>
-              <p className="mt-1 truncate text-sm text-muted">{display.email ?? "-"}</p>
-            </div>
+          <div className="min-w-0">
+            <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-accent">Profile</p>
+            <h2 className="mt-1 truncate text-xl font-bold tracking-tight text-ink">
+              {display.name ?? "미설정"}
+            </h2>
+            <p className="mt-1 truncate text-sm text-muted">{display.email ?? "-"}</p>
           </div>
         </section>
 

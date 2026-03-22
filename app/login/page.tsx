@@ -62,7 +62,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               type="submit"
               className="w-full rounded-full border border-line bg-paper px-5 py-3 text-sm font-semibold text-ink transition-colors hover:bg-surface"
             >
-              게스트로 체험하기
+              게스트로 로그인
             </button>
           </form>
 

@@ -32,4 +32,5 @@ Author: Claude (PM/QA)
 | T-013 | 백엔드 & DB 전수 검수 (Audit) | `ready` | [spec](handoffs/T-013-spec.md) | | | 읽기 전용 검수 — 스키마·액션·인증·SQL 정합성 점검 |
 | T-014 | 프로필+설정 페이지 통합 | `done` | [spec](handoffs/T-014-spec.md) | [result](handoffs/T-014-result.md) | | 프로필→설정 통합, 게임 관리·마지막 경기 삭제 |
 | T-015 | UI 마이크로카피 & 정보 설계 정비 | `done` | [spec](handoffs/T-015-spec.md) | [result](handoffs/T-015-result.md) | | 날짜 절대표기, 중복 텍스트 제거, 스탯카드 차별화 |
+| T-016 | UI 정리: 게스트 문구·배너·헤더 링크·아바타 | `done` | [spec](handoffs/T-016-spec.md) | [result](handoffs/T-016-result.md) | | 게스트 버튼 문구, 배너 삭제, 헤더 홈링크, 아바타 제거 |
 
