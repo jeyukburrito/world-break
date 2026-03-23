@@ -5,16 +5,55 @@ import { useState } from "react";
 type MatchResultInputProps = {
   defaultFormat?: string;
   defaultResult?: string;
+  defaultWins?: number;
+  defaultLosses?: number;
 };
 
 export function MatchResultInput({
   defaultFormat = "bo1",
   defaultResult = "win",
+  defaultWins,
+  defaultLosses,
 }: MatchResultInputProps) {
   const [format, setFormat] = useState(defaultFormat);
   const [result, setResult] = useState<"win" | "lose">(
     defaultResult === "lose" ? "lose" : "win",
   );
+  const [myWins, setMyWins] = useState(
+    defaultFormat === "bo3" && defaultWins !== undefined ? defaultWins : 2,
+  );
+  const [myLosses, setMyLosses] = useState(
+    defaultFormat === "bo3" && defaultLosses !== undefined ? defaultLosses : 0,
+  );
+
+  const handleFormatChange = (next: string) => {
+    setFormat(next);
+    if (next === "bo3") {
+      if (result === "win") {
+        setMyWins(2);
+        setMyLosses(0);
+      } else {
+        setMyWins(0);
+        setMyLosses(2);
+      }
+    }
+  };
+
+  const handleResultChange = (next: "win" | "lose") => {
+    setResult(next);
+    if (format === "bo3") {
+      if (next === "win") {
+        setMyWins(2);
+        setMyLosses(0);
+      } else {
+        setMyWins(0);
+        setMyLosses(2);
+      }
+    }
+  };
+
+  const bo3Score =
+    format === "bo3" ? (`${myWins}-${myLosses}` as "2-0" | "2-1" | "0-2" | "1-2") : undefined;
 
   return (
     <section className="space-y-6">
@@ -25,7 +64,7 @@ export function MatchResultInput({
         <div className="grid grid-cols-2 gap-1.5 rounded-full bg-surface-container-low p-1.5">
           <button
             type="button"
-            onClick={() => setFormat("bo1")}
+            onClick={() => handleFormatChange("bo1")}
             className={`rounded-full px-4 py-3 text-sm font-bold transition-all ${
               format === "bo1" ? "bg-surface text-accent shadow-sm" : "text-muted"
             }`}
@@ -34,7 +73,7 @@ export function MatchResultInput({
           </button>
           <button
             type="button"
-            onClick={() => setFormat("bo3")}
+            onClick={() => handleFormatChange("bo3")}
             className={`rounded-full px-4 py-3 text-sm font-bold transition-all ${
               format === "bo3" ? "bg-surface text-accent shadow-sm" : "text-muted"
             }`}
@@ -51,7 +90,7 @@ export function MatchResultInput({
         <div className="grid grid-cols-2 gap-1.5 rounded-full bg-surface-container-low p-1.5">
           <button
             type="button"
-            onClick={() => setResult("win")}
+            onClick={() => handleResultChange("win")}
             className={`rounded-full px-4 py-3 text-sm font-bold transition-all ${
               result === "win" ? "bg-surface text-accent shadow-sm" : "text-muted"
             }`}
@@ -60,7 +99,7 @@ export function MatchResultInput({
           </button>
           <button
             type="button"
-            onClick={() => setResult("lose")}
+            onClick={() => handleResultChange("lose")}
             className={`rounded-full px-4 py-3 text-sm font-bold transition-all ${
               result === "lose" ? "bg-surface text-danger shadow-sm" : "text-muted"
             }`}
@@ -69,6 +108,39 @@ export function MatchResultInput({
           </button>
         </div>
       </div>
+
+      {/* BO3 세부 점수 — 직접 입력 */}
+      {format === "bo3" ? (
+        <div className="grid gap-2">
+          <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-muted">세부 점수</p>
+          <input type="hidden" name="bo3Score" value={bo3Score} />
+          <div className="flex items-center justify-center gap-3">
+            <label className="grid gap-1 text-center">
+              <span className="text-xs text-muted">내 승</span>
+              <input
+                type="number"
+                min={0}
+                max={2}
+                value={myWins}
+                onChange={(e) => setMyWins(Math.min(2, Math.max(0, Number(e.target.value) || 0)))}
+                className="w-16 rounded-2xl bg-surface-container-high px-3 py-3 text-center text-lg font-bold text-ink"
+              />
+            </label>
+            <span className="mt-5 text-lg font-bold text-muted">-</span>
+            <label className="grid gap-1 text-center">
+              <span className="text-xs text-muted">내 패</span>
+              <input
+                type="number"
+                min={0}
+                max={2}
+                value={myLosses}
+                onChange={(e) => setMyLosses(Math.min(2, Math.max(0, Number(e.target.value) || 0)))}
+                className="w-16 rounded-2xl bg-surface-container-high px-3 py-3 text-center text-lg font-bold text-ink"
+              />
+            </label>
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }

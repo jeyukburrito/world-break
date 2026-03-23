@@ -1,93 +1,34 @@
-﻿# GEMINI.md - World Break Project Context
+Author: Gemini (Code Reviewer)
 
-**Your role: Code Reviewer.** You review implementation work from Codex (and occasionally Claude). You do NOT implement features or modify code directly. Your output is review documents written to `.ai/daily/T-xxx-review-gemini.md`.
+# World Break — CLI Master Index
 
-This file provides the foundational context, architectural patterns, and development workflows for the **World Break** project.
+본 프로젝트는 여러 AI 에이전트(Claude, Codex, Gemini)가 협업하는 환경이다. 각 CLI는 작업 시작 전 이 인덱스를 참조하여 필요한 최신 컨텍스트를 확보해야 한다.
 
-## Project Overview
+## 1. Documentation Map (문서 지도)
 
-**World Break** is a mobile-first Progressive Web App (PWA) designed for Trading Card Game (TCG) players to record match results, analyze win rates by deck, track match-up statistics, and manage tournament sessions.
+| 상황 | 참조 문서 |
+|------|-----------|
+| **최초 프로젝트 탐색** | `ARCHITECTURE.md` (구조), `PRD.md` (목표) |
+| **코드 구현 및 생성** | `.ai/STANDARDS.md` (필수 규칙), `prisma/schema.prisma` |
+| **협업 및 워크플로우** | `.ai/PROJECT_RULES.md` (역할 및 통신 규약) |
+| **현재 작업 상태 확인** | `.ai/TASKS.md` (티켓 목록) |
+| **최균 작업 히스토리** | `.ai/daily/` (일일 로그 및 세션 보고서) |
 
-- **Primary Framework:** Next.js 15 (App Router) + TypeScript
-- **Authentication:** Supabase Auth (Google OAuth) + Guest Mode (Cookie-based)
-- **Database & ORM:** Supabase Postgres + Prisma 6
-- **Styling:** Tailwind CSS
-- **Visualization:** Recharts
-- **Hosting:** Vercel
+## 2. CLI Core Mandates
 
-## Core Architecture
+### 2-1. Data Privacy & Integrity
+- **userId Isolation**: 모든 DB 접근 시 `userId` 필터링 필수.
+- **Secrets Protection**: `.env` 파일 및 API Key 노출 절대 금지.
 
-The project follows a standard Next.js App Router structure with a focus on Server Actions for data mutations and Prisma for database access.
+### 2-2. Communication Protocol
+- 모든 CLI 간의 의사소통은 `.ai/` 내의 마크다운 파일을 통해 **비동기적**으로만 이루어진다.
+- 파일 상단에 `Author: [Role/Name]` 기재 필수.
 
-- `app/`: Contains application pages, layouts, and Server Actions (`actions.ts` within route folders).
-- `components/`: Reusable UI components.
-- `lib/`: Core utility logic, including:
-  - `auth.ts`: Authentication helpers and `requireUser()` session validation.
-  - `prisma.ts`: Prisma client instance.
-  - `supabase/`: Supabase client configuration for server and browser.
-  - `dashboard.ts`: Complex SQL aggregations using Prisma `$queryRaw`.
-  - `validation/`: Zod schemas for data validation (match, deck, game, tag).
-- `prisma/`: Database schema (`schema.prisma`) and migrations.
-- `supabase/`: SQL scripts for Row Level Security (RLS) policies.
+## 3. Tech Stack Reference
+- **Framework**: Next.js 15 (App Router)
+- **Database**: Supabase Postgres + Prisma 6
+- **Auth**: Supabase Auth + Guest Mode (Cookie-based)
+- **UI System**: Tactical Editorial (Material You Inspired)
 
-## Key Patterns & Conventions
-
-### 1. Authentication & User Scoping
-- **`requireUser()`:** Use this function (cached via `react.cache()`) in all Server Components and Actions that require authentication. It handles Supabase session validation and ensures the user exists in the Prisma `users` table.
-- **User Privacy:** The `User` model in Prisma stores only the `id` (UUID). Sensitive PII (email, name) remains in Supabase Auth metadata.
-- **Data Isolation:** **Every** database query must include a `userId` filter to ensure users can only access their own data.
-
-### 2. Documentation Standards
-- **Consolidated Logs:** All reviews, session retrospectives, and daily logs are consolidated into the `.ai/daily/` directory.
-
-### 3. Data Mutation (Server Actions)
-- All data modifications (Create, Update, Delete) should be handled via Server Actions in `actions.ts` files.
-- Use `zod` for input validation within these actions.
-- Post-mutation, always use `revalidatePath()` to refresh the UI and `redirect()` where necessary.
-
-### 4. Database Aggregation
-- For dashboard statistics and complex queries, prefer raw SQL via `prisma.$queryRaw` in `lib/dashboard.ts` to optimize performance over multiple Prisma model calls.
-
-### 5. Codebase Navigation
-- Check `docs/ARCHITECTURE.md` for high-level design decisions.
-- Follow `.ai/PROJECT_RULES.md` for collaboration between AI agents.
-- Review `.ai/TASKS.md` for current development status and ticket tracking.
-- All session logs, reviews, and checklists are located in `.ai/daily/`.
-
-## Development Workflow
-
-### Key Commands
-- `npm run dev`: Start the development server at `http://localhost:3000`.
-- `npm run build`: Perform a production build. Note: This automatically runs `prisma migrate deploy`.
-- `npm run lint`: Run ESLint for code quality checks.
-- `npm run prisma:generate`: Regenerate the Prisma Client.
-- `npm run prisma:migrate`: Create and apply development migrations.
-- `npm run prisma:seed`: Populate the database with development seed data.
-
-### Testing & Validation
-- Ensure new features are accompanied by appropriate validation logic in `lib/validation/`.
-- Verify changes by running `npm run build` locally before pushing to ensure type safety and successful migration application.
-
-## Collaboration & Handoffs
-- All significant feature work follows a ticket-based system using `.ai/handoffs/`.
-- **Spec:** `handoffs/T-xxx-spec.md` (Requirements & Done Definition) — written by Claude.
-- **Result:** `handoffs/T-xxx-result.md` (Implementation details, lint/build results) — written by Codex.
-- **Review:** `daily/T-xxx-review-gemini.md` (Code review feedback) — written by you (Gemini).
-
-### Your Review Process
-1. Read the spec (`handoffs/T-xxx-spec.md`) to understand requirements and Done Definition.
-2. Read the result (`handoffs/T-xxx-result.md`) to understand what was implemented.
-3. Read the actual diff (`git diff` against the base branch or relevant commits).
-4. Write your review to `daily/T-xxx-review-gemini.md` covering:
-   - Spec compliance: Does the implementation meet every Done Definition item?
-   - Code quality: Clean code, proper patterns, no unnecessary complexity?
-   - Security: Auth checks, input validation, SQL safety, data scoping?
-   - Performance: N+1 queries, unnecessary re-renders, large payloads?
-   - Bugs: Logic errors, edge cases, race conditions?
-5. Verdict: `APPROVE`, `REQUEST_CHANGES`, or `NEEDS_DISCUSSION`.
-6. Do NOT add new requirements. Review only against the spec.
-
-### File Naming Rules
-- Review documents: `T-xxx-review-gemini.md`
-- Daily work logs: `YYYY-MM-DD-gemini.md`
-
+---
+*Last Updated: 2026-03-22*

@@ -33,4 +33,6 @@ Author: Claude (PM/QA)
 | T-014 | 프로필+설정 페이지 통합 | `done` | [spec](handoffs/T-014-spec.md) | [result](handoffs/T-014-result.md) | | 프로필→설정 통합, 게임 관리·마지막 경기 삭제 |
 | T-015 | UI 마이크로카피 & 정보 설계 정비 | `done` | [spec](handoffs/T-015-spec.md) | [result](handoffs/T-015-result.md) | | 날짜 절대표기, 중복 텍스트 제거, 스탯카드 차별화 |
 | T-016 | UI 정리: 게스트 문구·배너·헤더 링크·아바타 | `done` | [spec](handoffs/T-016-spec.md) | [result](handoffs/T-016-result.md) | | 게스트 버튼 문구, 배너 삭제, 헤더 홈링크, 아바타 제거 |
+| T-017 | 매치 공유 카드 — Stateless OG Image | `ready` | [spec](handoffs/T-017-spec.md) | | | Discord/Slack 링크 프리뷰 + Web Share API, DB 변경 없음 |
+| T-018 | 사용자 피드백: BO3 점수·선후결정 표시·대회종료·폼보존 | `done` | [spec](handoffs/T-018-spec.md) | | | BO3 세부점수, didChoosePlayOrder 표시, 대회종료 버그, 폼상태 보존 |
 

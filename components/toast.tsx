@@ -3,6 +3,8 @@
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { CLIENT_TOAST_EVENT, type ClientToastDetail } from "@/lib/toast";
+
 const MESSAGE_MAP: Record<string, string> = {
   record_created: "대전 결과를 저장했습니다.",
   record_updated: "대전 결과를 수정했습니다.",
@@ -36,22 +38,41 @@ export function Toast() {
     }, FADE_OUT_MS);
   }, []);
 
-  useEffect(() => {
-    const msg = searchParams.get("message");
-    if (!msg || !MESSAGE_MAP[msg]) return;
-
+  const showToast = useCallback((nextText: string) => {
     if (fadeTimerRef.current) clearTimeout(fadeTimerRef.current);
     if (removeTimerRef.current) clearTimeout(removeTimerRef.current);
 
-    setText(MESSAGE_MAP[msg]);
+    setText(nextText);
     setDismissing(false);
+    fadeTimerRef.current = setTimeout(dismiss, VISIBLE_MS);
+  }, [dismiss]);
+
+  useEffect(() => {
+    const msg = searchParams.get("message");
+    if (!msg || !MESSAGE_MAP[msg]) return;
+    showToast(MESSAGE_MAP[msg]);
 
     const url = new URL(window.location.href);
     url.searchParams.delete("message");
     window.history.replaceState({}, "", url.toString());
+  }, [searchParams, showToast]);
 
-    fadeTimerRef.current = setTimeout(dismiss, VISIBLE_MS);
-  }, [searchParams, dismiss]);
+  useEffect(() => {
+    function handleCustomToast(event: Event) {
+      const customEvent = event as CustomEvent<ClientToastDetail>;
+
+      if (!customEvent.detail?.text) {
+        return;
+      }
+
+      showToast(customEvent.detail.text);
+    }
+
+    window.addEventListener(CLIENT_TOAST_EVENT, handleCustomToast as EventListener);
+    return () => {
+      window.removeEventListener(CLIENT_TOAST_EVENT, handleCustomToast as EventListener);
+    };
+  }, [showToast]);
 
   if (!text) return null;
 

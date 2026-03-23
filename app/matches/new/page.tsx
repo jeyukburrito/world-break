@@ -27,6 +27,8 @@ export default async function NewMatchPage({ searchParams }: NewMatchPageProps) 
   const continueDeckName = typeof params?.deckName === "string" ? params.deckName : undefined;
   const continueTournamentId =
     typeof params?.tournamentId === "string" ? params.tournamentId : undefined;
+  const continueMatchFormat = typeof params?.matchFormat === "string" ? params.matchFormat : undefined;
+  const continuePlayOrder = typeof params?.playOrder === "string" ? params.playOrder : undefined;
   const phase = params?.phase === "elimination" ? "elimination" : "swiss";
   const isContinue = continueEvent === "shop";
   const isElimination = phase === "elimination";
@@ -150,8 +152,13 @@ export default async function NewMatchPage({ searchParams }: NewMatchPageProps) 
             </label>
           </section>
 
-          <MatchResultInput />
-          <MatchDetailControls />
+          <MatchResultInput
+            defaultFormat={continueMatchFormat}
+            defaultResult={undefined}
+          />
+          <MatchDetailControls
+            defaultPlayOrder={continuePlayOrder === "first" || continuePlayOrder === "second" ? continuePlayOrder : undefined}
+          />
 
           <section className="grid gap-3">
             <label className="grid gap-2 text-sm font-semibold">

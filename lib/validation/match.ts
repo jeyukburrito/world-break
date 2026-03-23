@@ -15,10 +15,19 @@ export const matchResultSchema = z
       .transform((value) => value === "true"),
     matchFormat: z.enum(["bo1", "bo3"]),
     result: z.enum(["win", "lose"]),
+    bo3Score: z.enum(["2-0", "2-1", "0-2", "1-2"]).optional(),
     tournamentDetail: z.string().max(200).optional().or(z.literal("")),
     memo: z.string().max(1000).optional().or(z.literal("")),
     tagIds: z.array(z.string().uuid()).max(10).default([]),
-  });
+  })
+  .refine(
+    (data) => {
+      if (data.matchFormat !== "bo3" || !data.bo3Score) return true;
+      const isWinScore = data.bo3Score === "2-0" || data.bo3Score === "2-1";
+      return data.result === "win" ? isWinScore : !isWinScore;
+    },
+    { message: "BO3 세부 점수가 매치 결과와 일치하지 않습니다", path: ["bo3Score"] },
+  );
 
 export type MatchResultInput = z.infer<typeof matchResultSchema>;
 

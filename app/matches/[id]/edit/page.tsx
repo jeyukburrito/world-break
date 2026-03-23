@@ -103,6 +103,8 @@ export default async function EditMatchPage({ params, searchParams }: EditMatchP
         <MatchResultInput
           defaultFormat={match.matchFormat}
           defaultResult={match.isMatchWin ? "win" : "lose"}
+          defaultWins={match.wins}
+          defaultLosses={match.losses}
         />
         <MatchDetailControls
           defaultPlayOrder={match.playOrder}

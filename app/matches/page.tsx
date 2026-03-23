@@ -3,6 +3,7 @@ import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
 import { DeleteMatchButton } from "@/components/delete-match-button";
 import { HeaderActions } from "@/components/header-actions";
+import { ShareButton } from "@/components/share-button";
 import { getUserDisplayInfo, requireUser } from "@/lib/auth";
 import { formatDate } from "@/lib/format-date";
 import { groupMatchesForDisplay, type DisplayItem } from "@/lib/group-matches";
@@ -11,6 +12,7 @@ import {
   countMatchesForUser,
   listMatchesForUser,
 } from "@/lib/matches";
+import { buildMatchSharePath, type MatchSharePayload } from "@/lib/share/match-share";
 
 import { deleteMatchResult } from "./actions";
 
@@ -38,6 +40,29 @@ function MatchStatusPill({ isWin }: { isWin: boolean }) {
   );
 }
 
+function createMatchSharePayload(
+  match: Extract<DisplayItem, { type: "single" }>["match"],
+  round?: number,
+): MatchSharePayload {
+  return {
+    game: match.myDeck.game.name,
+    myDeck: match.myDeck.name,
+    opponentDeck: match.opponentDeckName,
+    result: match.isMatchWin ? "win" : "lose",
+    format: match.matchFormat === "bo3" ? "bo3" : "bo1",
+    score: match.matchFormat === "bo3" ? `${match.wins}-${match.losses}` : undefined,
+    order: match.playOrder === "second" ? "second" : "first",
+    phase:
+      match.eventCategory === "shop"
+        ? match.tournamentPhase === "elimination"
+          ? "elimination"
+          : "swiss"
+        : undefined,
+    round,
+    date: match.playedAt.toISOString().slice(0, 10),
+  };
+}
+
 function SingleMatchCard({
   match,
   deleteAction,
@@ -57,7 +82,7 @@ function SingleMatchCard({
               {formatDate(match.playedAt)}
             </span>
             <span className="rounded-full bg-line/40 px-3 py-1 text-xs font-semibold text-muted">
-              {match.matchFormat.toUpperCase()}
+              {match.matchFormat === "bo3" ? `BO3 ${match.wins}-${match.losses}` : match.matchFormat.toUpperCase()}
             </span>
           </div>
           <div>
@@ -65,7 +90,7 @@ function SingleMatchCard({
               {match.myDeck.name} vs {match.opponentDeckName}
             </h2>
             <p className="mt-1 text-sm text-muted">
-              {match.myDeck.game.name} · {match.playOrder === "first" ? "선공" : "후공"}
+              {match.myDeck.game.name} · {match.playOrder === "first" ? "선공" : "후공"}{match.didChoosePlayOrder ? "(선택)" : ""}
               {match.memo ? ` · ${match.memo}` : ""}
             </p>
           </div>
@@ -80,6 +105,7 @@ function SingleMatchCard({
         >
           수정
         </Link>
+        <ShareButton href={buildMatchSharePath(createMatchSharePayload(match))} />
         <form action={deleteAction}>
           <input type="hidden" name="matchId" value={match.id} />
           <DeleteMatchButton />
@@ -167,7 +193,8 @@ function TournamentMatchCard({
         {group.matches.map((match, index) => {
           const isElimination = match.tournamentPhase === "elimination";
           const phaseChanged = index > 0 && group.matches[index - 1].tournamentPhase !== match.tournamentPhase;
-          const roundLabel = isElimination ? `T${++eliminationIndex}` : `R${++swissIndex}`;
+          const roundNumber = isElimination ? ++eliminationIndex : ++swissIndex;
+          const roundLabel = isElimination ? `T${roundNumber}` : `R${roundNumber}`;
 
           return (
             <div
@@ -191,7 +218,7 @@ function TournamentMatchCard({
                     vs {match.opponentDeckName}
                   </h3>
                   <p className="mt-1 text-sm text-muted">
-                    {match.matchFormat.toUpperCase()} · {match.playOrder === "first" ? "선공" : "후공"}
+                    {match.matchFormat === "bo3" ? `BO3 ${match.wins}-${match.losses}` : match.matchFormat.toUpperCase()} · {match.playOrder === "first" ? "선공" : "후공"}{match.didChoosePlayOrder ? "(선택)" : ""}
                     {match.memo ? ` · ${match.memo}` : ""}
                   </p>
                 </div>
@@ -205,6 +232,10 @@ function TournamentMatchCard({
                 >
                   수정
                 </Link>
+                <ShareButton
+                  href={buildMatchSharePath(createMatchSharePayload(match, roundNumber))}
+                  tone="surface"
+                />
                 <form action={deleteAction}>
                   <input type="hidden" name="matchId" value={match.id} />
                   <DeleteMatchButton />

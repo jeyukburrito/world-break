@@ -6,7 +6,7 @@ import { isSupabaseConfigured } from "@/lib/env";
 const GUEST_COOKIE = "wb_guest_token";
 import { updateSession } from "@/lib/supabase/middleware";
 
-const PUBLIC_PATHS = ["/", "/login", "/auth/callback"];
+const PUBLIC_PATHS = ["/", "/login", "/auth/callback", "/share", "/api/og"];
 
 // Routes that require Supabase auth and do not support guest sessions
 const SUPABASE_ONLY_PATHS = ["/matches/export", "/matches/tournaments/end"];

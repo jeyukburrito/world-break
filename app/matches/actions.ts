@@ -75,11 +75,21 @@ async function ensureOwnedTags(tx: TxClient, userId: string, tagIds: string[]) {
   });
 }
 
-function deriveScore(matchFormat: "bo1" | "bo3", result: "win" | "lose") {
+function deriveScore(
+  matchFormat: "bo1" | "bo3",
+  result: "win" | "lose",
+  bo3Score?: "2-0" | "2-1" | "0-2" | "1-2",
+) {
   if (matchFormat === "bo1") {
     return result === "win" ? { wins: 1, losses: 0 } : { wins: 0, losses: 1 };
   }
 
+  if (bo3Score) {
+    const [w, l] = bo3Score.split("-").map(Number);
+    return { wins: w, losses: l };
+  }
+
+  // 폴백: 기존 로직 (bo3Score 미제공 시)
   return result === "win" ? { wins: 2, losses: 1 } : { wins: 1, losses: 2 };
 }
 
@@ -102,6 +112,7 @@ function parseMatchForm(formData: FormData) {
     didChoosePlayOrder: formData.get("didChoosePlayOrder"),
     matchFormat: formData.get("matchFormat"),
     result: formData.get("result"),
+    bo3Score: formData.get("bo3Score") || undefined,
     tournamentDetail: formData.get("tournamentDetail") || undefined,
     memo: formData.get("memo"),
     tagIds,
@@ -171,9 +182,11 @@ async function buildNextTournamentRedirect(params: {
   gameName: string;
   deckName: string;
   tournamentPhase: "swiss" | "elimination";
+  matchFormat: "bo1" | "bo3";
+  playOrder: "first" | "second";
   matchEp: Record<string, string>;
 }) {
-  const { sessionId, userId, eventCategory, playedAt, gameName, deckName, tournamentPhase, matchEp } = params;
+  const { sessionId, userId, eventCategory, playedAt, gameName, deckName, tournamentPhase, matchFormat, playOrder, matchEp } = params;
   const phaseCount = await prisma.matchResult.count({
     where: {
       userId,
@@ -192,6 +205,8 @@ async function buildNextTournamentRedirect(params: {
     round: String(phaseCount + 1),
     phase: tournamentPhase,
     tournamentId: sessionId,
+    matchFormat,
+    playOrder,
   });
 
   return `/matches/new?${sp.toString()}`;
@@ -205,7 +220,7 @@ export async function createMatchResult(formData: FormData) {
     redirect(newMatchRedirect("error", "입력값을 확인해 주세요."));
   }
 
-  const score = deriveScore(parsed.data.matchFormat, parsed.data.result);
+  const score = deriveScore(parsed.data.matchFormat, parsed.data.result, parsed.data.bo3Score);
 
   const { tournamentSessionId } = await prisma.$transaction(async (tx) => {
     const [{ deckId }, ownedTags] = await Promise.all([
@@ -301,6 +316,8 @@ export async function createMatchResult(formData: FormData) {
         gameName: parsed.data.gameName,
         deckName: parsed.data.myDeckName,
         tournamentPhase: parsed.data.tournamentPhase ?? "swiss",
+        matchFormat: parsed.data.matchFormat,
+        playOrder: parsed.data.playOrder,
         matchEp,
       }),
     );
@@ -322,7 +339,7 @@ export async function updateMatchResult(formData: FormData) {
     redirect(editRedirect(matchId, "error", "입력값을 확인해 주세요."));
   }
 
-  const score = deriveScore(parsed.data.matchFormat, parsed.data.result);
+  const score = deriveScore(parsed.data.matchFormat, parsed.data.result, parsed.data.bo3Score);
 
   const result = await prisma.$transaction(async (tx) => {
     const [{ deckId }, existingMatch, ownedTags] = await Promise.all([

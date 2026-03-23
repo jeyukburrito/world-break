@@ -7,6 +7,8 @@ type MatchRow = {
   tournamentPhase: string | null;
   tournamentSessionId: string | null;
   matchFormat: string;
+  wins: number;
+  losses: number;
   isMatchWin: boolean;
   playOrder: string;
   didChoosePlayOrder: boolean;
