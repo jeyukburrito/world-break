@@ -35,5 +35,5 @@ Author: Claude (PM/QA)
 | T-016 | UI 정리: 게스트 문구·배너·헤더 링크·아바타 | `done` | [spec](handoffs/T-016-spec.md) | [result](handoffs/T-016-result.md) | | 게스트 버튼 문구, 배너 삭제, 헤더 홈링크, 아바타 제거 |
 | T-017 | 매치 공유 카드 — Stateless OG Image | `done` | [spec](handoffs/T-017-spec.md) | [result](handoffs/T-017-result.md) | | Discord/Slack 링크 프리뷰 + Web Share API, DB 변경 없음 |
 | T-018 | 사용자 피드백: BO3 점수·선후결정 표시·대회종료·폼보존 | `done` | [spec](handoffs/T-018-spec.md) | | | BO3 세부점수, didChoosePlayOrder 표시, 대회종료 버그, 폼상태 보존 |
-| T-019 | 공유 재설계 + BO3 입력 UX + 폼 보존 버그 | `ready` | [spec](handoffs/T-019-spec.md) | | | 대회 전체 공유, BO3 빈칸 입력, nextHref 파라미터 수정 |
+| T-019 | 공유 재설계 + BO3 입력 UX + 폼 보존 버그 | `done` | [spec](handoffs/T-019-spec.md) | [result](handoffs/T-019-result.md) | [review](daily/T-019-review-gemini.md) | 대회 전체 공유, BO3 빈칸 입력, nextHref 파라미터 수정 |
 
