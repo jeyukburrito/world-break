@@ -6,13 +6,20 @@ import { HeaderActions } from "@/components/header-actions";
 import { ShareButton } from "@/components/share-button";
 import { getUserDisplayInfo, requireUser } from "@/lib/auth";
 import { formatDate } from "@/lib/format-date";
-import { groupMatchesForDisplay, type DisplayItem } from "@/lib/group-matches";
+import {
+  groupMatchesForDisplay,
+  type DisplayItem,
+  type TournamentGroup,
+} from "@/lib/group-matches";
 import {
   MATCHES_PAGE_SIZE,
   countMatchesForUser,
   listMatchesForUser,
 } from "@/lib/matches";
-import { buildMatchSharePath, type MatchSharePayload } from "@/lib/share/match-share";
+import {
+  buildTournamentSharePath,
+  type TournamentSharePayload,
+} from "@/lib/share/match-share";
 
 import { deleteMatchResult } from "./actions";
 
@@ -40,26 +47,20 @@ function MatchStatusPill({ isWin }: { isWin: boolean }) {
   );
 }
 
-function createMatchSharePayload(
-  match: Extract<DisplayItem, { type: "single" }>["match"],
-  round?: number,
-): MatchSharePayload {
+function createTournamentSharePayload(group: TournamentGroup): TournamentSharePayload {
+  const wins = group.matches.filter((match) => match.isMatchWin).length;
+  const losses = group.matches.length - wins;
+  const allBo3 = group.matches.every((match) => match.matchFormat === "bo3");
+
   return {
-    game: match.myDeck.game.name,
-    myDeck: match.myDeck.name,
-    opponentDeck: match.opponentDeckName,
-    result: match.isMatchWin ? "win" : "lose",
-    format: match.matchFormat === "bo3" ? "bo3" : "bo1",
-    score: match.matchFormat === "bo3" ? `${match.wins}-${match.losses}` : undefined,
-    order: match.playOrder === "second" ? "second" : "first",
-    phase:
-      match.eventCategory === "shop"
-        ? match.tournamentPhase === "elimination"
-          ? "elimination"
-          : "swiss"
-        : undefined,
-    round,
-    date: match.playedAt.toISOString().slice(0, 10),
+    game: group.gameName,
+    myDeck: group.deckName,
+    result: wins > losses ? "win" : "lose",
+    format: allBo3 ? "bo3" : "bo1",
+    wins,
+    losses,
+    rounds: group.matches.length,
+    date: group.date.toISOString().slice(0, 10),
   };
 }
 
@@ -105,7 +106,6 @@ function SingleMatchCard({
         >
           수정
         </Link>
-        <ShareButton href={buildMatchSharePath(createMatchSharePayload(match))} />
         <form action={deleteAction}>
           <input type="hidden" name="matchId" value={match.id} />
           <DeleteMatchButton />
@@ -126,19 +126,23 @@ function TournamentMatchCard({
   const losses = group.matches.length - wins;
   const isEnded = Boolean(group.endedAt);
   const showPhaseLabels = group.hasSwiss && group.hasElimination;
+  const lastMatch = group.matches[group.matches.length - 1];
   const nextSwissRound = group.matches.filter((match) => match.tournamentPhase !== "elimination").length + 1;
   const nextEliminationRound =
     group.matches.filter((match) => match.tournamentPhase === "elimination").length + 1;
-  const nextHref = group.tournamentSessionId
+  const nextHref = group.tournamentSessionId && lastMatch
     ? `/matches/new?${new URLSearchParams({
         event: group.eventCategory,
         date: group.date.toISOString().slice(0, 10),
-        deckId: group.firstDeckId,
-        gameId: group.firstGameId,
+        deckName: group.deckName,
+        gameName: group.gameName,
+        matchFormat: lastMatch.matchFormat,
+        playOrder: lastMatch.playOrder,
         phase: group.hasElimination ? "elimination" : "swiss",
         tournamentId: group.tournamentSessionId,
       }).toString()}`
     : null;
+  const tournamentShareHref = buildTournamentSharePath(createTournamentSharePayload(group));
 
   let swissIndex = 0;
   let eliminationIndex = 0;
@@ -175,6 +179,9 @@ function TournamentMatchCard({
             <p className="mt-1 text-sm text-muted">
               {group.name ? `${group.gameName} · ${group.deckName}` : group.gameName}
             </p>
+            <div className="mt-4">
+              <ShareButton href={tournamentShareHref} />
+            </div>
           </div>
         </div>
         <div className="text-right">
@@ -193,8 +200,7 @@ function TournamentMatchCard({
         {group.matches.map((match, index) => {
           const isElimination = match.tournamentPhase === "elimination";
           const phaseChanged = index > 0 && group.matches[index - 1].tournamentPhase !== match.tournamentPhase;
-          const roundNumber = isElimination ? ++eliminationIndex : ++swissIndex;
-          const roundLabel = isElimination ? `T${roundNumber}` : `R${roundNumber}`;
+          const roundLabel = isElimination ? `T${++eliminationIndex}` : `R${++swissIndex}`;
 
           return (
             <div
@@ -232,10 +238,6 @@ function TournamentMatchCard({
                 >
                   수정
                 </Link>
-                <ShareButton
-                  href={buildMatchSharePath(createMatchSharePayload(match, roundNumber))}
-                  tone="surface"
-                />
                 <form action={deleteAction}>
                   <input type="hidden" name="matchId" value={match.id} />
                   <DeleteMatchButton />

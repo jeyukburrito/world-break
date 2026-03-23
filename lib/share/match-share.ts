@@ -18,13 +18,25 @@ const matchShareParamsSchema = z.object({
 });
 
 export type MatchSharePayload = z.infer<typeof matchShareParamsSchema>;
+const tournamentShareParamsSchema = z.object({
+  game: z.string().trim().min(1).max(80),
+  myDeck: z.string().trim().min(1).max(120),
+  result: z.enum(["win", "lose"]),
+  format: z.enum(["bo1", "bo3"]),
+  wins: z.coerce.number().int().min(0),
+  losses: z.coerce.number().int().min(0),
+  rounds: z.coerce.number().int().min(1),
+  date: z.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/),
+});
+
+export type TournamentSharePayload = z.infer<typeof tournamentShareParamsSchema>;
 
 type ShareSearchParams =
   | URLSearchParams
   | Record<string, string | string[] | undefined>
   | undefined;
 
-function readSearchParam(searchParams: ShareSearchParams, key: keyof MatchSharePayload) {
+function readSearchParam(searchParams: ShareSearchParams, key: string) {
   if (!searchParams) {
     return undefined;
   }
@@ -83,12 +95,46 @@ export function buildMatchShareSearchParams(payload: MatchSharePayload) {
   return params;
 }
 
+export function parseTournamentShareParams(searchParams: ShareSearchParams) {
+  return tournamentShareParamsSchema.safeParse({
+    game: readSearchParam(searchParams, "game"),
+    myDeck: readSearchParam(searchParams, "myDeck"),
+    result: readSearchParam(searchParams, "result"),
+    format: readSearchParam(searchParams, "format"),
+    wins: readSearchParam(searchParams, "wins"),
+    losses: readSearchParam(searchParams, "losses"),
+    rounds: readSearchParam(searchParams, "rounds"),
+    date: readSearchParam(searchParams, "date"),
+  });
+}
+
+export function buildTournamentShareSearchParams(payload: TournamentSharePayload) {
+  return new URLSearchParams({
+    game: payload.game,
+    myDeck: payload.myDeck,
+    result: payload.result,
+    format: payload.format,
+    wins: String(payload.wins),
+    losses: String(payload.losses),
+    rounds: String(payload.rounds),
+    date: payload.date,
+  });
+}
+
 export function buildMatchSharePath(payload: MatchSharePayload) {
   return `/share/match?${buildMatchShareSearchParams(payload).toString()}`;
 }
 
 export function buildMatchOgPath(payload: MatchSharePayload) {
   return `/api/og/match?${buildMatchShareSearchParams(payload).toString()}`;
+}
+
+export function buildTournamentSharePath(payload: TournamentSharePayload) {
+  return `/share/tournament?${buildTournamentShareSearchParams(payload).toString()}`;
+}
+
+export function buildTournamentOgPath(payload: TournamentSharePayload) {
+  return `/api/og/tournament?${buildTournamentShareSearchParams(payload).toString()}`;
 }
 
 export function getMatchResultLabel(result: MatchSharePayload["result"]) {
@@ -160,6 +206,22 @@ export function buildMatchShareFooterItems(payload: MatchSharePayload) {
   return items;
 }
 
+export function buildTournamentShareTitle(payload: TournamentSharePayload) {
+  return `${payload.myDeck} — ${payload.wins}승 ${payload.losses}패 (${payload.rounds} Rounds)`;
+}
+
+export function buildTournamentShareDescription(payload: TournamentSharePayload) {
+  return ["World Break", payload.game, payload.date].join(" · ");
+}
+
+export function buildTournamentShareAlt(payload: TournamentSharePayload) {
+  return `${payload.myDeck} · ${payload.wins}승 ${payload.losses}패`;
+}
+
+export function buildTournamentShareFooterItems(payload: TournamentSharePayload) {
+  return [payload.game, payload.format.toUpperCase(), `${payload.rounds} Rounds`, payload.date];
+}
+
 export function buildMatchOgFontText(payload: MatchSharePayload | null) {
   const baseText = [
     "World Break",
@@ -186,6 +248,34 @@ export function buildMatchOgFontText(payload: MatchSharePayload | null) {
       payload.score ?? "",
       getMatchOrderLabel(payload.order),
       getMatchPhaseLabel(payload.phase),
+    );
+  }
+
+  return Array.from(new Set(baseText.join("").replace(/\s+/g, ""))).join("");
+}
+
+export function buildTournamentOgFontText(payload: TournamentSharePayload | null) {
+  const baseText = [
+    "World Break",
+    "TOURNAMENT",
+    "ROUNDS",
+    "WIN",
+    "LOSE",
+    "승",
+    "패",
+    "Rounds",
+    "Date",
+    "Format",
+  ];
+
+  if (payload) {
+    baseText.push(
+      payload.game,
+      payload.myDeck,
+      payload.date,
+      String(payload.wins),
+      String(payload.losses),
+      String(payload.rounds),
     );
   }
 

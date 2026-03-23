@@ -20,40 +20,38 @@ export function MatchResultInput({
     defaultResult === "lose" ? "lose" : "win",
   );
   const [myWins, setMyWins] = useState(
-    defaultFormat === "bo3" && defaultWins !== undefined ? defaultWins : 2,
+    defaultFormat === "bo3" && defaultWins !== undefined ? String(defaultWins) : "",
   );
   const [myLosses, setMyLosses] = useState(
-    defaultFormat === "bo3" && defaultLosses !== undefined ? defaultLosses : 0,
+    defaultFormat === "bo3" && defaultLosses !== undefined ? String(defaultLosses) : "",
   );
+
+  const sanitizeScoreInput = (value: string) => value.replace(/[^0-2]/g, "").slice(0, 1);
 
   const handleFormatChange = (next: string) => {
     setFormat(next);
     if (next === "bo3") {
-      if (result === "win") {
-        setMyWins(2);
-        setMyLosses(0);
-      } else {
-        setMyWins(0);
-        setMyLosses(2);
-      }
+      setMyWins("");
+      setMyLosses("");
     }
   };
 
   const handleResultChange = (next: "win" | "lose") => {
     setResult(next);
     if (format === "bo3") {
-      if (next === "win") {
-        setMyWins(2);
-        setMyLosses(0);
-      } else {
-        setMyWins(0);
-        setMyLosses(2);
-      }
+      setMyWins("");
+      setMyLosses("");
     }
   };
 
   const bo3Score =
-    format === "bo3" ? (`${myWins}-${myLosses}` as "2-0" | "2-1" | "0-2" | "1-2") : undefined;
+    format === "bo3"
+      ? (`${myWins || (result === "win" ? "2" : "0")}-${myLosses || (result === "win" ? "0" : "2")}` as
+          | "2-0"
+          | "2-1"
+          | "0-2"
+          | "1-2")
+      : undefined;
 
   return (
     <section className="space-y-6">
@@ -118,11 +116,13 @@ export function MatchResultInput({
             <label className="grid gap-1 text-center">
               <span className="text-xs text-muted">내 승</span>
               <input
-                type="number"
-                min={0}
-                max={2}
+                type="text"
+                inputMode="numeric"
+                pattern="[0-2]"
+                maxLength={1}
                 value={myWins}
-                onChange={(e) => setMyWins(Math.min(2, Math.max(0, Number(e.target.value) || 0)))}
+                placeholder="0"
+                onChange={(e) => setMyWins(sanitizeScoreInput(e.target.value))}
                 className="w-16 rounded-2xl bg-surface-container-high px-3 py-3 text-center text-lg font-bold text-ink"
               />
             </label>
@@ -130,11 +130,13 @@ export function MatchResultInput({
             <label className="grid gap-1 text-center">
               <span className="text-xs text-muted">내 패</span>
               <input
-                type="number"
-                min={0}
-                max={2}
+                type="text"
+                inputMode="numeric"
+                pattern="[0-2]"
+                maxLength={1}
                 value={myLosses}
-                onChange={(e) => setMyLosses(Math.min(2, Math.max(0, Number(e.target.value) || 0)))}
+                placeholder="0"
+                onChange={(e) => setMyLosses(sanitizeScoreInput(e.target.value))}
                 className="w-16 rounded-2xl bg-surface-container-high px-3 py-3 text-center text-lg font-bold text-ink"
               />
             </label>
