@@ -248,14 +248,27 @@ function TournamentMatchCard({
         })}
       </div>
 
-      {!isEnded && nextHref ? (
-        <div className="mt-4">
-          <Link
-            href={nextHref}
-            className="inline-flex rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white"
-          >
-            {group.hasElimination ? `토너먼트 R${nextEliminationRound} 추가` : `스위스 R${nextSwissRound} 추가`}
-          </Link>
+      {!isEnded && (nextHref || group.tournamentSessionId) ? (
+        <div className="mt-4 flex gap-2">
+          {nextHref ? (
+            <Link
+              href={nextHref}
+              className="inline-flex rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white"
+            >
+              {group.hasElimination ? `토너먼트 R${nextEliminationRound} 추가` : `스위스 R${nextSwissRound} 추가`}
+            </Link>
+          ) : null}
+          {group.tournamentSessionId ? (
+            <form action="/matches/tournaments/end" method="post">
+              <input type="hidden" name="tournamentSessionId" value={group.tournamentSessionId} />
+              <button
+                type="submit"
+                className="inline-flex rounded-full border border-line px-4 py-2 text-sm font-semibold text-muted"
+              >
+                대회 종료
+              </button>
+            </form>
+          ) : null}
         </div>
       ) : null}
     </article>

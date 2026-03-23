@@ -12,14 +12,22 @@ export const runtime = "edge";
 export async function GET(request: NextRequest) {
   const parsed = parseTournamentShareParams(request.nextUrl.searchParams);
   const share = parsed.success ? parsed.data : null;
-  const fonts = await loadMatchOgFonts(buildTournamentOgFontText(share));
 
-  return new ImageResponse(createElement(TournamentShareOgCard, { share }), {
-    width: 1200,
-    height: 630,
-    fonts,
-    headers: {
-      "cache-control": "public, max-age=31536000, immutable",
-    },
-  });
+  try {
+    const fonts = await loadMatchOgFonts(buildTournamentOgFontText(share));
+
+    return new ImageResponse(createElement(TournamentShareOgCard, { share }), {
+      width: 1200,
+      height: 630,
+      fonts,
+      headers: {
+        "cache-control": "public, max-age=31536000, immutable",
+      },
+    });
+  } catch {
+    return new ImageResponse(createElement(TournamentShareOgCard, { share: null }), {
+      width: 1200,
+      height: 630,
+    });
+  }
 }

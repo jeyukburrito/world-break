@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 
 import {
   buildAbsoluteUrl,
@@ -79,7 +78,16 @@ export default async function ShareMatchPage({ searchParams }: ShareMatchPagePro
   const parsed = parseMatchShareParams(params);
 
   if (!parsed.success) {
-    redirect("/");
+    return (
+      <main className="min-h-screen bg-paper px-6 py-10 text-on-surface">
+        <section className="mx-auto flex w-full max-w-xl flex-col items-center gap-6 text-center">
+          <p className="text-sm text-muted">공유 링크가 올바르지 않습니다.</p>
+          <Link href="/" className="inline-flex items-center justify-center rounded-full bg-accent px-5 py-3 text-sm font-semibold text-white">
+            World Break 홈으로
+          </Link>
+        </section>
+      </main>
+    );
   }
 
   const share = parsed.data;

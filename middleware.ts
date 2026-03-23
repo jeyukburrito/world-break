@@ -9,7 +9,7 @@ import { updateSession } from "@/lib/supabase/middleware";
 const PUBLIC_PATHS = ["/", "/login", "/auth/callback", "/share", "/api/og"];
 
 // Routes that require Supabase auth and do not support guest sessions
-const SUPABASE_ONLY_PATHS = ["/matches/export", "/matches/tournaments/end"];
+const SUPABASE_ONLY_PATHS = ["/matches/export"];
 
 export async function middleware(request: NextRequest) {
   const isPublicPath = PUBLIC_PATHS.some(
