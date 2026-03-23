@@ -7,7 +7,7 @@ import { MatchShareOgCard } from "@/components/match-share-og-card";
 import { loadMatchOgFonts } from "@/lib/share/og-font";
 import { buildMatchOgFontText, parseMatchShareParams } from "@/lib/share/match-share";
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 
 export async function GET(request: NextRequest) {
   const parsed = parseMatchShareParams(request.nextUrl.searchParams);

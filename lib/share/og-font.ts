@@ -9,7 +9,10 @@ type LoadedFont = {
 
 const FONT_USER_AGENT =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36";
-const NOTO_SPIKE_THRESHOLD_MS = 500;
+// Total budget for font loading: if exceeded, return empty fonts and render without custom font
+const FONT_BUDGET_MS = 3000;
+// Per-request timeout for each Google Fonts fetch
+const FETCH_TIMEOUT_MS = 1500;
 
 const fontCache = new Map<string, Promise<LoadedFont[]>>();
 
@@ -20,7 +23,7 @@ function buildGoogleFontCssUrl(family: string, weight: FontWeight, text: string)
 
 async function fetchGoogleFont(family: string, weight: FontWeight, text: string) {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 3000);
+  const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
   try {
     const cssResponse = await fetch(buildGoogleFontCssUrl(family, weight, text), {
@@ -55,40 +58,37 @@ async function fetchGoogleFont(family: string, weight: FontWeight, text: string)
   }
 }
 
-async function loadFontFamily(family: string, text: string) {
-  const startedAt = Date.now();
+async function loadFontFamily(family: string, text: string): Promise<LoadedFont[]> {
   const [regular, bold] = await Promise.all([
     fetchGoogleFont(family, 400, text),
     fetchGoogleFont(family, 700, text),
   ]);
 
-  return {
-    elapsedMs: Date.now() - startedAt,
-    fonts: [
-      { name: family, data: regular, style: "normal" as const, weight: 400 as const },
-      { name: family, data: bold, style: "normal" as const, weight: 700 as const },
-    ],
-  };
+  return [
+    { name: family, data: regular, style: "normal" as const, weight: 400 as const },
+    { name: family, data: bold, style: "normal" as const, weight: 700 as const },
+  ];
 }
 
-async function loadFontFallbackChain(text: string) {
-  try {
-    const noto = await loadFontFamily("Noto Sans KR", text);
+async function loadFontFallbackChain(text: string): Promise<LoadedFont[]> {
+  const deadline = new Promise<LoadedFont[]>((resolve) =>
+    setTimeout(() => resolve([]), FONT_BUDGET_MS),
+  );
 
-    // Spike decision: only keep Noto when the subset fetch stays within the latency budget.
-    if (noto.elapsedMs <= NOTO_SPIKE_THRESHOLD_MS) {
-      return noto.fonts;
+  const attempt = (async () => {
+    try {
+      return await loadFontFamily("Noto Sans KR", text);
+    } catch {
+      // Noto failed — try Inter
     }
-  } catch {
-    // Fall through to Inter.
-  }
+    try {
+      return await loadFontFamily("Inter", text);
+    } catch {
+      return [];
+    }
+  })();
 
-  try {
-    const inter = await loadFontFamily("Inter", text);
-    return inter.fonts;
-  } catch {
-    return [];
-  }
+  return Promise.race([attempt, deadline]);
 }
 
 export async function loadMatchOgFonts(text: string) {
