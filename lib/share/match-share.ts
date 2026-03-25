@@ -222,66 +222,6 @@ export function buildTournamentShareFooterItems(payload: TournamentSharePayload)
   return [payload.game, payload.format.toUpperCase(), `${payload.rounds} Rounds`, payload.date];
 }
 
-export function buildMatchOgFontText(payload: MatchSharePayload | null) {
-  const baseText = [
-    "World Break",
-    "MY DECK",
-    "OPPONENT",
-    "WIN",
-    "LOSE",
-    "친선전",
-    "예선",
-    "본선",
-    "선공",
-    "후공",
-    "Round",
-    "Date",
-    "Format",
-  ];
-
-  if (payload) {
-    baseText.push(
-      payload.game,
-      payload.myDeck,
-      payload.opponentDeck,
-      payload.date ?? "",
-      payload.score ?? "",
-      getMatchOrderLabel(payload.order),
-      getMatchPhaseLabel(payload.phase),
-    );
-  }
-
-  return Array.from(new Set(baseText.join("").replace(/\s+/g, ""))).join("");
-}
-
-export function buildTournamentOgFontText(payload: TournamentSharePayload | null) {
-  const baseText = [
-    "World Break",
-    "TOURNAMENT",
-    "ROUNDS",
-    "WIN",
-    "LOSE",
-    "승",
-    "패",
-    "Rounds",
-    "Date",
-    "Format",
-  ];
-
-  if (payload) {
-    baseText.push(
-      payload.game,
-      payload.myDeck,
-      payload.date,
-      String(payload.wins),
-      String(payload.losses),
-      String(payload.rounds),
-    );
-  }
-
-  return Array.from(new Set(baseText.join("").replace(/\s+/g, ""))).join("");
-}
-
 export function getRequestOrigin(headers: Pick<Headers, "get">) {
   const origin = headers.get("origin");
 

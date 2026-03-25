@@ -1,4 +1,4 @@
-Author: Claude (PM/QA)
+﻿Author: Claude (PM/QA)
 
 # TASKS.md — 티켓 목록 및 상태
 
@@ -36,4 +36,6 @@ Author: Claude (PM/QA)
 | T-017 | 매치 공유 카드 — Stateless OG Image | `done` | [spec](handoffs/T-017-spec.md) | [result](handoffs/T-017-result.md) | | Discord/Slack 링크 프리뷰 + Web Share API, DB 변경 없음 |
 | T-018 | 사용자 피드백: BO3 점수·선후결정 표시·대회종료·폼보존 | `done` | [spec](handoffs/T-018-spec.md) | | | BO3 세부점수, didChoosePlayOrder 표시, 대회종료 버그, 폼상태 보존 |
 | T-019 | 공유 재설계 + BO3 입력 UX + 폼 보존 버그 | `done` | [spec](handoffs/T-019-spec.md) | [result](handoffs/T-019-result.md) | [review](daily/T-019-review-gemini.md) | 대회 전체 공유, BO3 빈칸 입력, nextHref 파라미터 수정 |
+| T-020 | QA Fix — Share OG·로그인 리다이렉트·대회 종료 | `done` | [spec](handoffs/T-020-spec.md) | | | OG 에러 방어, 공유페이지 리다이렉트 수정, 대회종료 복구 |
+| T-021 | OG 이미지 폰트 번들링 | `done` | [spec](handoffs/T-021-spec.md) | [result](handoffs/T-021-result.md) | [review](daily/T-021-review-subagent.md) | Google Fonts 네트워크 의존 제거 → 번들 TTF subset |
 

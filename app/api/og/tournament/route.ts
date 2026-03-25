@@ -5,7 +5,7 @@ import type { NextRequest } from "next/server";
 
 import { TournamentShareOgCard } from "@/components/tournament-share-og-card";
 import { loadMatchOgFonts } from "@/lib/share/og-font";
-import { buildTournamentOgFontText, parseTournamentShareParams } from "@/lib/share/match-share";
+import { parseTournamentShareParams } from "@/lib/share/match-share";
 
 export const runtime = "nodejs";
 
@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
   const share = parsed.success ? parsed.data : null;
 
   try {
-    const fonts = await loadMatchOgFonts(buildTournamentOgFontText(share));
+    const fonts = await loadMatchOgFonts();
 
     return new ImageResponse(createElement(TournamentShareOgCard, { share }), {
       width: 1200,
