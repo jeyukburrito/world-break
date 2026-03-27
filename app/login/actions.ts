@@ -14,12 +14,16 @@ export async function signInWithGoogle(formData: FormData) {
 
   const supabase = await createClient();
   const headerStore = await headers();
-  const origin = headerStore.get("origin");
   const nextPath = getSafeRedirectPath(formData.get("next")?.toString());
 
-  if (!origin) {
+  // Use x-forwarded-host (set by Vercel) instead of origin header,
+  // which can return the Vercel project URL instead of the production domain
+  const host = headerStore.get("x-forwarded-host") ?? headerStore.get("host");
+  if (!host) {
     redirect("/login?error=origin_missing");
   }
+  const proto = headerStore.get("x-forwarded-proto") ?? (host.includes("localhost") ? "http" : "https");
+  const origin = `${proto}://${host}`;
 
   const callbackUrl = new URL("/auth/callback", origin);
   callbackUrl.searchParams.set("next", nextPath);
