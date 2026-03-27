@@ -43,12 +43,12 @@ Security rules:
 In Supabase, open `Authentication > URL Configuration`.
 
 Set:
-- `Site URL`: `http://localhost:3000` for local-first setup
+- `Site URL`: `https://world-break.vercel.app` for production
 - Additional Redirect URLs:
   - `http://localhost:3000/auth/callback`
-  - production callback URL later, for example `https://your-domain.com/auth/callback`
+  - `https://world-break.vercel.app/auth/callback`
 
-Our app uses `redirectTo` and the callback route at `/auth/callback`, so that path must be allowed.
+Our app uses a fixed production `redirectTo` of `https://world-break.vercel.app/auth/callback` and keeps `http://localhost:3000/auth/callback` for local development, so both must be in the allow list.
 
 ## 4. Configure Google Login
 Supabase requires Google OAuth to be configured in Google Auth Platform / Google Cloud first.
@@ -64,7 +64,7 @@ Supabase requires Google OAuth to be configured in Google Auth Platform / Google
 1. Create an OAuth client with type `Web application`.
 2. Add authorized JavaScript origins:
    - `http://localhost:3000`
-   - your production origin later
+   - `https://world-break.vercel.app`
 3. Add authorized redirect URI:
    - the Supabase callback URL copied above
 4. Save the Google client ID and client secret.
@@ -113,6 +113,7 @@ Then verify:
 - `.env` and `.env.local` exist and are not committed
 - Google provider is enabled in Supabase
 - `http://localhost:3000/auth/callback` is in redirect URLs
+- `https://world-break.vercel.app/auth/callback` is in redirect URLs
 - Prisma migration completed successfully
 - RLS SQL applied successfully
 - Login works

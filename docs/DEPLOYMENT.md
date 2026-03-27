@@ -22,9 +22,11 @@
 4. Deploy.
 
 ## Supabase Setup
-1. Add the Vercel production URL to `Authentication > URL Configuration > Site URL`.
-2. Add `https://YOUR_DOMAIN/auth/callback` to Redirect URLs.
-3. Add the same URL to the Google OAuth client if Google login is enabled.
+1. Set `Authentication > URL Configuration > Site URL` to `https://world-break.vercel.app`.
+2. Add `https://world-break.vercel.app/auth/callback` to Redirect URLs.
+3. Keep `http://localhost:3000/auth/callback` in Redirect URLs for local development.
+4. Add `https://world-break.vercel.app` to Google OAuth client `Authorized JavaScript origins` if Google login is enabled.
+5. Keep the Google OAuth client `Authorized redirect URI` pointed at the Supabase callback URL shown in Supabase.
 
 ## Database Migration
 Run from a machine with direct Supabase access:
@@ -44,4 +46,3 @@ npx prisma migrate deploy
 - [ ] `/matches` filters records
 - [ ] CSV export downloads a file
 - [ ] `/dashboard` loads stats without errors
-

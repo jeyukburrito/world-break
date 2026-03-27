@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+const CANONICAL_APP_ORIGIN = "https://world-break.vercel.app";
+
 const envSchema = z.object({
   DATABASE_URL: z.string().min(1),
   DIRECT_URL: z.string().min(1),
@@ -22,6 +24,18 @@ export const isSupabaseConfigured = Boolean(
   env?.NEXT_PUBLIC_SUPABASE_URL && env?.NEXT_PUBLIC_SUPABASE_ANON_KEY,
 );
 
+function isLocalHost(host: string) {
+  const normalizedHost = host.toLowerCase();
+  return (
+    normalizedHost === "localhost" ||
+    normalizedHost.startsWith("localhost:") ||
+    normalizedHost === "127.0.0.1" ||
+    normalizedHost.startsWith("127.0.0.1:") ||
+    normalizedHost === "[::1]" ||
+    normalizedHost.startsWith("[::1]:")
+  );
+}
+
 export function requireEnv() {
   if (!parsedEnv.success) {
     throw new Error(`Invalid environment configuration: ${parsedEnv.error.message}`);
@@ -40,4 +54,19 @@ export function getSafeRedirectPath(value: string | null | undefined, fallback =
   }
 
   return value;
+}
+
+export function getAuthCallbackOrigin(headers: Pick<Headers, "get">) {
+  const host = headers.get("x-forwarded-host") ?? headers.get("host");
+
+  if (!host) {
+    return process.env.NODE_ENV === "development" ? null : CANONICAL_APP_ORIGIN;
+  }
+
+  if (!isLocalHost(host)) {
+    return CANONICAL_APP_ORIGIN;
+  }
+
+  const proto = headers.get("x-forwarded-proto") ?? "http";
+  return `${proto}://${host}`;
 }
