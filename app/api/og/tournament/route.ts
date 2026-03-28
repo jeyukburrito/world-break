@@ -7,14 +7,16 @@ import { TournamentShareOgCard } from "@/components/tournament-share-og-card";
 import { loadMatchOgFonts } from "@/lib/share/og-font";
 import { parseTournamentShareParams } from "@/lib/share/match-share";
 
-export const runtime = "nodejs";
+export const runtime = "edge";
 
 export async function GET(request: NextRequest) {
   const parsed = parseTournamentShareParams(request.nextUrl.searchParams);
   const share = parsed.success ? parsed.data : null;
 
+  const origin = new URL(request.url).origin;
+
   try {
-    const fonts = await loadMatchOgFonts();
+    const fonts = await loadMatchOgFonts(origin);
 
     return new ImageResponse(createElement(TournamentShareOgCard, { share }), {
       width: 1200,

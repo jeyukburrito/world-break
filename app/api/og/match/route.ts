@@ -7,14 +7,16 @@ import { MatchShareOgCard } from "@/components/match-share-og-card";
 import { loadMatchOgFonts } from "@/lib/share/og-font";
 import { parseMatchShareParams } from "@/lib/share/match-share";
 
-export const runtime = "nodejs";
+export const runtime = "edge";
 
 export async function GET(request: NextRequest) {
   const parsed = parseMatchShareParams(request.nextUrl.searchParams);
   const share = parsed.success ? parsed.data : null;
 
+  const origin = new URL(request.url).origin;
+
   try {
-    const fonts = await loadMatchOgFonts();
+    const fonts = await loadMatchOgFonts(origin);
 
     return new ImageResponse(createElement(MatchShareOgCard, { share }), {
       width: 1200,

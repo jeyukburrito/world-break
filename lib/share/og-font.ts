@@ -1,6 +1,3 @@
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
-
 type LoadedFont = {
   name: string;
   data: ArrayBuffer;
@@ -8,28 +5,14 @@ type LoadedFont = {
   weight: 400 | 700;
 };
 
-async function readBundledOgFonts(): Promise<LoadedFont[]> {
-  const fontDir = join(process.cwd(), "public", "fonts");
+export async function loadMatchOgFonts(baseUrl: string): Promise<LoadedFont[]> {
   const [regular, bold] = await Promise.all([
-    readFile(join(fontDir, "NotoSansKR-Regular.woff2")),
-    readFile(join(fontDir, "NotoSansKR-Bold.woff2")),
+    fetch(new URL("/fonts/NotoSansKR-Regular.woff2", baseUrl)).then((r) => r.arrayBuffer()),
+    fetch(new URL("/fonts/NotoSansKR-Bold.woff2", baseUrl)).then((r) => r.arrayBuffer()),
   ]);
 
   return [
-    { name: "Noto Sans KR", data: regular.buffer, style: "normal", weight: 400 },
-    { name: "Noto Sans KR", data: bold.buffer, style: "normal", weight: 700 },
+    { name: "Noto Sans KR", data: regular, style: "normal", weight: 400 },
+    { name: "Noto Sans KR", data: bold, style: "normal", weight: 700 },
   ];
-}
-
-let fontPromise: Promise<LoadedFont[]> | null = null;
-
-export async function loadMatchOgFonts(): Promise<LoadedFont[]> {
-  if (!fontPromise) {
-    fontPromise = readBundledOgFonts().catch((error) => {
-      fontPromise = null;
-      throw error;
-    });
-  }
-
-  return fontPromise;
 }
