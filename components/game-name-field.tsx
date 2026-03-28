@@ -6,7 +6,13 @@ import { PRESET_GAMES } from "@/lib/preset-games";
 
 const CUSTOM_VALUE = "__custom__";
 
-export function GameNameField({ defaultValue }: { defaultValue?: string }) {
+export function GameNameField({
+  defaultValue,
+  onValueChange,
+}: {
+  defaultValue?: string;
+  onValueChange?: (value: string) => void;
+}) {
   const isCustomDefault =
     defaultValue !== undefined && !PRESET_GAMES.includes(defaultValue as (typeof PRESET_GAMES)[number]);
 
@@ -30,6 +36,10 @@ export function GameNameField({ defaultValue }: { defaultValue?: string }) {
     window.addEventListener("keydown", handleEscape);
     return () => window.removeEventListener("keydown", handleEscape);
   }, [open]);
+
+  useEffect(() => {
+    onValueChange?.(gameName);
+  }, [gameName, onValueChange]);
 
   return (
     <>

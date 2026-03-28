@@ -10,6 +10,8 @@ type MatchResultInputProps = {
   defaultWins?: number;
   defaultLosses?: number;
   defaultBo3PlaySequence?: string;
+  currentGameName?: string;
+  defaultFormatByGame?: Record<string, "bo1" | "bo3">;
 };
 
 function sanitizeScoreInput(value: string) {
@@ -53,6 +55,8 @@ export function MatchResultInput({
   defaultWins,
   defaultLosses,
   defaultBo3PlaySequence,
+  currentGameName,
+  defaultFormatByGame,
 }: MatchResultInputProps) {
   const [format, setFormat] = useState(defaultFormat === "bo3" ? "bo3" : "bo1");
   const [result, setResult] = useState<"win" | "lose">(
@@ -77,6 +81,14 @@ export function MatchResultInput({
 
   const gameCount = format === "bo3" ? getBo3GameCount(myWins, myLosses) : null;
   const previousGameCountRef = useRef<number | null>(initialGameCount);
+  const previousGameNameRef = useRef(currentGameName);
+
+  const applyFormatChange = (next: "bo1" | "bo3") => {
+    setFormat(next);
+    setMyWins("");
+    setMyLosses("");
+    setBo3PlaySequence("");
+  };
 
   useEffect(() => {
     window.dispatchEvent(
@@ -111,16 +123,17 @@ export function MatchResultInput({
     setBo3PlaySequence("F".repeat(gameCount));
   }, [bo3PlaySequence, format, gameCount]);
 
-  const handleFormatChange = (next: "bo1" | "bo3") => {
-    setFormat(next);
-
-    if (next === "bo3") {
-      setMyWins("");
-      setMyLosses("");
+  useEffect(() => {
+    if (currentGameName === previousGameNameRef.current) {
       return;
     }
 
-    setBo3PlaySequence("");
+    previousGameNameRef.current = currentGameName;
+    applyFormatChange(currentGameName ? defaultFormatByGame?.[currentGameName] ?? "bo1" : "bo1");
+  }, [currentGameName, defaultFormatByGame]);
+
+  const handleFormatChange = (next: "bo1" | "bo3") => {
+    applyFormatChange(next);
   };
 
   const handleResultChange = (next: "win" | "lose") => {

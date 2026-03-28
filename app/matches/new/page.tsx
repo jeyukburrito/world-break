@@ -1,12 +1,12 @@
 import { AppShell } from "@/components/app-shell";
 import { EventCategorySelect } from "@/components/event-category-select";
-import { GameDeckFields } from "@/components/game-deck-fields";
 import { HeaderActions } from "@/components/header-actions";
 import { MatchDetailControls } from "@/components/match-detail-controls";
-import { MatchResultInput } from "@/components/match-result-input";
+import { MatchPrefillFields } from "@/components/match-prefill-fields";
 import { SubmitButton } from "@/components/submit-button";
 import { TournamentBanner } from "@/components/tournament-banner";
 import { getUserDisplayInfo, requireUser } from "@/lib/auth";
+import { getNewMatchPrefill } from "@/lib/matches";
 import { prisma } from "@/lib/prisma";
 
 import { createMatchResult } from "../actions";
@@ -37,7 +37,7 @@ export default async function NewMatchPage({ searchParams }: NewMatchPageProps) 
   const phaseLabel = isElimination ? "본선" : "예선";
   const today = continueDate ?? new Date().toISOString().slice(0, 10);
 
-  const [continuedTournament, phaseCount] = await Promise.all([
+  const [continuedTournament, phaseCount, prefill] = await Promise.all([
     continueTournamentId
       ? prisma.tournamentSession.findFirst({
           where: {
@@ -59,7 +59,13 @@ export default async function NewMatchPage({ searchParams }: NewMatchPageProps) 
           },
         })
       : Promise.resolve(0),
+    getNewMatchPrefill(user.id),
   ]);
+
+  const initialGameName = continueGameName ?? prefill.latest?.gameName;
+  const initialGamePrefill = initialGameName ? prefill.byGame[initialGameName] : undefined;
+  const initialDeckName = continueDeckName ?? initialGamePrefill?.deckName;
+  const initialMatchFormat = continueMatchFormat ?? initialGamePrefill?.matchFormat;
 
   const isActiveTournament = Boolean(continuedTournament && !continuedTournament.endedAt);
   const isEndedTournament = Boolean(continuedTournament?.endedAt);
@@ -137,9 +143,11 @@ export default async function NewMatchPage({ searchParams }: NewMatchPageProps) 
           </section>
 
           <section className="grid gap-3">
-            <GameDeckFields
-              defaultGameName={continueGameName}
-              defaultDeckName={continueDeckName}
+            <MatchPrefillFields
+              defaultGameName={initialGameName}
+              defaultDeckName={initialDeckName}
+              defaultFormat={initialMatchFormat}
+              gameDefaults={prefill.byGame}
             />
             <label className="grid gap-2 text-sm font-semibold">
               상대 덱명
@@ -152,13 +160,9 @@ export default async function NewMatchPage({ searchParams }: NewMatchPageProps) 
             </label>
           </section>
 
-          <MatchResultInput
-            defaultFormat={continueMatchFormat}
-            defaultResult={undefined}
-          />
           <MatchDetailControls
             defaultPlayOrder={continuePlayOrder === "first" || continuePlayOrder === "second" ? continuePlayOrder : undefined}
-            format={continueMatchFormat}
+            format={initialMatchFormat}
           />
 
           <section className="grid gap-3">

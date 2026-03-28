@@ -5,12 +5,12 @@
 ---
 ## 현재 상태 (Last Updated: 2026-03-28)
 
-> **이 블록은 세션 종료 시 Claude가 업데이트한다. 아래 티켓 목록이 authoritative.**
+> **이 블록은 세션 종료 시 각 에이전트가 업데이트한다. 아래 티켓 목록이 authoritative.**
 
-- **마지막 완료:** T-030 (기록 카드 승/패 시각화 강화)
-- **진행 중:** 없음
-- **다음 우선순위:** T-026 (게임별 마지막 덱 자동 프리필 — spec 작성 필요)
-- **최근 주요 결정:** BO3 선후공 시퀀스 기록 스키마 추가(T-028), 선택 주체 용어 개선(T-029)
+- **마지막 완료:** T-026 (게임별 마지막 덱 자동 프리필) — Gemini APPROVE
+- **현재 진행 중:** 없음
+- **다음 우선순위:** 다음 티켓 spec 작성 또는 배포 진행
+- **최근 주요 결정:** OG 이미지 500 버그 수정 (fetch r.ok 검증 추가, 8ac8a4c)
 
 빠른 참조: [역할 규칙](.ai/PROJECT_RULES.md) · [기술 표준](.ai/STANDARDS.md) · [구현 가이드](../AGENTS.md)
 
@@ -56,9 +56,10 @@
 | T-023 | Server Action 통합 테스트 도입 | `done` | [spec](handoffs/T-023-spec.md) | [result](handoffs/T-023-result.md) | | Vitest + DB 연동 테스트 인프라 구축 |
 | T-024 | 게스트 orphan 데이터 정리 | `done` | [spec](handoffs/T-024-spec.md) | [result](handoffs/T-024-result.md) | | 만료 게스트 데이터 주기적 자동 삭제 |
 | T-025 | 미사용 Tag/MatchResultTag 테이블 정리 | `done` | [spec](handoffs/T-025-spec.md) | [result](handoffs/T-025-result.md) | | Prisma 스키마에서 Tag 모델 제거 + DROP TABLE 마이그레이션 |
-| T-026 | 게임별 마지막 덱 자동 프리필 | `draft` | | | | Server-side 프리필 — 이전 매치 기반 게임/덱/포맷 자동 채우기 |
+| T-026 | 게임별 마지막 덱 자동 프리필 | `done` | [spec](handoffs/T-026-spec.md) | [result](handoffs/T-026-result.md) | [review](daily/T-026-review-gemini.md) | Server-side 프리필 — 이전 매치 기반 게임/덱/포맷 자동 채우기 |
 | T-027 | 상단 바 아이콘 제거 | `done` | [spec](handoffs/T-027-spec.md) | [result](handoffs/T-027-result.md) | | top-app-bar.tsx에서 icon-192.png 제거 |
 | T-028 | BO3 게임별 선후공 시퀀스 기록 | `done` | [spec](handoffs/T-028-spec.md) | [result](handoffs/T-028-result.md) | | 선후선/선선/후후 등 게임별 시퀀스 — schema 추가 + 폼/기록 표시 |
 | T-029 | 선후공 선택 주체 용어 개선 + 표시 수정 | `done` | [spec](handoffs/T-029-spec.md) | [result](handoffs/T-029-result.md) | | "결정 방식"→"선택 주체", 기록 페이지 상대 선택 미표시 버그 수정 |
 | T-030 | 기록 카드 승/패 시각화 강화 | `done` | [spec](handoffs/T-030-spec.md) | [result](handoffs/T-030-result.md) | | 승리/패배 배지 크기·색상 강화, 카드 배경 조건부 tint |
+
 

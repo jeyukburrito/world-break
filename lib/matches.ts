@@ -12,6 +12,16 @@ export type MatchFilters = {
 
 export const MATCHES_PAGE_SIZE = 30;
 
+export type MatchPrefillPreference = {
+  deckName: string;
+  matchFormat: "bo1" | "bo3";
+};
+
+export type NewMatchPrefill = {
+  latest: ({ gameName: string } & MatchPrefillPreference) | null;
+  byGame: Record<string, MatchPrefillPreference>;
+};
+
 export function parseMatchFilters(searchParams?: URLSearchParams | Record<string, string | string[] | undefined>): MatchFilters {
   const read = (key: string) => {
     if (!searchParams) {
@@ -109,6 +119,97 @@ export async function listMatchesForUser(userId: string, filters: MatchFilters, 
       },
     },
   });
+}
+
+export async function getNewMatchPrefill(userId: string): Promise<NewMatchPrefill> {
+  const [latestMatch, decks] = await Promise.all([
+    prisma.matchResult.findFirst({
+      where: { userId },
+      orderBy: [{ playedAt: "desc" }, { createdAt: "desc" }],
+      select: {
+        matchFormat: true,
+        myDeck: {
+          select: {
+            name: true,
+            game: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
+    }),
+    prisma.deck.findMany({
+      where: { userId },
+      select: {
+        name: true,
+        game: {
+          select: {
+            name: true,
+          },
+        },
+        matches: {
+          orderBy: [{ playedAt: "desc" }, { createdAt: "desc" }],
+          take: 1,
+          select: {
+            playedAt: true,
+            createdAt: true,
+            matchFormat: true,
+          },
+        },
+      },
+    }),
+  ]);
+
+  const latestByGame = new Map<
+    string,
+    MatchPrefillPreference & { playedAt: number; createdAt: number }
+  >();
+
+  for (const deck of decks) {
+    const latestDeckMatch = deck.matches[0];
+    if (!latestDeckMatch) {
+      continue;
+    }
+
+    const gameName = deck.game.name;
+    const nextPlayedAt = latestDeckMatch.playedAt.getTime();
+    const nextCreatedAt = latestDeckMatch.createdAt.getTime();
+    const current = latestByGame.get(gameName);
+
+    if (
+      !current ||
+      nextPlayedAt > current.playedAt ||
+      (nextPlayedAt === current.playedAt && nextCreatedAt > current.createdAt)
+    ) {
+      latestByGame.set(gameName, {
+        deckName: deck.name,
+        matchFormat: latestDeckMatch.matchFormat,
+        playedAt: nextPlayedAt,
+        createdAt: nextCreatedAt,
+      });
+    }
+  }
+
+  return {
+    latest: latestMatch
+      ? {
+          gameName: latestMatch.myDeck.game.name,
+          deckName: latestMatch.myDeck.name,
+          matchFormat: latestMatch.matchFormat,
+        }
+      : null,
+    byGame: Object.fromEntries(
+      Array.from(latestByGame.entries()).map(([gameName, preference]) => [
+        gameName,
+        {
+          deckName: preference.deckName,
+          matchFormat: preference.matchFormat,
+        },
+      ]),
+    ),
+  };
 }
 
 export async function countMatchesForUser(userId: string, filters: MatchFilters) {
