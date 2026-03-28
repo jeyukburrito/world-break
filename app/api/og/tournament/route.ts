@@ -15,21 +15,19 @@ export async function GET(request: NextRequest) {
 
   const origin = new URL(request.url).origin;
 
+  let fonts: Awaited<ReturnType<typeof loadMatchOgFonts>> | undefined;
   try {
-    const fonts = await loadMatchOgFonts(origin);
-
-    return new ImageResponse(createElement(TournamentShareOgCard, { share }), {
-      width: 1200,
-      height: 630,
-      fonts,
-      headers: {
-        "cache-control": "public, max-age=31536000, immutable",
-      },
-    });
+    fonts = await loadMatchOgFonts(origin);
   } catch {
-    return new ImageResponse(createElement(TournamentShareOgCard, { share: null }), {
-      width: 1200,
-      height: 630,
-    });
+    // font loading failed — render without custom fonts
   }
+
+  return new ImageResponse(createElement(TournamentShareOgCard, { share }), {
+    width: 1200,
+    height: 630,
+    ...(fonts ? { fonts } : {}),
+    headers: {
+      "cache-control": "public, max-age=31536000, immutable",
+    },
+  });
 }
