@@ -22,15 +22,11 @@ export async function GET(request: NextRequest) {
     // font loading failed — render without custom fonts
   }
 
-  const response = new ImageResponse(createElement(MatchShareOgCard, { share }), {
+  return new ImageResponse(createElement(MatchShareOgCard, { share }), {
     width: 1200,
     height: 630,
     ...(fonts ? { fonts } : {}),
-  });
-
-  return new Response(response.body, {
     headers: {
-      "content-type": "image/png",
       "cache-control": "public, max-age=31536000, immutable",
     },
   });
