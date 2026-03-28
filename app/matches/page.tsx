@@ -35,11 +35,37 @@ function pageHref(page: number) {
   return page > 1 ? `/matches?page=${page}` : "/matches";
 }
 
+function formatPlayOrderLabel(playOrder: string, didChoosePlayOrder: boolean) {
+  const order = playOrder === "first" ? "선공" : "후공";
+  const chooser = didChoosePlayOrder ? "내가 선택" : "상대가 선택";
+  return `${order} · ${chooser}`;
+}
+
+function formatPlaySequence(sequence: string | null | undefined) {
+  if (!sequence) {
+    return "";
+  }
+
+  return sequence
+    .split("")
+    .map((value) => (value === "S" ? "후" : "선"))
+    .join("");
+}
+
+function formatMatchFormatLabel(match: Extract<DisplayItem, { type: "single" }>["match"]) {
+  if (match.matchFormat !== "bo3") {
+    return match.matchFormat.toUpperCase();
+  }
+
+  const sequence = formatPlaySequence(match.bo3PlaySequence);
+  return sequence ? `BO3 ${match.wins}-${match.losses} · ${sequence}` : `BO3 ${match.wins}-${match.losses}`;
+}
+
 function MatchStatusPill({ isWin }: { isWin: boolean }) {
   return (
     <span
-      className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${
-        isWin ? "bg-success/10 text-success" : "bg-danger/10 text-danger"
+      className={`inline-flex rounded-full px-4 py-1.5 text-sm font-bold ${
+        isWin ? "bg-success/20 text-success" : "bg-danger/20 text-danger"
       }`}
     >
       {isWin ? "승리" : "패배"}
@@ -72,7 +98,13 @@ function SingleMatchCard({
   deleteAction: (formData: FormData) => void;
 }) {
   return (
-    <article className="rounded-[32px] bg-surface-container-low p-5 shadow-sm">
+    <article
+      className={`rounded-[32px] p-5 shadow-sm ${
+        match.isMatchWin
+          ? "bg-success/[0.07] ring-1 ring-success/20"
+          : "bg-danger/[0.04] ring-1 ring-danger/15"
+      }`}
+    >
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0 space-y-3">
           <div className="flex flex-wrap items-center gap-2">
@@ -83,7 +115,7 @@ function SingleMatchCard({
               {formatDate(match.playedAt)}
             </span>
             <span className="rounded-full bg-line/40 px-3 py-1 text-xs font-semibold text-muted">
-              {match.matchFormat === "bo3" ? `BO3 ${match.wins}-${match.losses}` : match.matchFormat.toUpperCase()}
+              {formatMatchFormatLabel(match)}
             </span>
           </div>
           <div>
@@ -91,7 +123,7 @@ function SingleMatchCard({
               {match.myDeck.name} vs {match.opponentDeckName}
             </h2>
             <p className="mt-1 text-sm text-muted">
-              {match.myDeck.game.name} · {match.playOrder === "first" ? "선공" : "후공"}{match.didChoosePlayOrder ? "(선택)" : ""}
+              {match.myDeck.game.name} · {formatPlayOrderLabel(match.playOrder, match.didChoosePlayOrder)}
               {match.memo ? ` · ${match.memo}` : ""}
             </p>
           </div>
@@ -127,21 +159,23 @@ function TournamentMatchCard({
   const isEnded = Boolean(group.endedAt);
   const showPhaseLabels = group.hasSwiss && group.hasElimination;
   const lastMatch = group.matches[group.matches.length - 1];
-  const nextSwissRound = group.matches.filter((match) => match.tournamentPhase !== "elimination").length + 1;
+  const nextSwissRound =
+    group.matches.filter((match) => match.tournamentPhase !== "elimination").length + 1;
   const nextEliminationRound =
     group.matches.filter((match) => match.tournamentPhase === "elimination").length + 1;
-  const nextHref = group.tournamentSessionId && lastMatch
-    ? `/matches/new?${new URLSearchParams({
-        event: group.eventCategory,
-        date: group.date.toISOString().slice(0, 10),
-        deckName: group.deckName,
-        gameName: group.gameName,
-        matchFormat: lastMatch.matchFormat,
-        playOrder: lastMatch.playOrder,
-        phase: group.hasElimination ? "elimination" : "swiss",
-        tournamentId: group.tournamentSessionId,
-      }).toString()}`
-    : null;
+  const nextHref =
+    group.tournamentSessionId && lastMatch
+      ? `/matches/new?${new URLSearchParams({
+          event: group.eventCategory,
+          date: group.date.toISOString().slice(0, 10),
+          deckName: group.deckName,
+          gameName: group.gameName,
+          matchFormat: lastMatch.matchFormat,
+          playOrder: lastMatch.playOrder,
+          phase: group.hasElimination ? "elimination" : "swiss",
+          tournamentId: group.tournamentSessionId,
+        }).toString()}`
+      : null;
   const tournamentShareHref = buildTournamentSharePath(createTournamentSharePayload(group));
 
   let swissIndex = 0;
@@ -150,7 +184,7 @@ function TournamentMatchCard({
   return (
     <article
       className={`rounded-[32px] p-5 shadow-sm ${
-        isEnded ? "bg-surface-container p-5" : "bg-surface-container-low p-5"
+        isEnded ? "bg-surface-container" : "bg-surface-container-low"
       }`}
     >
       <div className="flex items-start justify-between gap-4">
@@ -199,14 +233,17 @@ function TournamentMatchCard({
       <div className="mt-5 space-y-3">
         {group.matches.map((match, index) => {
           const isElimination = match.tournamentPhase === "elimination";
-          const phaseChanged = index > 0 && group.matches[index - 1].tournamentPhase !== match.tournamentPhase;
+          const phaseChanged =
+            index > 0 && group.matches[index - 1].tournamentPhase !== match.tournamentPhase;
           const roundLabel = isElimination ? `T${++eliminationIndex}` : `R${++swissIndex}`;
 
           return (
             <div
               key={match.id}
               className={`rounded-[24px] px-4 py-4 ${
-                match.isMatchWin ? "bg-success/5" : "bg-paper"
+                match.isMatchWin
+                  ? "bg-success/[0.07] ring-1 ring-success/20"
+                  : "bg-danger/[0.04] ring-1 ring-danger/15"
               }`}
             >
               {showPhaseLabels && (index === 0 || phaseChanged) ? (
@@ -219,12 +256,15 @@ function TournamentMatchCard({
 
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-muted">{roundLabel}</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-muted">
+                    {roundLabel}
+                  </p>
                   <h3 className="mt-1 truncate text-base font-semibold text-ink">
                     vs {match.opponentDeckName}
                   </h3>
                   <p className="mt-1 text-sm text-muted">
-                    {match.matchFormat === "bo3" ? `BO3 ${match.wins}-${match.losses}` : match.matchFormat.toUpperCase()} · {match.playOrder === "first" ? "선공" : "후공"}{match.didChoosePlayOrder ? "(선택)" : ""}
+                    {formatMatchFormatLabel(match)} ·{" "}
+                    {formatPlayOrderLabel(match.playOrder, match.didChoosePlayOrder)}
                     {match.memo ? ` · ${match.memo}` : ""}
                   </p>
                 </div>
@@ -255,12 +295,18 @@ function TournamentMatchCard({
               href={nextHref}
               className="inline-flex rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white"
             >
-              {group.hasElimination ? `토너먼트 R${nextEliminationRound} 추가` : `스위스 R${nextSwissRound} 추가`}
+              {group.hasElimination
+                ? `토너먼트 R${nextEliminationRound} 추가`
+                : `스위스 R${nextSwissRound} 추가`}
             </Link>
           ) : null}
           {group.tournamentSessionId ? (
             <form action="/matches/tournaments/end" method="post">
-              <input type="hidden" name="tournamentSessionId" value={group.tournamentSessionId} />
+              <input
+                type="hidden"
+                name="tournamentSessionId"
+                value={group.tournamentSessionId}
+              />
               <button
                 type="submit"
                 className="inline-flex rounded-full border border-line px-4 py-2 text-sm font-semibold text-muted"
@@ -308,7 +354,9 @@ export default async function MatchesPage({ searchParams }: MatchesPageProps) {
         {displayItems.length === 0 ? (
           <article className="rounded-[32px] bg-surface-container-low p-8 text-center shadow-sm">
             <p className="text-lg font-semibold text-ink">아직 등록된 기록이 없습니다.</p>
-            <p className="mt-2 text-sm text-muted">첫 경기 결과를 입력하면 목록이 여기에 쌓입니다.</p>
+            <p className="mt-2 text-sm text-muted">
+              첫 경기 결과를 입력하면 목록이 여기에 나타납니다.
+            </p>
             <Link
               href="/matches/new"
               className="mt-4 inline-flex rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white"
@@ -336,7 +384,9 @@ export default async function MatchesPage({ searchParams }: MatchesPageProps) {
 
         {totalCount > MATCHES_PAGE_SIZE ? (
           <div className="flex items-center justify-between rounded-[28px] bg-surface-container-low p-4 shadow-sm">
-            <p className="text-sm text-muted">한 페이지에 {MATCHES_PAGE_SIZE}경기씩 보여줍니다.</p>
+            <p className="text-sm text-muted">
+              한 페이지에 {MATCHES_PAGE_SIZE}경기씩 보여줍니다.
+            </p>
             <div className="flex gap-2">
               {prevPage ? (
                 <Link

@@ -32,8 +32,6 @@ world-break/
 - `Deck` — user's own decks (scoped by Game)
 - `MatchResult` — match records with `wins` and `losses`
 - `TournamentSession` — shop/CS tournament grouping
-- `Tag` — user-defined tags
-- `MatchResultTag` — M:N join table
 
 ## Coding Conventions
 - Variables and code comments in English

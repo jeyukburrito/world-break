@@ -158,6 +158,7 @@ export default async function NewMatchPage({ searchParams }: NewMatchPageProps) 
           />
           <MatchDetailControls
             defaultPlayOrder={continuePlayOrder === "first" || continuePlayOrder === "second" ? continuePlayOrder : undefined}
+            format={continueMatchFormat}
           />
 
           <section className="grid gap-3">

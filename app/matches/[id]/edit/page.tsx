@@ -32,7 +32,21 @@ export default async function EditMatchPage({ params, searchParams }: EditMatchP
       id,
       userId: user.id,
     },
-    include: {
+    select: {
+      id: true,
+      playedAt: true,
+      tournamentSessionId: true,
+      tournamentPhase: true,
+      opponentDeckName: true,
+      eventCategory: true,
+      matchFormat: true,
+      wins: true,
+      losses: true,
+      isMatchWin: true,
+      playOrder: true,
+      didChoosePlayOrder: true,
+      bo3PlaySequence: true,
+      memo: true,
       myDeck: {
         select: {
           name: true,
@@ -105,10 +119,12 @@ export default async function EditMatchPage({ params, searchParams }: EditMatchP
           defaultResult={match.isMatchWin ? "win" : "lose"}
           defaultWins={match.wins}
           defaultLosses={match.losses}
+          defaultBo3PlaySequence={match.bo3PlaySequence ?? undefined}
         />
         <MatchDetailControls
           defaultPlayOrder={match.playOrder}
           defaultDidChoosePlayOrder={match.didChoosePlayOrder}
+          format={match.matchFormat}
         />
         <label className="grid gap-2 text-sm font-medium md:col-span-2">
           메모

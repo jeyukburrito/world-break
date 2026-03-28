@@ -13,7 +13,7 @@
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key |
 | `SUPABASE_SERVICE_ROLE_KEY` | Admin operations (account deletion) |
 | `DATABASE_URL` | Transaction Pooler — port 6543 (pgbouncer) |
-| `DIRECT_URL` | Direct connection — port 5432 (migrations only) |
+| `DIRECT_URL` | Direct connection — port 5432 (REQUIRED for build/migrate) |
 
 ## Vercel Setup
 1. Import `jeyukburisto/world-break` in Vercel.

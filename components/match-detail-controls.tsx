@@ -1,11 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type MatchDetailControlsProps = {
   defaultPlayOrder?: "first" | "second";
   defaultDidChoosePlayOrder?: boolean;
+  format?: string;
 };
+
+type MatchFormat = "bo1" | "bo3";
+
+export const MATCH_FORMAT_EVENT = "world-break:match-format-change";
 
 const PLAY_ORDER_OPTIONS = [
   { value: "first", label: "선공" },
@@ -13,8 +18,8 @@ const PLAY_ORDER_OPTIONS = [
 ] as const;
 
 const DECISION_OPTIONS = [
-  { value: "true", label: "자신" },
-  { value: "false", label: "상대" },
+  { value: "true", label: "내가 선택" },
+  { value: "false", label: "상대가 선택" },
 ] as const;
 
 function SegmentedControl({
@@ -34,7 +39,6 @@ function SegmentedControl({
     <div className="grid gap-2">
       <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-muted">{label}</p>
       <input type="hidden" name={name} value={value} />
-      {/* pill-shaped 세그먼트 컨트롤 */}
       <div className="grid grid-cols-2 gap-1.5 rounded-full bg-surface-container-low p-1.5">
         {options.map((option) => {
           const active = option.value === value;
@@ -57,27 +61,50 @@ function SegmentedControl({
   );
 }
 
+function normalizeFormat(value?: string): MatchFormat {
+  return value === "bo3" ? "bo3" : "bo1";
+}
+
 export function MatchDetailControls({
   defaultPlayOrder = "first",
   defaultDidChoosePlayOrder = false,
+  format,
 }: MatchDetailControlsProps) {
   const [playOrder, setPlayOrder] = useState<"first" | "second">(defaultPlayOrder);
   const [didChoosePlayOrder, setDidChoosePlayOrder] = useState(
     defaultDidChoosePlayOrder ? "true" : "false",
   );
+  const [currentFormat, setCurrentFormat] = useState<MatchFormat>(normalizeFormat(format));
+
+  useEffect(() => {
+    setCurrentFormat(normalizeFormat(format));
+  }, [format]);
+
+  useEffect(() => {
+    const handleFormatChange = (event: Event) => {
+      const detail = (event as CustomEvent<{ format?: string }>).detail;
+      setCurrentFormat(normalizeFormat(detail?.format));
+    };
+
+    window.addEventListener(MATCH_FORMAT_EVENT, handleFormatChange as EventListener);
+    return () => {
+      window.removeEventListener(MATCH_FORMAT_EVENT, handleFormatChange as EventListener);
+    };
+  }, []);
 
   return (
-    // 카드 래퍼 제거 — 두 세그먼트 컨트롤을 나란히 2열로 배치
-    <section className="grid grid-cols-2 gap-6">
+    <section className={currentFormat === "bo3" ? "grid gap-6" : "grid grid-cols-2 gap-6"}>
+      {currentFormat === "bo3" ? null : (
+        <SegmentedControl
+          label="선후공"
+          name="playOrder"
+          value={playOrder}
+          options={PLAY_ORDER_OPTIONS}
+          onChange={(next) => setPlayOrder(next as "first" | "second")}
+        />
+      )}
       <SegmentedControl
-        label="선후공"
-        name="playOrder"
-        value={playOrder}
-        options={PLAY_ORDER_OPTIONS}
-        onChange={(next) => setPlayOrder(next as "first" | "second")}
-      />
-      <SegmentedControl
-        label="결정 방식"
+        label="선택 주체"
         name="didChoosePlayOrder"
         value={didChoosePlayOrder}
         options={DECISION_OPTIONS}

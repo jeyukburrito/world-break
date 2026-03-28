@@ -15,6 +15,7 @@ export type FilterOptions = {
   from?: string;
   to?: string;
   category?: string;
+  game?: string;
 };
 
 const DASHBOARD_TAG_PREFIX = "dashboard";
@@ -83,11 +84,19 @@ function buildPlayedAtSql(opts: FilterOptions) {
 }
 
 function buildWhereSql(userId: string, opts: FilterOptions) {
-  const { category } = opts;
+  const { category, game } = opts;
   const clauses = [Prisma.sql`m."userId" = CAST(${userId} AS uuid)`, ...buildPlayedAtSql(opts)];
 
   if (category === "friendly" || category === "shop") {
     clauses.push(Prisma.sql`m."eventCategory" = ${category}::"EventCategory"`);
+  }
+
+  if (game && game !== "all") {
+    clauses.push(Prisma.sql`m."myDeckId" IN (
+      SELECT d."id" FROM "decks" d
+      INNER JOIN "games" g ON g."id" = d."gameId"
+      WHERE g."name" = ${game}
+    )`);
   }
 
   return Prisma.sql`WHERE ${Prisma.join(clauses, " AND ")}`;
@@ -99,11 +108,12 @@ function normalizeFilterOptions(opts: FilterOptions): FilterOptions {
     from: opts.from,
     to: opts.to,
     category: opts.category ?? "all",
+    game: opts.game ?? "all",
   };
 }
 
 function buildDashboardKeyParts(scope: string, userId: string, opts: FilterOptions) {
-  return [scope, userId, opts.period, opts.from ?? "", opts.to ?? "", opts.category ?? "all"];
+  return [scope, userId, opts.period, opts.from ?? "", opts.to ?? "", opts.category ?? "all", opts.game ?? "all"];
 }
 
 function getDashboardTag(userId: string) {
@@ -209,4 +219,24 @@ export async function getTopMatchups(userId: string, opts: FilterOptions): Promi
 
 export function revalidateDashboard(userId: string) {
   revalidateTag(getDashboardTag(userId));
+}
+
+async function queryUserGames(userId: string): Promise<string[]> {
+  const rows = await prisma.$queryRaw<{ name: string }[]>(Prisma.sql`
+    SELECT DISTINCT g."name"
+    FROM "match_results" m
+    INNER JOIN "decks" d ON d."id" = m."myDeckId"
+    INNER JOIN "games" g ON g."id" = d."gameId"
+    WHERE m."userId" = CAST(${userId} AS uuid)
+    ORDER BY g."name"
+  `);
+  return rows.map((r) => r.name);
+}
+
+export async function getUserGames(userId: string): Promise<string[]> {
+  return unstable_cache(
+    () => queryUserGames(userId),
+    ["user-games", userId],
+    { tags: [getDashboardTag(userId)] },
+  )();
 }

@@ -55,7 +55,7 @@ Available skills: /office-hours, /plan-ceo-review, /plan-eng-review, /plan-desig
 
 ---
 
-## Claude↔Codex 협업 규칙
+## AI AGENT 간 협업 규칙
 
 Webapp 개발은 **파일 기반 핸드오프**로 운영합니다. 상세 규칙: `.ai/PROJECT_RULES.md`
 

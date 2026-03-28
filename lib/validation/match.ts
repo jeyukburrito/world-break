@@ -1,5 +1,14 @@
 import { z } from "zod";
 
+const bo3PlaySequenceSchema = z.preprocess((value) => {
+  if (typeof value !== "string") {
+    return undefined;
+  }
+
+  const normalized = value.trim().toUpperCase();
+  return normalized === "" ? undefined : normalized;
+}, z.string().regex(/^[FS]{2,3}$/, "Invalid BO3 play sequence").optional());
+
 export const matchResultSchema = z
   .object({
     playedAt: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format"),
@@ -16,9 +25,9 @@ export const matchResultSchema = z
     matchFormat: z.enum(["bo1", "bo3"]),
     result: z.enum(["win", "lose"]),
     bo3Score: z.enum(["2-0", "2-1", "0-2", "1-2"]).optional(),
+    bo3PlaySequence: bo3PlaySequenceSchema,
     tournamentDetail: z.string().max(200).optional().or(z.literal("")),
     memo: z.string().max(1000).optional().or(z.literal("")),
-    tagIds: z.array(z.string().uuid()).max(10).default([]),
   })
   .refine(
     (data) => {

@@ -8,11 +8,12 @@ Author: Gemini (Code Reviewer)
 
 | 상황 | 참조 문서 |
 |------|-----------|
-| **최초 프로젝트 탐색** | `ARCHITECTURE.md` (구조), `PRD.md` (목표) |
+| **최초 프로젝트 탐색** | `docs/ARCHITECTURE.md` (구조), `.ai/PRD.md` (목표) |
 | **코드 구현 및 생성** | `.ai/STANDARDS.md` (필수 규칙), `prisma/schema.prisma` |
 | **협업 및 워크플로우** | `.ai/PROJECT_RULES.md` (역할 및 통신 규약) |
 | **현재 작업 상태 확인** | `.ai/TASKS.md` (티켓 목록) |
-| **최균 작업 히스토리** | `.ai/daily/` (일일 로그 및 세션 보고서) |
+| **최근 작업 히스토리** | `.ai/daily/` (일일 로그 및 세션 보고서) |
+| **Codex sub-agent 활용** | `.ai/CODEX_GUIDE.md` |
 
 ## 2. CLI Core Mandates
 

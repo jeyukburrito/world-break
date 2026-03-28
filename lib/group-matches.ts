@@ -6,6 +6,7 @@ type MatchRow = {
   eventCategory: string;
   tournamentPhase: string | null;
   tournamentSessionId: string | null;
+  bo3PlaySequence: string | null;
   matchFormat: string;
   wins: number;
   losses: number;
@@ -13,12 +14,6 @@ type MatchRow = {
   playOrder: string;
   didChoosePlayOrder: boolean;
   memo: string | null;
-  tags: Array<{
-    tag: {
-      id: string;
-      name: string;
-    };
-  }>;
   tournamentSession: {
     id: string;
     name: string | null;

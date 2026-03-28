@@ -71,7 +71,23 @@ export async function listMatchesForUser(userId: string, filters: MatchFilters, 
           take: MATCHES_PAGE_SIZE,
         }
       : {}),
-    include: {
+    select: {
+      id: true,
+      playedAt: true,
+      createdAt: true,
+      opponentDeckName: true,
+      eventCategory: true,
+      tournamentPhase: true,
+      tournamentSessionId: true,
+      bo3PlaySequence: true,
+      matchFormat: true,
+      wins: true,
+      losses: true,
+      isMatchWin: true,
+      playOrder: true,
+      didChoosePlayOrder: true,
+      memo: true,
+      myDeckId: true,
       myDeck: {
         select: {
           id: true,
@@ -79,16 +95,6 @@ export async function listMatchesForUser(userId: string, filters: MatchFilters, 
           gameId: true,
           game: {
             select: {
-              name: true,
-            },
-          },
-        },
-      },
-      tags: {
-        select: {
-          tag: {
-            select: {
-              id: true,
               name: true,
             },
           },

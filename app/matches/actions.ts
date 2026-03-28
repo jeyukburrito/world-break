@@ -57,24 +57,6 @@ async function resolveGameAndDeck(tx: TxClient, userId: string, gameName: string
   return { gameId: game.id, deckId: deck.id };
 }
 
-async function ensureOwnedTags(tx: TxClient, userId: string, tagIds: string[]) {
-  if (tagIds.length === 0) {
-    return [];
-  }
-
-  return tx.tag.findMany({
-    where: {
-      userId,
-      id: {
-        in: tagIds,
-      },
-    },
-    select: {
-      id: true,
-    },
-  });
-}
-
 function deriveScore(
   matchFormat: "bo1" | "bo3",
   result: "win" | "lose",
@@ -89,17 +71,11 @@ function deriveScore(
     return { wins: w, losses: l };
   }
 
-  // 폴백: 기존 로직 (bo3Score 미제공 시)
+  // ?대갚: 湲곗〈 濡쒖쭅 (bo3Score 誘몄젣怨???
   return result === "win" ? { wins: 2, losses: 1 } : { wins: 1, losses: 2 };
 }
 
 function parseMatchForm(formData: FormData) {
-  const tagIds = Array.from(
-    new Set(
-      formData.getAll("tagIds").flatMap((value) => (typeof value === "string" && value ? [value] : [])),
-    ),
-  );
-
   return matchResultSchema.safeParse({
     playedAt: formData.get("playedAt"),
     gameName: formData.get("gameName"),
@@ -113,9 +89,9 @@ function parseMatchForm(formData: FormData) {
     matchFormat: formData.get("matchFormat"),
     result: formData.get("result"),
     bo3Score: formData.get("bo3Score") || undefined,
+    bo3PlaySequence: formData.get("bo3PlaySequence") || undefined,
     tournamentDetail: formData.get("tournamentDetail") || undefined,
     memo: formData.get("memo"),
-    tagIds,
   });
 }
 
@@ -145,13 +121,13 @@ async function resolveTournamentSession(tx: TxClient, params: {
     });
 
     if (!existing) {
-      return { ok: false as const, error: "이어지는 대회 세션을 찾을 수 없습니다." as const };
+      return { ok: false as const, error: "?댁뼱吏??????몄뀡??李얠쓣 ???놁뒿?덈떎." as const };
     }
 
     if (existing.endedAt) {
       return {
         ok: false as const,
-        error: "종료된 대회입니다. 기존 기록은 수정할 수 있지만 새 라운드는 추가할 수 없습니다." as const,
+        error: "醫낅즺????뚯엯?덈떎. 湲곗〈 湲곕줉? ?섏젙?????덉?留????쇱슫?쒕뒗 異붽??????놁뒿?덈떎." as const,
       };
     }
 
@@ -217,20 +193,13 @@ export async function createMatchResult(formData: FormData) {
   const parsed = parseMatchForm(formData);
 
   if (!parsed.success) {
-    redirect(newMatchRedirect("error", "입력값을 확인해 주세요."));
+    redirect(newMatchRedirect("error", "?낅젰媛믪쓣 ?뺤씤??二쇱꽭??"));
   }
 
   const score = deriveScore(parsed.data.matchFormat, parsed.data.result, parsed.data.bo3Score);
 
   const { tournamentSessionId } = await prisma.$transaction(async (tx) => {
-    const [{ deckId }, ownedTags] = await Promise.all([
-      resolveGameAndDeck(tx, user.id, parsed.data.gameName, parsed.data.myDeckName),
-      ensureOwnedTags(tx, user.id, parsed.data.tagIds),
-    ]);
-
-    if (ownedTags.length !== parsed.data.tagIds.length) {
-      throw new Error("TAG_MISMATCH");
-    }
+    const { deckId } = await resolveGameAndDeck(tx, user.id, parsed.data.gameName, parsed.data.myDeckName);
 
     let sessionId: string | null = null;
 
@@ -256,6 +225,8 @@ export async function createMatchResult(formData: FormData) {
         userId: user.id,
         myDeckId: deckId,
         tournamentSessionId: sessionId,
+        bo3PlaySequence:
+          parsed.data.matchFormat === "bo3" ? parsed.data.bo3PlaySequence ?? null : null,
         playedAt: new Date(parsed.data.playedAt),
         opponentDeckName: parsed.data.opponentDeckName,
         eventCategory: parsed.data.eventCategory,
@@ -270,21 +241,11 @@ export async function createMatchResult(formData: FormData) {
         losses: score.losses,
         isMatchWin: parsed.data.result === "win",
         memo: parsed.data.memo || null,
-        tags: parsed.data.tagIds.length
-          ? {
-              createMany: {
-                data: parsed.data.tagIds.map((tagId) => ({ tagId })),
-              },
-            }
-          : undefined,
       },
     });
 
     return { tournamentSessionId: sessionId };
   }).catch((error: Error) => {
-    if (error.message === "TAG_MISMATCH") {
-      redirect(newMatchRedirect("error", "선택한 태그를 사용할 수 없습니다."));
-    }
     if (error.message.startsWith("TOURNAMENT_ERROR:")) {
       redirect(newMatchRedirect("error", error.message.slice("TOURNAMENT_ERROR:".length)));
     }
@@ -294,14 +255,12 @@ export async function createMatchResult(formData: FormData) {
   revalidatePath("/matches");
   revalidateDashboard(user.id);
   revalidatePath("/matches/new");
-  revalidatePath("/settings/tags");
 
   const matchEp = {
     event_category: parsed.data.eventCategory,
     match_format: parsed.data.matchFormat,
     result: parsed.data.result,
     has_memo: parsed.data.memo ? "true" : "false",
-    has_tags: parsed.data.tagIds.length > 0 ? "true" : "false",
     is_tournament: parsed.data.eventCategory === "shop" ? "true" : "false",
     game_name: parsed.data.gameName,
   };
@@ -332,17 +291,17 @@ export async function updateMatchResult(formData: FormData) {
   const parsed = parseMatchForm(formData);
 
   if (!matchIdSchema.safeParse(matchId).success) {
-    redirect(matchesRedirect("error", "수정할 경기 ID가 올바르지 않습니다."));
+    redirect(matchesRedirect("error", "?섏젙??寃쎄린 ID媛 ?щ컮瑜댁? ?딆뒿?덈떎."));
   }
 
   if (!parsed.success) {
-    redirect(editRedirect(matchId, "error", "입력값을 확인해 주세요."));
+    redirect(editRedirect(matchId, "error", "?낅젰媛믪쓣 ?뺤씤??二쇱꽭??"));
   }
 
   const score = deriveScore(parsed.data.matchFormat, parsed.data.result, parsed.data.bo3Score);
 
   const result = await prisma.$transaction(async (tx) => {
-    const [{ deckId }, existingMatch, ownedTags] = await Promise.all([
+    const [{ deckId }, existingMatch] = await Promise.all([
       resolveGameAndDeck(tx, user.id, parsed.data.gameName, parsed.data.myDeckName),
       tx.matchResult.findFirst({
         where: {
@@ -352,17 +311,13 @@ export async function updateMatchResult(formData: FormData) {
         select: {
           id: true,
           tournamentSessionId: true,
+          bo3PlaySequence: true,
         },
       }),
-      ensureOwnedTags(tx, user.id, parsed.data.tagIds),
     ]);
 
     if (!existingMatch) {
       throw new Error("MATCH_NOT_FOUND");
-    }
-
-    if (ownedTags.length !== parsed.data.tagIds.length) {
-      throw new Error("TAG_MISMATCH");
     }
 
     let tournamentSessionId = existingMatch.tournamentSessionId;
@@ -394,6 +349,10 @@ export async function updateMatchResult(formData: FormData) {
       data: {
         myDeckId: deckId,
         tournamentSessionId,
+        bo3PlaySequence:
+          parsed.data.matchFormat === "bo3"
+            ? parsed.data.bo3PlaySequence ?? existingMatch.bo3PlaySequence
+            : null,
         playedAt: new Date(parsed.data.playedAt),
         opponentDeckName: parsed.data.opponentDeckName,
         eventCategory: parsed.data.eventCategory,
@@ -411,28 +370,10 @@ export async function updateMatchResult(formData: FormData) {
       },
     });
 
-    await tx.matchResultTag.deleteMany({
-      where: {
-        matchResultId: matchId,
-      },
-    });
-
-    if (parsed.data.tagIds.length > 0) {
-      await tx.matchResultTag.createMany({
-        data: parsed.data.tagIds.map((tagId) => ({
-          matchResultId: matchId,
-          tagId,
-        })),
-      });
-    }
-
     return updated;
   }).catch((error: Error) => {
     if (error.message === "MATCH_NOT_FOUND") {
-      redirect(matchesRedirect("error", "수정할 대전 기록을 찾을 수 없습니다."));
-    }
-    if (error.message === "TAG_MISMATCH") {
-      redirect(editRedirect(matchId, "error", "선택한 태그를 사용할 수 없습니다."));
+      redirect(matchesRedirect("error", "?섏젙?????湲곕줉??李얠쓣 ???놁뒿?덈떎."));
     }
     if (error.message.startsWith("TOURNAMENT_ERROR:")) {
       redirect(editRedirect(matchId, "error", error.message.slice("TOURNAMENT_ERROR:".length)));
@@ -441,14 +382,13 @@ export async function updateMatchResult(formData: FormData) {
   });
 
   if (result.count === 0) {
-    redirect(matchesRedirect("error", "수정 권한이 없거나 대전 기록을 찾을 수 없습니다."));
+    redirect(matchesRedirect("error", "?섏젙 沅뚰븳???녾굅?????湲곕줉??李얠쓣 ???놁뒿?덈떎."));
   }
 
   revalidatePath("/matches");
   revalidatePath(`/matches/${matchId}/edit`);
   revalidateDashboard(user.id);
   revalidatePath("/matches/new");
-  revalidatePath("/settings/tags");
   redirect(matchesRedirect("message", "record_updated", { match_id: matchId }));
 }
 
@@ -457,7 +397,7 @@ export async function deleteMatchResult(formData: FormData) {
   const matchId = String(formData.get("matchId") || "");
 
   if (!matchIdSchema.safeParse(matchId).success) {
-    redirect(matchesRedirect("error", "삭제할 경기 ID가 올바르지 않습니다."));
+    redirect(matchesRedirect("error", "??젣??寃쎄린 ID媛 ?щ컮瑜댁? ?딆뒿?덈떎."));
   }
 
   const result = await prisma.matchResult.deleteMany({
@@ -468,11 +408,10 @@ export async function deleteMatchResult(formData: FormData) {
   });
 
   if (result.count === 0) {
-    redirect(matchesRedirect("error", "삭제 권한이 없거나 대전 기록을 찾을 수 없습니다."));
+    redirect(matchesRedirect("error", "??젣 沅뚰븳???녾굅?????湲곕줉??李얠쓣 ???놁뒿?덈떎."));
   }
 
   revalidatePath("/matches");
   revalidateDashboard(user.id);
-  revalidatePath("/settings/tags");
   redirect(matchesRedirect("message", "record_deleted", { match_id: matchId }));
 }

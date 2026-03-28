@@ -11,8 +11,8 @@ type LoadedFont = {
 async function readBundledOgFonts(): Promise<LoadedFont[]> {
   const fontDir = join(process.cwd(), "public", "fonts");
   const [regular, bold] = await Promise.all([
-    readFile(join(fontDir, "NotoSansKR-Regular.ttf")),
-    readFile(join(fontDir, "NotoSansKR-Bold.ttf")),
+    readFile(join(fontDir, "NotoSansKR-Regular.woff2")),
+    readFile(join(fontDir, "NotoSansKR-Bold.woff2")),
   ]);
 
   return [

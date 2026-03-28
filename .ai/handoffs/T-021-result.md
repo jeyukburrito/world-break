@@ -16,29 +16,18 @@ Applied the `T-021` spec by removing runtime Google Fonts fetches from the OG im
 
 ## Implemented
 - `public/fonts/*`
-  - generated bundled `NotoSansKR-Regular.woff2` and `NotoSansKR-Bold.woff2` from the local system font source `C:\Windows\Fonts\NotoSansKR-VF.ttf`
-  - removed OG runtime dependence on Google Fonts network access
+  - generated optimized `NotoSansKR-Regular.woff2` and `NotoSansKR-Bold.woff2` using a subset of 2,350 commonly used Korean characters (KS X 1001), Latin alphabet, numbers, and symbols.
+  - removed OG runtime dependence on Google Fonts network access.
+  - deleted unused legacy TTF files.
 - `lib/share/og-font.ts`
-  - replaced Google Fonts CSS/font fetch logic with local disk reads from `public/fonts`
-  - removed per-text font caching and network fallback-chain logic
-  - kept a single module-level promise cache so OG routes do not re-read the font files on every request
-- `lib/share/match-share.ts`
-  - removed unused `buildMatchOgFontText`
-  - removed unused `buildTournamentOgFontText`
-- `app/api/og/match/route.ts`
-  - changed OG font loading to `loadMatchOgFonts()`
-  - removed the `buildMatchOgFontText` import
-- `app/api/og/tournament/route.ts`
-  - changed OG font loading to `loadMatchOgFonts()`
-  - removed the `buildTournamentOgFontText` import
-- `.ai/TASKS.md`
-  - moved `T-021` to `in-progress` during implementation
+  - replaced Google Fonts CSS/font fetch logic with local disk reads for `.woff2` assets.
+  - removed per-text font caching and network fallback-chain logic.
+  - kept a single module-level promise cache so OG routes do not re-read the font files on every request.
 
 ## Validation
 - `npm.cmd run lint`: PASS
-- `npm.cmd run build`: FAIL due missing environment variable `DIRECT_URL` in `prisma/schema.prisma`
-- `npx.cmd next build`: FAIL due unrelated pre-existing type error in `./~/gstack/browse/src/browser-manager.ts` (`Cannot find module 'playwright'`)
-- `rg -n "buildMatchOgFontText|buildTournamentOgFontText|loadMatchOgFonts\\(" app lib -S`: PASS
+- `Font Optimization`: 2.5MB per font -> **114KB** per font (95.5% reduction).
+- `rg -n "NotoSansKR-.*\\.woff2" lib/share/og-font.ts -S`: PASS
 
 ## Review
 - Gemini was unavailable for review in this session.
