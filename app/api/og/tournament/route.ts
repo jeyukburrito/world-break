@@ -7,7 +7,7 @@ import { TournamentShareOgCard } from "@/components/tournament-share-og-card";
 import { loadMatchOgFonts } from "@/lib/share/og-font";
 import { parseTournamentShareParams } from "@/lib/share/match-share";
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 
 export async function GET(request: NextRequest) {
   const parsed = parseTournamentShareParams(request.nextUrl.searchParams);
@@ -22,11 +22,15 @@ export async function GET(request: NextRequest) {
     // font loading failed — render without custom fonts
   }
 
-  return new ImageResponse(createElement(TournamentShareOgCard, { share }), {
+  const response = new ImageResponse(createElement(TournamentShareOgCard, { share }), {
     width: 1200,
     height: 630,
     ...(fonts ? { fonts } : {}),
+  });
+
+  return new Response(response.body, {
     headers: {
+      "content-type": "image/png",
       "cache-control": "public, max-age=31536000, immutable",
     },
   });
