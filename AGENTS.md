@@ -47,14 +47,22 @@ world-break/
 - Before calling work done, run the relevant verification commands and record the result, including failures.
 - Use sub-agents only for clearly bounded work; keep one focused task per sub-agent and preserve file ownership boundaries.
 
+## Session Start Protocol
+
+**Read in this order to orient yourself:**
+1. `.ai/TASKS.md` — top "현재 상태" block for current state summary, then ticket list for full status
+2. Most recent result file for the last completed ticket (`handoffs/T-xxx-result.md`) — check "Next Agent Context" section if present
+3. Relevant spec for the ticket you're working on
+
+If the "현재 상태" block in TASKS.md looks stale (old date), treat the ticket list below it as authoritative.
+
 ## Multi-CLI Coordination
 The `.ai/` directory is the single source of truth for all collaboration.
 
+- `.ai/TASKS.md`: ticket index, status, and **current state header** (start here)
 - `.ai/PROJECT_RULES.md`: role boundaries and operating rules
-- `.ai/TASKS.md`: ticket index and status
 - `.ai/handoffs/`: spec and result documents
 - `.ai/daily/`: daily logs, reviews, retrospectives, release notes, and release checklists
-
 
 Do not use ad-hoc notes or chat-only instructions as collaboration sources of truth.
 Do not create a parallel `tasks/` workflow for planning or lessons unless a dedicated project ticket explicitly introduces it; use the `.ai/` system instead.

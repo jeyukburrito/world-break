@@ -55,6 +55,20 @@ Available skills: /office-hours, /plan-ceo-review, /plan-eng-review, /plan-desig
 
 ---
 
+## 세션 프로토콜
+
+### 세션 시작 시
+1. `.ai/TASKS.md` 상단 "현재 상태" 블록 읽기 (진행 중 티켓, 다음 우선순위 확인)
+2. 마지막 완료 티켓의 result에 "Next Agent Context" 섹션이 있으면 읽기
+
+### 세션 종료 시 (TASKS.md 헤더 업데이트)
+`.ai/TASKS.md` 상단 "현재 상태" 블록을 현재 상태로 업데이트:
+- Last Updated 날짜
+- 마지막 완료 티켓
+- 다음 우선순위
+
+---
+
 ## AI AGENT 간 협업 규칙
 
 Webapp 개발은 **파일 기반 핸드오프**로 운영합니다. 상세 규칙: `.ai/PROJECT_RULES.md`
