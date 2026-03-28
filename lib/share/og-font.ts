@@ -7,8 +7,14 @@ type LoadedFont = {
 
 export async function loadMatchOgFonts(baseUrl: string): Promise<LoadedFont[]> {
   const [regular, bold] = await Promise.all([
-    fetch(new URL("/fonts/NotoSansKR-Regular.woff2", baseUrl)).then((r) => r.arrayBuffer()),
-    fetch(new URL("/fonts/NotoSansKR-Bold.woff2", baseUrl)).then((r) => r.arrayBuffer()),
+    fetch(new URL("/fonts/NotoSansKR-Regular.woff2", baseUrl)).then((r) => {
+      if (!r.ok) throw new Error(`Font fetch failed: ${r.status} ${r.url}`);
+      return r.arrayBuffer();
+    }),
+    fetch(new URL("/fonts/NotoSansKR-Bold.woff2", baseUrl)).then((r) => {
+      if (!r.ok) throw new Error(`Font fetch failed: ${r.status} ${r.url}`);
+      return r.arrayBuffer();
+    }),
   ]);
 
   return [
