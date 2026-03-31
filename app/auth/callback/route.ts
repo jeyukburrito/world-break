@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 
 import { ensureUserProfile } from "@/lib/auth";
 import { encodeJsonBase64Url } from "@/lib/base64url";
-import { getSafeRedirectPath, isSupabaseConfigured } from "@/lib/env";
+import { getAuthCallbackOrigin, getSafeRedirectPath, isSupabaseConfigured } from "@/lib/env";
 import { prisma } from "@/lib/prisma";
 import { createClient } from "@/lib/supabase/server";
 
@@ -53,11 +53,18 @@ async function buildUserProperties(userId: string): Promise<Record<string, strin
 
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
+  const callbackOrigin = getAuthCallbackOrigin(request.headers);
   const code = requestUrl.searchParams.get("code");
   const next = getSafeRedirectPath(requestUrl.searchParams.get("next"));
 
   if (!isSupabaseConfigured) {
     return NextResponse.redirect(new URL("/login?error=config_missing", request.url));
+  }
+
+  if (callbackOrigin && requestUrl.origin !== callbackOrigin) {
+    const canonicalUrl = new URL(requestUrl.pathname, callbackOrigin);
+    canonicalUrl.search = requestUrl.search;
+    return NextResponse.redirect(canonicalUrl, 307);
   }
 
   if (code) {
