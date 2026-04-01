@@ -94,6 +94,7 @@ model TournamentSession {
   myDeckId      String           @db.Uuid
   eventCategory EventCategory
   name          String?
+  scorecardUrl  String?
   playedOn      DateTime
   endedAt       DateTime?
   createdAt     DateTime         @default(now())
