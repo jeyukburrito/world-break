@@ -1,0 +1,65 @@
+{
+  "date": "2026-03-23",
+  "window": "7d",
+  "metrics": {
+    "commits": 45,
+    "contributors": 1,
+    "prs_merged": 2,
+    "insertions": 23722,
+    "deletions": 4860,
+    "net_loc": 18862,
+    "test_loc": 0,
+    "test_ratio": 0.0,
+    "active_days": 3,
+    "sessions": 14,
+    "deep_sessions": 5,
+    "avg_session_minutes": 31,
+    "loc_per_session_hour": 2550,
+    "feat_pct": 0.27,
+    "fix_pct": 0.33,
+    "docs_pct": 0.13,
+    "chore_pct": 0.09,
+    "style_pct": 0.09,
+    "peak_hour": 15,
+    "ai_assisted_commits": 39
+  },
+  "authors": {
+    "Yoo Yoon Jong": {
+      "commits": 45,
+      "insertions": 23722,
+      "deletions": 4860,
+      "test_ratio": 0.0,
+      "top_area": "app/"
+    }
+  },
+  "version_range": ["0.1.0", "0.1.0"],
+  "streak_days": 3,
+  "tweetable": "Week of Mar 20: 45 commits, 23.7k LOC, 0% tests, 2 PRs, peak: 15:00 KST | Streak: 3d | 87% AI-assisted",
+  "test_health": {
+    "total_test_files": 0,
+    "tests_added_this_period": 0,
+    "regression_test_commits": 0,
+    "test_files_changed": 0
+  },
+  "backlog": {
+    "total_open": 1,
+    "p0_p1": 0,
+    "p2": 1,
+    "completed_this_period": 0,
+    "added_this_period": 1
+  },
+  "skill_usage": {
+    "qa": 5,
+    "plan-ceo-review": 4,
+    "plan-design-review": 2,
+    "plan-eng-review": 2,
+    "codex": 2,
+    "ship": 2,
+    "gstack": 2,
+    "review": 1,
+    "design-review": 1,
+    "document-release": 1,
+    "office-hours": 1,
+    "retro": 1
+  }
+}
