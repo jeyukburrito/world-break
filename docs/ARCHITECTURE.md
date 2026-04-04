@@ -10,6 +10,7 @@
 - Supabase Auth (Google OAuth) → `middleware.ts`가 모든 요청에서 세션 갱신
 - `requireUser()` (`lib/auth.ts`) — `react.cache()` 래핑으로 렌더 트리 내 1회만 실행. Supabase 세션 우선 → 게스트 쿠키(`wb_guest_token`) fallback → 미인증 시 `/login` redirect. Supabase user는 Prisma `users` 테이블에 upsert 동기화.
 - **게스트 모드** (`lib/guest.ts`): Supabase 환경 변수 없이 쿠키 기반으로 동작. 게스트 세션은 `/matches/export`, `/matches/tournaments/end` 접근 불가 (미들웨어 차단). Google OAuth 성공 후에만 게스트 쿠키 삭제.
+- **Canonical host redirect** (`middleware.ts`): `/auth/callback` 경로에만 적용. 전체 경로에 적용하면 preview 배포가 모두 프로덕션으로 307 리다이렉트되는 버그 발생.
 - 모든 페이지 컴포넌트는 서버 컴포넌트로 작성, 상단에서 `await requireUser()` 호출.
 
 ---
@@ -34,6 +35,18 @@
 - `eventCategory`가 `shop`이면 `TournamentSession`이 자동 생성/연결
 - `tournamentSessionId` URL 파라미터로 기존 세션에 연결하거나 없으면 신규 생성
 - 종료(`endedAt` != null)된 세션에는 새 라운드 추가 불가
+- 대회 종료 후 `/matches/tournaments/[id]/result` 페이지에서 성적 요약 확인 + PNG 스코어카드 저장 가능
+- `scorecardUrl` — Supabase Storage에 업로드된 PNG URL (`tournament-scorecards/{userId}/{sessionId}.png`). 인증 유저만 저장 가능.
+
+---
+
+## PNG / OG 이미지 생성
+
+- Satori 기반 PNG 생성: `lib/og/render-scorecard.ts` (대회 스코어카드), `lib/og/render-daily-summary.ts` (일일 요약)
+- `next/og`의 `ImageResponse`는 **Node.js runtime** API route에서만 사용. Server Action에서는 파일 다운로드에 부적합.
+- 응답으로 반환 시 `Buffer` → `new Uint8Array(buffer)` 변환 필요 (직접 `Buffer`를 `Response`에 전달하면 타입 오류)
+- 한글 렌더링: `public/fonts/NotoSansKR-Regular.woff2` + `NotoSansKR-Bold.woff2`를 `fs.readFile`로 로드, `react.cache()`로 메모이제이션
+- **iOS Safari 제약**: `Content-Disposition: attachment` 무시 — 이미지가 새 탭에서 열림. 저장은 롱프레스(사진에 추가)로만 가능.
 
 ---
 
@@ -54,6 +67,7 @@ User → Game → Deck → MatchResult
 - `MatchResult.wins` / `losses` — BO1은 1/0, BO3은 2/1 or 1/2 (자동 계산)
 - `MatchResult.isMatchWin` — 매치 승패 (games 기준 아님)
 - `TournamentPhase`: `swiss` | `elimination`
+- `TournamentSession.scorecardUrl` — 생성된 PNG 스코어카드 Supabase Storage URL (nullable)
 
 ---
 
@@ -67,7 +81,9 @@ world-break/
 │   │   ├── [id]/edit/
 │   │   ├── new/
 │   │   ├── export/
-│   │   └── tournaments/end/
+│   │   └── tournaments/
+│   │       ├── end/
+│   │       └── [id]/result/
 │   ├── settings/
 │   │   ├── export/
 │   │   ├── games/

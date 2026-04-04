@@ -88,14 +88,29 @@ Expected result:
 - `users`, `games`, `decks`, `match_results`, `tournament_sessions` created
 - one local dev user and three sample decks inserted
 
-## 6. Apply RLS Policies
+## 6. Create Storage Bucket
+
+Tournament scorecard PNGs are stored in Supabase Storage. The bucket must be created manually — it cannot be provisioned by Prisma migrations.
+
+In the Supabase Dashboard:
+1. Go to `Storage`.
+2. Click `New bucket`.
+3. Name: `tournament-scorecards`
+4. Set to **private** (files are accessed via service role key only).
+5. Save.
+
+File path structure: `{userId}/{sessionId}.png`
+
+If this bucket is missing, the scorecard save button on the tournament result page will silently fail (the PNG is generated but the upload returns an error).
+
+## 7. Apply RLS Policies
 Open Supabase `SQL Editor` and run:
 
 - [rls.sql](../supabase/rls.sql)
 
 This enables row-level security so each user can only access records tied to their `user_id`.
 
-## 7. Local Verification
+## 8. Local Verification
 Run:
 
 ```bash
@@ -109,13 +124,14 @@ Then verify:
 4. Visit `/dashboard`, `/matches`, `/settings`
 5. Confirm unauthenticated access redirects to `/login`
 
-## 8. QA Checklist
+## 9. QA Checklist
 - `.env` and `.env.local` exist and are not committed
 - Google provider is enabled in Supabase
 - `http://localhost:3000/auth/callback` is in redirect URLs
 - `https://world-break.vercel.app/auth/callback` is in redirect URLs
 - Prisma migration completed successfully
 - RLS SQL applied successfully
+- `tournament-scorecards` Storage bucket created (private)
 - Login works
 - Protected pages redirect correctly when signed out
 
