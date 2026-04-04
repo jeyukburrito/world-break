@@ -18,8 +18,8 @@ const PLAY_ORDER_OPTIONS = [
 ] as const;
 
 const DECISION_OPTIONS = [
-  { value: "true", label: "내가 선택" },
-  { value: "false", label: "상대가 선택" },
+  { value: "true", label: "자신" },
+  { value: "false", label: "상대" },
 ] as const;
 
 function SegmentedControl({
@@ -48,7 +48,7 @@ function SegmentedControl({
               key={option.value}
               type="button"
               onClick={() => onChange(option.value)}
-              className={`rounded-full px-4 py-3 text-sm font-semibold transition-all ${
+              className={`rounded-full px-4 py-3 text-sm font-semibold whitespace-nowrap transition-all ${
                 active ? "bg-surface text-accent shadow-sm" : "text-muted"
               }`}
             >
@@ -104,7 +104,7 @@ export function MatchDetailControls({
         />
       )}
       <SegmentedControl
-        label="선택 주체"
+        label="선후 결정"
         name="didChoosePlayOrder"
         value={didChoosePlayOrder}
         options={DECISION_OPTIONS}
