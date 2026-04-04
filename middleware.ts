@@ -12,13 +12,17 @@ const PUBLIC_PATHS = ["/", "/login", "/auth/callback", "/share", "/api/og"];
 const SUPABASE_ONLY_PATHS = ["/matches/export"];
 
 export async function middleware(request: NextRequest) {
-  const canonicalOrigin = getAuthCallbackOrigin(request.headers);
-  if (canonicalOrigin && request.nextUrl.origin !== canonicalOrigin) {
-    const canonicalUrl = request.nextUrl.clone();
-    const canonicalBase = new URL(canonicalOrigin);
-    canonicalUrl.protocol = canonicalBase.protocol;
-    canonicalUrl.host = canonicalBase.host;
-    return NextResponse.redirect(canonicalUrl, 307);
+  // Canonicalize host only for the OAuth callback — preview/staging hosts must
+  // stay functional for all other paths.
+  if (request.nextUrl.pathname.startsWith("/auth/callback")) {
+    const canonicalOrigin = getAuthCallbackOrigin(request.headers);
+    if (canonicalOrigin && request.nextUrl.origin !== canonicalOrigin) {
+      const canonicalUrl = request.nextUrl.clone();
+      const canonicalBase = new URL(canonicalOrigin);
+      canonicalUrl.protocol = canonicalBase.protocol;
+      canonicalUrl.host = canonicalBase.host;
+      return NextResponse.redirect(canonicalUrl, 307);
+    }
   }
 
   const isPublicPath = PUBLIC_PATHS.some(
