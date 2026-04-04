@@ -346,9 +346,18 @@ export default async function MatchesPage({ searchParams }: MatchesPageProps) {
       <section className="space-y-4">
         <div className="flex items-center justify-between px-1 text-sm text-muted">
           <p>총 {formatNumber(totalCount)}경기</p>
-          <p>
-            {currentPage} / {totalPages} 페이지
-          </p>
+          <div className="flex items-center gap-3">
+            <a
+              href="/api/og/daily-summary"
+              download
+              className="inline-flex items-center gap-1.5 rounded-full bg-surface-container-low px-4 py-1.5 text-sm font-semibold text-ink"
+            >
+              오늘 저장
+            </a>
+            <p>
+              {currentPage} / {totalPages} 페이지
+            </p>
+          </div>
         </div>
 
         {displayItems.length === 0 ? (

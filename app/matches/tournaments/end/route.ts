@@ -2,7 +2,6 @@ import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
-import { encodeJsonBase64Url } from "@/lib/base64url";
 import { isSupabaseConfigured } from "@/lib/env";
 import { GUEST_COOKIE, findGuestUserByToken } from "@/lib/guest";
 import { prisma } from "@/lib/prisma";
@@ -71,25 +70,11 @@ export async function POST(request: Request) {
     return NextResponse.redirect(new URL("/matches?error=tournament_not_found", request.url), 303);
   }
 
-  // Fetch tournament stats for GA4 event params
-  const stats = await prisma.matchResult.aggregate({
-    where: { tournamentSessionId, userId },
-    _count: { id: true },
-    _sum: { wins: true, losses: true },
-  });
-
-  const ep = encodeJsonBase64Url({
-    total_rounds: String(stats._count.id),
-    wins: String(stats._sum.wins ?? 0),
-    losses: String(stats._sum.losses ?? 0),
-  });
-
   revalidatePath("/matches");
   revalidatePath("/matches/new");
 
-  const redirectUrl = new URL("/matches", request.url);
-  redirectUrl.searchParams.set("message", "tournament_ended");
-  redirectUrl.searchParams.set("ep", ep);
-
-  return NextResponse.redirect(redirectUrl, 303);
+  return NextResponse.redirect(
+    new URL(`/matches/tournaments/${tournamentSessionId}/result`, request.url),
+    303,
+  );
 }

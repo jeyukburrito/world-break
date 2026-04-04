@@ -22,6 +22,20 @@ export async function deleteAccount() {
   const admin = createAdminClient();
   const supabase = await createClient();
 
+  // Delete scorecard PNGs from Storage before removing DB records
+  try {
+    const { data: scorecardFiles } = await admin.storage
+      .from("tournament-scorecards")
+      .list(user.id);
+    if (scorecardFiles && scorecardFiles.length > 0) {
+      const paths = scorecardFiles.map((f) => `${user.id}/${f.name}`);
+      await admin.storage.from("tournament-scorecards").remove(paths);
+    }
+  } catch (storageError) {
+    // Non-blocking — log and continue with account deletion
+    console.error("[deleteAccount] Storage cleanup failed:", storageError);
+  }
+
   // DB first — cascade deletes all child records, and failures are recoverable
   await prisma.user.delete({ where: { id: user.id } });
 
