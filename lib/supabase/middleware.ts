@@ -4,7 +4,7 @@ import { createServerClient } from "@supabase/ssr";
 
 import { isSupabaseConfigured, requireEnv } from "@/lib/env";
 
-const PUBLIC_PATHS = ["/", "/login", "/auth/callback", "/share", "/api/og"];
+const PUBLIC_PATHS = ["/", "/login", "/auth/callback", "/api/og"];
 
 export async function updateSession(request: NextRequest) {
   const isPublicPath = PUBLIC_PATHS.some(
