@@ -3,23 +3,17 @@ import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
 import { DeleteMatchButton } from "@/components/delete-match-button";
 import { HeaderActions } from "@/components/header-actions";
-import { ShareButton } from "@/components/share-button";
 import { getUserDisplayInfo, requireUser } from "@/lib/auth";
 import { formatDate } from "@/lib/format-date";
 import {
   groupMatchesForDisplay,
   type DisplayItem,
-  type TournamentGroup,
 } from "@/lib/group-matches";
 import {
   MATCHES_PAGE_SIZE,
   countMatchesForUser,
   listMatchesForUser,
 } from "@/lib/matches";
-import {
-  buildTournamentSharePath,
-  type TournamentSharePayload,
-} from "@/lib/share/match-share";
 
 import { deleteMatchResult } from "./actions";
 
@@ -71,23 +65,6 @@ function MatchStatusPill({ isWin }: { isWin: boolean }) {
       {isWin ? "승리" : "패배"}
     </span>
   );
-}
-
-function createTournamentSharePayload(group: TournamentGroup): TournamentSharePayload {
-  const wins = group.matches.filter((match) => match.isMatchWin).length;
-  const losses = group.matches.length - wins;
-  const allBo3 = group.matches.every((match) => match.matchFormat === "bo3");
-
-  return {
-    game: group.gameName,
-    myDeck: group.deckName,
-    result: wins > losses ? "win" : "lose",
-    format: allBo3 ? "bo3" : "bo1",
-    wins,
-    losses,
-    rounds: group.matches.length,
-    date: group.date.toISOString().slice(0, 10),
-  };
 }
 
 function SingleMatchCard({
@@ -176,7 +153,6 @@ function TournamentMatchCard({
           tournamentId: group.tournamentSessionId,
         }).toString()}`
       : null;
-  const tournamentShareHref = buildTournamentSharePath(createTournamentSharePayload(group));
 
   let swissIndex = 0;
   let eliminationIndex = 0;
@@ -213,9 +189,6 @@ function TournamentMatchCard({
             <p className="mt-1 text-sm text-muted">
               {group.name ? `${group.gameName} · ${group.deckName}` : group.gameName}
             </p>
-            <div className="mt-4">
-              <ShareButton href={tournamentShareHref} />
-            </div>
           </div>
         </div>
         <div className="text-right">
@@ -354,9 +327,9 @@ export default async function MatchesPage({ searchParams }: MatchesPageProps) {
             >
               오늘 저장
             </a>
-            <p>
+            <span>
               {currentPage} / {totalPages} 페이지
-            </p>
+            </span>
           </div>
         </div>
 
