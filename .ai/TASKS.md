@@ -3,14 +3,14 @@
 # TASKS.md — 티켓 목록 및 상태
 
 ---
-## 현재 상태 (Last Updated: 2026-03-31)
+## 현재 상태 (Last Updated: 2026-04-05)
 
 > **이 블록은 세션 종료 시 각 에이전트가 업데이트한다. 아래 티켓 목록이 authoritative.**
 
-- **마지막 완료:** T-031 (대회 성적표 이미지 영구 보관) — PM APPROVE
+- **마지막 완료:** T-033 (PC/태블릿 Adaptive Shell UI) — Gemini PASS, PM APPROVE
 - **현재 진행 중:** 없음
-- **다음 우선순위:** T-031 `/ship` 배포 → Supabase Storage 버킷/정책 설정 필수 → 인증 유저 저장 플로우 QA
-- **최근 주요 결정:** T-031 PM 승인. build/lint PASS. 배포 전 Supabase `tournament-scorecards` 버킷 생성 필요. `prisma migrate dev` 실패는 기존 shadow DB 문제(무관).
+- **다음 우선순위:** T-034 (데스크톱 타이틀/프로필 노출 개선) — T-033 Gemini 제안 follow-up
+- **최근 주요 결정:** T-032, T-033 모두 Gemini 리뷰 통과. T-033 데스크톱에서 TopAppBar 숨김으로 페이지 제목·프로필 링크 미노출 이슈 확인 — 별도 티켓으로 분리.
 
 빠른 참조: [역할 규칙](.ai/PROJECT_RULES.md) · [기술 표준](.ai/STANDARDS.md) · [구현 가이드](../AGENTS.md)
 
@@ -62,5 +62,7 @@
 | T-029 | 선후공 선택 주체 용어 개선 + 표시 수정 | `done` | [spec](handoffs/T-029-spec.md) | [result](handoffs/T-029-result.md) | | "결정 방식"→"선택 주체", 기록 페이지 상대 선택 미표시 버그 수정 |
 | T-030 | 기록 카드 승/패 시각화 강화 | `done` | [spec](handoffs/T-030-spec.md) | [result](handoffs/T-030-result.md) | | 승리/패배 배지 크기·색상 강화, 카드 배경 조건부 tint |
 | T-031 | 대회 성적표 이미지 영구 보관 | `done` | [spec](handoffs/T-031-spec.md) | [result](handoffs/T-031-result.md) | [review](daily/T-031-review-gemini.md) | Satori PNG 생성 + Supabase Storage 저장, result 페이지 신규 |
+| T-032 | 공유 이미지 기능 제거 | `done` | [spec](handoffs/T-032-spec.md) | [result](handoffs/T-032-result.md) | — | share-button, share pages, OG image routes 제거. daily-summary/scorecard는 유지 |
+| T-033 | PC/태블릿 Adaptive Shell UI | `done` | [spec](handoffs/T-033-spec.md) | [result](handoffs/T-033-result.md) | [review](daily/T-033-review-gemini.md) | SideNav 신규 + AppShell 반응형 (md: breakpoint). 데스크톱 타이틀/프로필 노출은 T-034로 분리 |
 
 
