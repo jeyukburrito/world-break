@@ -2,20 +2,31 @@
 
 import { useState, useTransition } from "react";
 
-import { saveTournamentScorecard } from "./actions";
+import { getScorecardSignedUrl, saveTournamentScorecard } from "./actions";
 
 type SaveScorecardButtonProps = {
   sessionId: string;
-  existingUrl: string | null;
+  existingUrl: string | null; // This now holds the path or null
 };
 
 export function SaveScorecardButton({
   sessionId,
   existingUrl,
 }: SaveScorecardButtonProps) {
-  const [savedUrl, setSavedUrl] = useState(existingUrl);
+  const [savedPath, setSavedPath] = useState(existingUrl);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  async function handleOpen() {
+    if (!savedPath) return;
+    setError(null);
+    try {
+      const { signedUrl } = await getScorecardSignedUrl(savedPath);
+      window.open(signedUrl, "_blank", "noopener,noreferrer");
+    } catch (openError) {
+      setError(openError instanceof Error ? openError.message : "이미지 주소 생성 실패");
+    }
+  }
 
   function handleSave() {
     setError(null);
@@ -24,7 +35,7 @@ export function SaveScorecardButton({
       void (async () => {
         try {
           const { scorecardUrl } = await saveTournamentScorecard(sessionId);
-          setSavedUrl(scorecardUrl);
+          setSavedPath(scorecardUrl);
         } catch (saveError) {
           setError(
             saveError instanceof Error ? saveError.message : "성적표 저장에 실패했습니다",
@@ -34,20 +45,19 @@ export function SaveScorecardButton({
     });
   }
 
-  if (savedUrl) {
+  if (savedPath) {
     return (
       <section className="space-y-3 rounded-[32px] bg-surface-container-low p-5 shadow-sm">
         <p className="text-sm font-medium text-success">성적표가 저장되었습니다.</p>
         {error ? <p className="text-sm text-danger">{error}</p> : null}
         <div className="flex gap-2">
-          <a
-            href={savedUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            type="button"
+            onClick={handleOpen}
             className="inline-flex flex-1 items-center justify-center rounded-full bg-accent px-4 py-3 text-sm font-semibold text-white"
           >
             PNG 열기
-          </a>
+          </button>
           <button
             type="button"
             onClick={handleSave}

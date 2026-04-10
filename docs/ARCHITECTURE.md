@@ -15,6 +15,23 @@
 
 ---
 
+## 셸 아키텍처 (Adaptive Shell)
+
+반응형 레이아웃은 `md` 브레이크포인트(768px)를 기준으로 모바일/데스크톱 레이아웃을 전환한다.
+
+| 컴포넌트 | 가시성 | 역할 |
+|---------|--------|------|
+| `components/app-shell.tsx` | 항상 | 루트 래퍼. 데스크톱에서 `md:pl-56` + `max-w-3xl` 콘텐츠 영역 제한 |
+| `components/side-nav.tsx` | `md:flex` (모바일 `hidden`) | 고정 사이드바 (w-56). 브랜드, nav 항목, `+ 새 매치 입력` CTA |
+| `components/bottom-nav.tsx` | `md:hidden` | 모바일 하단 탭 바 |
+| `components/top-app-bar.tsx` | `md:hidden` | 모바일 상단 바. 데스크톱에서 페이지 제목·프로필 미노출 (T-034 예정) |
+| `lib/navigation.ts` | — | `NavigationItem` 타입 + `isNavigationItemActive()`. BottomNav/SideNav 공유 |
+
+- 레이아웃 전환은 Tailwind 클래스로만 처리 (JS 감지 없음)
+- 네비게이션 활성 상태 로직은 `lib/navigation.ts`에 중앙화
+
+---
+
 ## Server Actions 패턴
 
 - 모든 데이터 변경은 `app/**/actions.ts`의 Server Actions로 처리 (별도 API route 없음)

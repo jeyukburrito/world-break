@@ -3,14 +3,14 @@
 # TASKS.md — 티켓 목록 및 상태
 
 ---
-## 현재 상태 (Last Updated: 2026-04-05)
+## 현재 상태 (Last Updated: 2026-04-10)
 
 > **이 블록은 세션 종료 시 각 에이전트가 업데이트한다. 아래 티켓 목록이 authoritative.**
 
-- **마지막 완료:** T-033 (PC/태블릿 Adaptive Shell UI) — Gemini PASS, PM APPROVE
-- **현재 진행 중:** 없음
-- **다음 우선순위:** T-034 (데스크톱 타이틀/프로필 노출 개선) — T-033 Gemini 제안 follow-up
-- **최근 주요 결정:** T-032, T-033 모두 Gemini 리뷰 통과. T-033 데스크톱에서 TopAppBar 숨김으로 페이지 제목·프로필 링크 미노출 이슈 확인 — 별도 티켓으로 분리.
+- **마지막 완료:** T-035, T-036 (뷁어 수정 및 이미지 내보내기 버그) — Gemini PASS
+- **현재 진행 중:** 없음 (T-034 구현 완료 / Gemini 리뷰 대기)
+- **다음 우선순위:** T-034 Gemini 리뷰
+- **최근 주요 결정:** T-034 구현 완료. `AppShell` 본문 상단에 데스크톱 전용 제목/프로필 헤더를 추가했고, `TopAppBar`의 미사용 `title` prop 정의를 제거함.
 
 빠른 참조: [역할 규칙](.ai/PROJECT_RULES.md) · [기술 표준](.ai/STANDARDS.md) · [구현 가이드](../AGENTS.md)
 
@@ -64,5 +64,8 @@
 | T-031 | 대회 성적표 이미지 영구 보관 | `done` | [spec](handoffs/T-031-spec.md) | [result](handoffs/T-031-result.md) | [review](daily/T-031-review-gemini.md) | Satori PNG 생성 + Supabase Storage 저장, result 페이지 신규 |
 | T-032 | 공유 이미지 기능 제거 | `done` | [spec](handoffs/T-032-spec.md) | [result](handoffs/T-032-result.md) | — | share-button, share pages, OG image routes 제거. daily-summary/scorecard는 유지 |
 | T-033 | PC/태블릿 Adaptive Shell UI | `done` | [spec](handoffs/T-033-spec.md) | [result](handoffs/T-033-result.md) | [review](daily/T-033-review-gemini.md) | SideNav 신규 + AppShell 반응형 (md: breakpoint). 데스크톱 타이틀/프로필 노출은 T-034로 분리 |
+| T-034 | 데스크톱 타이틀/프로필 노출 개선 | `done` | [spec](handoffs/T-034-spec.md) | [result](handoffs/T-034-result.md) | [review](daily/2026-04-10-gemini-review.md) | AppShell main 상단에 md: 전용 헤더 행 추가 + TopAppBar title prop 잔재 제거 |
+| T-035 | actions.ts 뷁어 에러 메시지 수정 | `done` | [spec](handoffs/T-035-spec.md) | [result](handoffs/T-035-result.md) | [review](daily/2026-04-10-gemini-review.md) | Windows Codex CP949 인코딩 손상 — 모든 에러 문자열 교체 |
+| T-036 | 이미지 내보내기 버그 수정 | `done` | [spec](handoffs/T-036-spec.md) | [result](handoffs/T-036-result.md) | [review](daily/2026-04-10-gemini-review.md) | middleware SUPABASE_ONLY_PATHS + 성적표 저장 실패 진단 |
 
 
