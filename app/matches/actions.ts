@@ -71,7 +71,7 @@ function deriveScore(
     return { wins: w, losses: l };
   }
 
-  // ?대갚: 湲곗〈 濡쒖쭅 (bo3Score 誘몄젣怨???
+  // 기본값: bo3Score가 없을 때 2-1 / 1-2를 기본 적용
   return result === "win" ? { wins: 2, losses: 1 } : { wins: 1, losses: 2 };
 }
 
@@ -121,13 +121,13 @@ async function resolveTournamentSession(tx: TxClient, params: {
     });
 
     if (!existing) {
-      return { ok: false as const, error: "?댁뼱吏??????몄뀡??李얠쓣 ???놁뒿?덈떎." as const };
+      return { ok: false as const, error: "대회 세션을 찾을 수 없습니다." as const };
     }
 
     if (existing.endedAt) {
       return {
         ok: false as const,
-        error: "醫낅즺????뚯엯?덈떎. 湲곗〈 湲곕줉? ?섏젙?????덉?留????쇱슫?쒕뒗 異붽??????놁뒿?덈떎." as const,
+        error: "대회가 종료되었습니다. 현재 기록을 수정하거나 해당 세션에 추가할 수 없습니다." as const,
       };
     }
 
@@ -193,7 +193,7 @@ export async function createMatchResult(formData: FormData) {
   const parsed = parseMatchForm(formData);
 
   if (!parsed.success) {
-    redirect(newMatchRedirect("error", "?낅젰媛믪쓣 ?뺤씤??二쇱꽭??"));
+    redirect(newMatchRedirect("error", "입력값을 확인해 주세요."));
   }
 
   const score = deriveScore(parsed.data.matchFormat, parsed.data.result, parsed.data.bo3Score);
@@ -291,11 +291,11 @@ export async function updateMatchResult(formData: FormData) {
   const parsed = parseMatchForm(formData);
 
   if (!matchIdSchema.safeParse(matchId).success) {
-    redirect(matchesRedirect("error", "?섏젙??寃쎄린 ID媛 ?щ컮瑜댁? ?딆뒿?덈떎."));
+    redirect(matchesRedirect("error", "수정할 매치 ID가 필요합니다."));
   }
 
   if (!parsed.success) {
-    redirect(editRedirect(matchId, "error", "?낅젰媛믪쓣 ?뺤씤??二쇱꽭??"));
+    redirect(editRedirect(matchId, "error", "입력값을 확인해 주세요."));
   }
 
   const score = deriveScore(parsed.data.matchFormat, parsed.data.result, parsed.data.bo3Score);
@@ -373,7 +373,7 @@ export async function updateMatchResult(formData: FormData) {
     return updated;
   }).catch((error: Error) => {
     if (error.message === "MATCH_NOT_FOUND") {
-      redirect(matchesRedirect("error", "?섏젙?????湲곕줉??李얠쓣 ???놁뒿?덈떎."));
+      redirect(matchesRedirect("error", "수정할 기록을 찾을 수 없습니다."));
     }
     if (error.message.startsWith("TOURNAMENT_ERROR:")) {
       redirect(editRedirect(matchId, "error", error.message.slice("TOURNAMENT_ERROR:".length)));
@@ -382,7 +382,7 @@ export async function updateMatchResult(formData: FormData) {
   });
 
   if (result.count === 0) {
-    redirect(matchesRedirect("error", "?섏젙 沅뚰븳???녾굅?????湲곕줉??李얠쓣 ???놁뒿?덈떎."));
+    redirect(matchesRedirect("error", "수정할 기록을 찾을 수 없습니다."));
   }
 
   revalidatePath("/matches");
@@ -397,7 +397,7 @@ export async function deleteMatchResult(formData: FormData) {
   const matchId = String(formData.get("matchId") || "");
 
   if (!matchIdSchema.safeParse(matchId).success) {
-    redirect(matchesRedirect("error", "??젣??寃쎄린 ID媛 ?щ컮瑜댁? ?딆뒿?덈떎."));
+    redirect(matchesRedirect("error", "삭제할 매치 ID가 필요합니다."));
   }
 
   const result = await prisma.matchResult.deleteMany({
@@ -408,7 +408,7 @@ export async function deleteMatchResult(formData: FormData) {
   });
 
   if (result.count === 0) {
-    redirect(matchesRedirect("error", "??젣 沅뚰븳???녾굅?????湲곕줉??李얠쓣 ???놁뒿?덈떎."));
+    redirect(matchesRedirect("error", "삭제할 기록을 찾을 수 없습니다."));
   }
 
   revalidatePath("/matches");

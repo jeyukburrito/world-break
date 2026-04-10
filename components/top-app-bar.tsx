@@ -2,7 +2,6 @@ import Link from "next/link";
 import { ReactNode } from "react";
 
 type TopAppBarProps = {
-  title?: string;
   right?: ReactNode;
 };
 

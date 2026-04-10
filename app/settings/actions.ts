@@ -13,17 +13,22 @@ export async function deleteAccount() {
   const user = await requireUser();
   const cookieStore = await cookies();
 
-  if (user.isGuest) {
-    await prisma.user.delete({ where: { id: user.id } });
-    cookieStore.delete(GUEST_COOKIE);
-    redirect("/login?message=account_deleted");
+  // 1. Supabase Auth first — critical step. If this fails, the account is still active.
+  // Admin client deletes even if user is not signed in to Supabase in this session (e.g. session expired).
+  if (!user.isGuest) {
+    const admin = createAdminClient();
+    const { error } = await admin.auth.admin.deleteUser(user.id);
+    
+    if (error) {
+      console.error("[deleteAccount] Supabase auth delete failed:", error);
+      // Fail early so the user knows deletion didn't happen.
+      throw new Error("인증 서버 계정 삭제에 실패했습니다. 잠시 후 다시 시도해 주세요.");
+    }
   }
 
-  const admin = createAdminClient();
-  const supabase = await createClient();
-
-  // Delete scorecard PNGs from Storage before removing DB records
+  // 2. Storage cleanup (Optional/Best Effort)
   try {
+    const admin = createAdminClient();
     const { data: scorecardFiles } = await admin.storage
       .from("tournament-scorecards")
       .list(user.id);
@@ -32,21 +37,18 @@ export async function deleteAccount() {
       await admin.storage.from("tournament-scorecards").remove(paths);
     }
   } catch (storageError) {
-    // Non-blocking — log and continue with account deletion
     console.error("[deleteAccount] Storage cleanup failed:", storageError);
   }
 
-  // DB first — cascade deletes all child records, and failures are recoverable
+  // 3. DB row last — if this fails, we have an orphaned record but the user can't log in anymore.
   await prisma.user.delete({ where: { id: user.id } });
 
-  const { error } = await admin.auth.admin.deleteUser(user.id);
-  if (error) {
-    // DB row is already gone — user can't access the app anymore.
-    // Supabase auth record will be orphaned but harmless.
-    console.error("[deleteAccount] Supabase auth delete failed:", error);
+  // 4. Client session cleanup
+  if (!user.isGuest) {
+    const supabase = await createClient();
+    await supabase.auth.signOut();
   }
-
-  await supabase.auth.signOut();
+  
   cookieStore.delete(GUEST_COOKIE);
   redirect("/login?message=account_deleted");
 }

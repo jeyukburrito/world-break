@@ -90,13 +90,15 @@ export default async function SettingsPage() {
           </div>
         </section>
 
-        <section className="overflow-hidden rounded-3xl border border-line bg-surface shadow-sm">
-          <SettingsLink
-            href="/settings/export"
-            label="CSV 내보내기"
-            description="조건에 맞는 기록을 CSV로 받습니다."
-          />
-        </section>
+        {!isGuest ? (
+          <section className="overflow-hidden rounded-3xl border border-line bg-surface shadow-sm">
+            <SettingsLink
+              href="/settings/export"
+              label="CSV 내보내기"
+              description="조건에 맞는 기록을 CSV로 받습니다."
+            />
+          </section>
+        ) : null}
 
         <section>
           <p className="mb-3 px-1 text-[10px] font-bold uppercase tracking-[0.28em] text-muted">
