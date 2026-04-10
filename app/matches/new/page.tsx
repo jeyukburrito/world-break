@@ -97,7 +97,7 @@ export default async function NewMatchPage({ searchParams }: NewMatchPageProps) 
       title="경기 입력"
       headerRight={<HeaderActions avatarUrl={display.avatarUrl} name={display.name} />}
     >
-      <div className="mx-auto flex max-w-md flex-col gap-4 pb-28">
+      <div className="mx-auto flex max-w-md flex-col gap-4 pb-28 md:pb-6">
         {isContinue && activeTournamentId && roundNumber ? (
           <TournamentBanner
             eventLabel={eventLabel}
@@ -182,7 +182,7 @@ export default async function NewMatchPage({ searchParams }: NewMatchPageProps) 
             </div>
           ) : null}
 
-          <div className="fixed inset-x-0 bottom-20 z-40 bg-surface/90 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur-lg">
+          <div className="fixed inset-x-0 bottom-20 z-40 bg-surface/90 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur-lg md:bottom-0 md:left-56">
             <div className="mx-auto max-w-md">
               <SubmitButton label={submitLabel} disabled={submitDisabled} />
             </div>

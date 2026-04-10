@@ -139,6 +139,21 @@ npm run prisma:seed     # 개발용 시드 데이터 삽입
 - **Path alias**: `@/*` → 프로젝트 루트 (tsconfig.json)
 
 
+## 티켓 완료 파이프라인
+
+T-xxx 구현이 끝나면 아래 순서로 실행. 각 단계를 순서대로 완료 후 다음으로 진행.
+
+```
+1. /everything-claude-code:verify   → build + tsc + lint 검증 (실패 시 STOP, 수정 후 재시도)
+2. /code-review-graph:review-delta  → 현재 브랜치 diff 코드 리뷰
+3. /ship                            → commit + PR 생성
+4. /session-wrap:wrap               → TASKS.md 상태 업데이트 + 세션 기록
+```
+
+원격 환경 제약 (DB 직접 접근 불가) 시: 1 → 3만 실행하고, 2는 선택.
+
+---
+
 ## Skill routing
 
 When the user's request matches an available skill, ALWAYS invoke it using the Skill
