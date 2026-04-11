@@ -6,7 +6,6 @@ import { HeaderActions } from "@/components/header-actions";
 import { getUserDisplayInfo, requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-import { SaveScorecardButton } from "./save-scorecard-button";
 
 type TournamentResultPageProps = {
   params: Promise<{ id: string }>;
@@ -133,13 +132,6 @@ export default async function TournamentResultPage({ params }: TournamentResultP
             </article>
           )}
         </section>
-
-        {!user.isGuest ? (
-          <SaveScorecardButton
-            sessionId={sessionId}
-            existingUrl={session.scorecardUrl ?? null}
-          />
-        ) : null}
 
         <Link
           href="/matches"
