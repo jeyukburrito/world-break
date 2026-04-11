@@ -1,4 +1,4 @@
-Author: Claude (PM/QA)
+Author: Claude (PM + Engineer)
 
 # PROJECT_RULES.md — Webapp 협업 운영 규칙
 
@@ -9,25 +9,26 @@ Author: Claude (PM/QA)
 구현 담당을 파일 수가 아닌 **작업 유형**으로 결정한다. 모든 프로젝트 문서는 상단에 `Author: [Role/Name]` 형식을 필수로 포함한다.
 
 ```
-작업 유형                        Claude 직접   Codex 위임
-────────────────────────────     ──────────    ──────────
-Config/Infra (.gitignore 등)        ✓
-문서 (README, CLAUDE.md, .ai/)      ✓
-Spec / Review / QA                  ✓
-대화 중 발생한 즉각적 소규모 수정    ✓  (≤3파일)
-디버깅 / 좁은 범위 정밀 수정        ✓  (≤3파일)
-아키텍처 결정 + 코드 동시 적용      ✓  (≤3파일)
-Feature 구현 (spec 기반)                           ✓
-Scaffolding / 보일러플레이트                       ✓
-테스트 작성                                        ✓
-대규모 리팩터링                                    ✓
+작업 유형                           Claude 직접   Claude + Sub-agent   Codex 위임
+──────────────────────────────────  ──────────    ──────────────────   ──────────
+Config/Infra (.gitignore 등)           ✓
+문서 (README, CLAUDE.md, .ai/)         ✓
+Spec / Review / QA                     ✓
+대화 중 발생한 즉각적 소규모 수정      ✓  (≤3파일)
+디버깅 / 좁은 범위 정밀 수정          ✓  (≤3파일)
+아키텍처 결정 + 코드 동시 적용        ✓  (≤3파일)
+Feature 구현 (4~7파일)                               ✓ (planner 필수)
+Feature 구현 (8파일+)                                                      ✓
+Scaffolding / 보일러플레이트                         ✓ (planner 필수)
+테스트 작성                            ✓  (≤3파일)  ✓ (4파일+ planner)
+대규모 리팩터링                                                            ✓
 ```
 
-**에스컬레이션:** Claude가 시작했다가 3파일 초과 또는 50줄 초과 예상 시 → spec 작성 후 Codex에 위임.
+**에스컬레이션:** Claude가 시작했다가 7파일 초과 또는 200줄 초과 예상 시 → spec 작성 후 Codex에 위임.
 
 ---
 
-### Claude (PM + 최종 승인)
+### Claude (PM + Engineer + 최종 승인)
 
 **책임:**
 - 요구사항 정리 및 MVP 범위 확정
@@ -35,10 +36,20 @@ Scaffolding / 보일러플레이트                       ✓
 - Done Definition이 포함된 spec 작성 (`handoffs/T-xxx-spec.md`)
 - Gemini 리뷰 결과 확인 및 최종 승인/반려
 - 배포 전 체크리스트 작성
-- 위 라우팅 원칙에 따른 직접 구현 (Config, Docs, 소규모 즉각 수정)
+- 위 라우팅 원칙에 따른 직접 구현 (모든 범위 — sub-agent 워크플로 준수)
+
+**엔지니어링 시 Sub-agent 워크플로:**
+```
+4~7파일 구현 전:
+  1. everything-claude-code:planner 또는 everything-claude-code:architect 호출
+  2. Sub-agent 설계 결과를 plan으로 기록
+  3. 기록된 plan 기준으로 구현 시작
+  4. 탐색이 필요하면 Explore sub-agent 먼저 호출
+```
 
 **금지:**
-- 4파일 이상 Feature 구현을 직접 담당
+- 4파일 이상 구현 시 sub-agent 호출 없이 바로 코드 작성
+- 8파일 이상 구현을 직접 담당 (Codex 위임)
 - spec 없이 Codex에 구현 지시
 - 리뷰 단계에서 새 요구사항 추가
 - 같은 티켓의 코드와 리뷰를 동시에 소유

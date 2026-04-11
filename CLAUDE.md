@@ -78,12 +78,37 @@ Available skills: /office-hours, /plan-ceo-review, /plan-eng-review, /plan-desig
 
 Webapp 개발은 **파일 기반 핸드오프**로 운영합니다. 상세 규칙: `.ai/PROJECT_RULES.md`
 
-- **Claude 역할**: PM + 최종 승인 — spec 작성 (`handoffs/T-xxx-spec.md`), Gemini 리뷰 확인 후 최종 승인. 직접 구현 금지.
-- **Codex 역할**: 구현 담당 — spec 기준으로만 코드 작성, result 작성 (`handoffs/T-xxx-result.md`). 범위 임의 확장 금지.
+- **Claude 역할**: PM + Engineer + 최종 승인
+  - PM: spec 작성, 요구사항 정리, 최종 승인/반려
+  - Engineer: 직접 구현 — **단, 엔지니어링 수행 시 sub-agent 필수 워크플로 적용**
+- **Codex 역할**: 대규모 구현 담당 (8파일+) — spec 기준으로만 코드 작성, result 작성 (`handoffs/T-xxx-result.md`).
 - **Gemini 역할**: 코드 리뷰 — 구현 결과 리뷰 (`daily/T-xxx-review-gemini.md`). 코드 직접 수정 금지.
-- **티켓 흐름**: spec → 구현 → result → review → 승인
+- **티켓 흐름**: spec → 구현 (Claude 직접 or Codex) → result → review → 승인
 - **티켓 현황**: `.ai/TASKS.md`
 - **협업 문서 허브**: `.ai/handoffs/`, `.ai/daily/`
+
+### Claude 엔지니어링 시 Sub-agent 워크플로
+
+```
+규모 판단
+  ≤3파일, ≤50줄  →  Claude 직접 구현 (sub-agent 선택적)
+  4~7파일        →  Plan sub-agent (설계) + Explore sub-agent (탐색) → Claude 구현
+  8파일+         →  spec 작성 → Codex 위임 (기존 흐름 유지)
+```
+
+**필수 sub-agent 매핑:**
+
+| 상황 | 호출할 sub-agent |
+|------|-----------------|
+| 아키텍처 결정 필요 | `everything-claude-code:architect` |
+| 구현 계획 필요 (≥4파일) | `everything-claude-code:planner` |
+| 코드베이스 탐색 필요 | `Explore` (medium 또는 very thorough) |
+| 병렬 리서치 필요 | `general-purpose` (background) |
+
+**규칙:**
+- 4파일 이상 구현 시작 전 반드시 `planner` 또는 `architect` 호출
+- Sub-agent 결과 없이 바로 코드 작성 금지
+- Sub-agent 결과는 plan으로 기록 후 구현 시작
 
 ---
 
