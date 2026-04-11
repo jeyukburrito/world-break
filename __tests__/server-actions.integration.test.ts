@@ -103,7 +103,7 @@ describe("Server Action integration", () => {
 
     const location = await expectRedirect(createMatchResult(buildMatchForm()));
 
-    expect(location).toContain("/matches?message=record_created");
+    expect(location).toContain("/matches/new?message=record_created");
 
     const savedMatch = await prisma.matchResult.findFirst({
       where: { userId: user.id },

@@ -282,7 +282,17 @@ export async function createMatchResult(formData: FormData) {
     );
   }
 
-  redirect(matchesRedirect("message", "record_created", matchEp));
+  // Friendly match: redirect back to the new-match form pre-filled so the user
+  // can immediately record the next match without re-entering game/deck/format.
+  const sp = new URLSearchParams({
+    message: "record_created",
+    ep: encodeParams(matchEp),
+    gameName: parsed.data.gameName,
+    deckName: parsed.data.myDeckName,
+    matchFormat: parsed.data.matchFormat,
+    playOrder: parsed.data.playOrder,
+  });
+  redirect(`/matches/new?${sp.toString()}`);
 }
 
 export async function updateMatchResult(formData: FormData) {
