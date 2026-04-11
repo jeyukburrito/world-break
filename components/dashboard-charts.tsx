@@ -26,31 +26,38 @@ function formatNumber(value: number) {
   return new Intl.NumberFormat("ko-KR").format(value);
 }
 
-function buildConicGradient(slices: DonutSlice[]) {
+const OTHER_COLOR = "#52525b";
+
+function buildConicGradient(slices: DonutSlice[], maxSlices: number) {
   const total = slices.reduce((sum, slice) => sum + slice.value, 0);
 
   if (total === 0) {
     return "conic-gradient(#e2e8f0 0% 100%)";
   }
 
+  const visible = slices.slice(0, maxSlices);
+  const otherValue = slices.slice(maxSlices).reduce((sum, s) => sum + s.value, 0);
+
   let cursor = 0;
-  const segments = slices.map((slice, index) => {
+  const segments = visible.map((slice, index) => {
     const start = cursor;
     const stop = start + (slice.value / total) * 100;
     cursor = stop;
     return `${COLORS[index % COLORS.length]} ${start.toFixed(2)}% ${stop.toFixed(2)}%`;
   });
 
+  if (otherValue > 0) {
+    const start = cursor;
+    const stop = start + (otherValue / total) * 100;
+    cursor = stop;
+    segments.push(`${OTHER_COLOR} ${start.toFixed(2)}% ${stop.toFixed(2)}%`);
+  }
+
   if (cursor < 100) {
     segments.push(`#e2e8f0 ${cursor.toFixed(2)}% 100%`);
   }
 
   return `conic-gradient(${segments.join(", ")})`;
-}
-
-function ringLabel(value: number, total: number) {
-  if (total === 0) return "0%";
-  return `${Math.round((value / total) * 100)}%`;
 }
 
 // 2-column 통계 카드 (보더 없음, 소프트 쉐도우)
@@ -65,23 +72,25 @@ function StatCard({ label, value, subtext }: { label: string; value: string; sub
 }
 
 // 분포 도넛 차트 카드 — 보더 없음, 색상 bar 인디케이터
+const MAX_VISIBLE_SLICES = 3;
+
 function DistributionCard({
   title,
-  centerLabel,
   slices,
   totalMatches,
   emptyHref,
 }: {
   title: string;
-  centerLabel: string;
   slices: DonutSlice[];
   totalMatches: number;
   emptyHref: string;
 }) {
   const hasData = slices.length > 0 && totalMatches > 0;
-  const topSlices = slices.slice(0, 4);
+  const topSlices = slices.slice(0, MAX_VISIBLE_SLICES);
+  const otherSlices = slices.slice(MAX_VISIBLE_SLICES);
+  const otherValue = otherSlices.reduce((sum, s) => sum + s.value, 0);
   const totalValue = slices.reduce((sum, slice) => sum + slice.value, 0);
-  const gradient = buildConicGradient(slices);
+  const gradient = buildConicGradient(slices, MAX_VISIBLE_SLICES);
 
   return (
     <article className="rounded-[28px] bg-surface p-5 shadow-[0_4px_20px_-4px_rgba(25,28,30,0.06)]">
@@ -102,20 +111,8 @@ function DistributionCard({
               className="relative flex size-40 items-center justify-center rounded-full"
               style={{ background: gradient }}
             >
-              {/* 안쪽 원 — 보더 없이 bg만 */}
-              <div className="flex size-24 items-center justify-center rounded-full bg-surface text-center">
-                <div>
-                  <p className="text-[9px] font-bold uppercase tracking-widest text-muted">
-                    {centerLabel}
-                  </p>
-                  <p className="mt-0.5 text-sm font-bold text-ink">
-                    {topSlices[0]?.name ?? "-"}
-                  </p>
-                  <p className="text-xs text-muted">
-                    {topSlices[0] ? ringLabel(topSlices[0].value, totalMatches) : "0%"}
-                  </p>
-                </div>
-              </div>
+              {/* 안쪽 원 */}
+              <div className="size-24 rounded-full bg-surface" />
             </div>
           </div>
 
@@ -133,9 +130,18 @@ function DistributionCard({
                 </span>
               </div>
             ))}
-            {slices.length > topSlices.length ? (
-              <div className="rounded-2xl bg-paper px-3 py-2.5 text-xs text-muted">
-                그 외 {slices.length - topSlices.length}개 항목
+            {otherValue > 0 ? (
+              <div className="flex items-center gap-3 rounded-2xl bg-paper px-3 py-2.5">
+                <span
+                  className="size-2.5 shrink-0 rounded-full"
+                  style={{ backgroundColor: OTHER_COLOR }}
+                />
+                <span className="flex-1 text-sm font-medium text-muted">
+                  기타 {otherSlices.length}개
+                </span>
+                <span className="text-xs font-semibold text-muted">
+                  {formatNumber(otherValue)} / {totalValue > 0 ? Math.round((otherValue / totalValue) * 100) : 0}%
+                </span>
               </div>
             ) : null}
           </div>
@@ -188,14 +194,12 @@ export function DashboardCharts({
         <div className="grid gap-4 lg:grid-cols-2">
           <DistributionCard
             title="내 덱 분포"
-            centerLabel="MAIN"
             slices={myDeckSlices}
             totalMatches={totalMatches}
             emptyHref="/matches/new"
           />
           <DistributionCard
             title="상대 덱 분포"
-            centerLabel="TIER 1"
             slices={opponentSlices}
             totalMatches={totalMatches}
             emptyHref="/matches/new"
