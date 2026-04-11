@@ -105,7 +105,7 @@ export default async function NewMatchPage({ searchParams }: NewMatchPageProps) 
       title="경기 입력"
       headerRight={<HeaderActions avatarUrl={display.avatarUrl} name={display.name} />}
     >
-      <div className="mx-auto flex max-w-md flex-col gap-4 pb-28 md:pb-6">
+      <div className="flex flex-col gap-4 pb-28 md:pb-6">
         {showSavedBanner ? (
           <div className="flex items-center justify-between rounded-2xl bg-surface-container-low px-4 py-3 text-sm">
             <span className="font-medium text-ink">저장 완료</span>
@@ -148,7 +148,7 @@ export default async function NewMatchPage({ searchParams }: NewMatchPageProps) 
             </>
           ) : null}
 
-          <section className="grid gap-3">
+          <section className="grid gap-3 md:grid-cols-2">
             <EventCategorySelect defaultValue={continueEvent ?? "friendly"} />
             <label className="grid gap-2 text-sm font-semibold">
               날짜
@@ -162,7 +162,7 @@ export default async function NewMatchPage({ searchParams }: NewMatchPageProps) 
             </label>
           </section>
 
-          <section className="grid gap-3">
+          <section className="grid gap-3 md:grid-cols-2">
             <MatchPrefillFields
               defaultGameName={initialGameName}
               defaultDeckName={initialDeckName}
@@ -197,10 +197,9 @@ export default async function NewMatchPage({ searchParams }: NewMatchPageProps) 
             </div>
           ) : null}
 
-          <div className="fixed inset-x-0 bottom-20 z-40 bg-surface/90 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur-lg md:bottom-0 md:left-56">
-            <div className="mx-auto max-w-md">
-              <SubmitButton label={submitLabel} disabled={submitDisabled} />
-            </div>
+          {/* 모바일: bottom nav 위 fixed. 데스크톱: 폼 하단 inline */}
+          <div className="fixed inset-x-0 bottom-20 z-40 bg-surface/90 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur-lg md:static md:z-auto md:bg-transparent md:px-0 md:pb-0 md:pt-0 md:backdrop-blur-none">
+            <SubmitButton label={submitLabel} disabled={submitDisabled} />
           </div>
         </form>
       </div>
