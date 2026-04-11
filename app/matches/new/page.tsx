@@ -162,7 +162,7 @@ export default async function NewMatchPage({ searchParams }: NewMatchPageProps) 
             </label>
           </section>
 
-          <section className="grid gap-3 md:grid-cols-2">
+          <section className="grid gap-3">
             <MatchPrefillFields
               defaultGameName={initialGameName}
               defaultDeckName={initialDeckName}
