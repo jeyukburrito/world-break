@@ -3,14 +3,14 @@
 # TASKS.md — 티켓 목록 및 상태
 
 ---
-## 현재 상태 (Last Updated: 2026-04-10)
+## 현재 상태 (Last Updated: 2026-04-11)
 
 > **이 블록은 세션 종료 시 각 에이전트가 업데이트한다. 아래 티켓 목록이 authoritative.**
 
-- **마지막 완료:** T-035, T-036 (뷁어 수정 및 이미지 내보내기 버그) — Gemini PASS
-- **현재 진행 중:** 없음 (T-034 구현 완료 / Gemini 리뷰 대기)
-- **다음 우선순위:** T-034 Gemini 리뷰
-- **최근 주요 결정:** T-034 구현 완료. `AppShell` 본문 상단에 데스크톱 전용 제목/프로필 헤더를 추가했고, `TopAppBar`의 미사용 `title` prop 정의를 제거함.
+- **마지막 완료:** Input UX Phase 1 (상대 덱명 자동완성 + 저장 후 폼 프리필) — PR #7 open
+- **현재 진행 중:** 없음
+- **다음 우선순위:** Input UX Phase 2 (날짜/메모 접기), 또는 통계/분석 강화
+- **최근 주요 결정:** T-031 성적표 Storage 저장 기능 제거 (CEO 리뷰 스코프 결정). Claude 역할 PM → PM+Engineer로 확대.
 
 빠른 참조: [역할 규칙](.ai/PROJECT_RULES.md) · [기술 표준](.ai/STANDARDS.md) · [구현 가이드](../AGENTS.md)
 
