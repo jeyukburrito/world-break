@@ -24,7 +24,7 @@
 | `components/app-shell.tsx` | 항상 | 루트 래퍼. 데스크톱에서 `md:pl-56` + `max-w-3xl` 콘텐츠 영역 제한 |
 | `components/side-nav.tsx` | `md:flex` (모바일 `hidden`) | 고정 사이드바 (w-56). 브랜드, nav 항목, `+ 새 매치 입력` CTA |
 | `components/bottom-nav.tsx` | `md:hidden` | 모바일 하단 탭 바 |
-| `components/top-app-bar.tsx` | `md:hidden` | 모바일 상단 바. 데스크톱에서 페이지 제목·프로필 미노출 (T-034 예정) |
+| `components/top-app-bar.tsx` | `md:hidden` | 모바일 상단 바. 데스크톱에서는 `AppShell` 내부 `md:` 헤더 행에서 제목·프로필 노출 |
 | `lib/navigation.ts` | — | `NavigationItem` 타입 + `isNavigationItemActive()`. BottomNav/SideNav 공유 |
 
 - 레이아웃 전환은 Tailwind 클래스로만 처리 (JS 감지 없음)
@@ -40,6 +40,15 @@
 
 ---
 
+## 입력 UX 패턴
+
+- **상대 덱명 자동완성**: `components/opponent-deck-field.tsx` — 클라이언트 컴포넌트. `<datalist>`로 네이티브 자동완성 제공 (의존성 없음, 모바일 키보드 연동).
+  - `lib/matches.ts` → `getRecentOpponentDecks(userId)`: 최근 300경기 기반 게임별 상대 덱명 목록 (게임당 30개 상한, 최신순)
+  - `world-break:game-name-change` 커스텀 이벤트로 `MatchPrefillFields` ↔ `OpponentDeckField` 간 게임 변경 실시간 동기화 (React state lifting 없이)
+- **경기 저장 후 흐름**: 친선전 저장 시 `/matches/new?gameName=X&deckName=Y&matchFormat=Z&playOrder=W`로 redirect — 다음 경기 연속 입력 최소화
+
+---
+
 ## 데이터 스코핑
 
 - 모든 DB 쿼리에 `userId` 조건 포함 필수 (Supabase RLS + 앱 레이어 이중 보호)
@@ -52,8 +61,7 @@
 - `eventCategory`가 `shop`이면 `TournamentSession`이 자동 생성/연결
 - `tournamentSessionId` URL 파라미터로 기존 세션에 연결하거나 없으면 신규 생성
 - 종료(`endedAt` != null)된 세션에는 새 라운드 추가 불가
-- 대회 종료 후 `/matches/tournaments/[id]/result` 페이지에서 성적 요약 확인 + PNG 스코어카드 저장 가능
-- `scorecardUrl` — Supabase Storage에 업로드된 PNG URL (`tournament-scorecards/{userId}/{sessionId}.png`). 인증 유저만 저장 가능.
+- 대회 종료 후 `/matches/tournaments/[id]/result` 페이지에서 성적 요약 확인 가능
 
 ---
 
@@ -84,7 +92,7 @@ User → Game → Deck → MatchResult
 - `MatchResult.wins` / `losses` — BO1은 1/0, BO3은 2/1 or 1/2 (자동 계산)
 - `MatchResult.isMatchWin` — 매치 승패 (games 기준 아님)
 - `TournamentPhase`: `swiss` | `elimination`
-- `TournamentSession.scorecardUrl` — 생성된 PNG 스코어카드 Supabase Storage URL (nullable)
+- `TournamentSession.scorecardUrl` — 레거시 필드 (Supabase Storage 저장 기능 제거, 미사용)
 
 ---
 

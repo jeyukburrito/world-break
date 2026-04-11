@@ -1,12 +1,15 @@
+import Link from "next/link";
+
 import { AppShell } from "@/components/app-shell";
 import { EventCategorySelect } from "@/components/event-category-select";
 import { HeaderActions } from "@/components/header-actions";
 import { MatchDetailControls } from "@/components/match-detail-controls";
 import { MatchPrefillFields } from "@/components/match-prefill-fields";
+import { OpponentDeckField } from "@/components/opponent-deck-field";
 import { SubmitButton } from "@/components/submit-button";
 import { TournamentBanner } from "@/components/tournament-banner";
 import { getUserDisplayInfo, requireUser } from "@/lib/auth";
-import { getNewMatchPrefill } from "@/lib/matches";
+import { getNewMatchPrefill, getRecentOpponentDecks } from "@/lib/matches";
 import { prisma } from "@/lib/prisma";
 
 import { createMatchResult } from "../actions";
@@ -20,6 +23,7 @@ export default async function NewMatchPage({ searchParams }: NewMatchPageProps) 
   const display = getUserDisplayInfo(user);
   const params = searchParams ? await searchParams : undefined;
   const errorMessage = typeof params?.error === "string" ? params.error : undefined;
+  const savedMessage = typeof params?.message === "string" ? params.message : undefined;
 
   const continueEvent = typeof params?.event === "string" ? params.event : undefined;
   const continueDate = typeof params?.date === "string" ? params.date : undefined;
@@ -27,6 +31,9 @@ export default async function NewMatchPage({ searchParams }: NewMatchPageProps) 
   const continueDeckName = typeof params?.deckName === "string" ? params.deckName : undefined;
   const continueTournamentId =
     typeof params?.tournamentId === "string" ? params.tournamentId : undefined;
+
+  // Show "saved" banner only on friendly match continuation (not tournament rounds).
+  const showSavedBanner = savedMessage === "record_created" && !continueTournamentId;
   const continueMatchFormat = typeof params?.matchFormat === "string" ? params.matchFormat : undefined;
   const continuePlayOrder = typeof params?.playOrder === "string" ? params.playOrder : undefined;
   const phase = params?.phase === "elimination" ? "elimination" : "swiss";
@@ -37,7 +44,7 @@ export default async function NewMatchPage({ searchParams }: NewMatchPageProps) 
   const phaseLabel = isElimination ? "본선" : "예선";
   const today = continueDate ?? new Date().toISOString().slice(0, 10);
 
-  const [continuedTournament, phaseCount, prefill] = await Promise.all([
+  const [continuedTournament, phaseCount, prefill, recentOpponentDecks] = await Promise.all([
     continueTournamentId
       ? prisma.tournamentSession.findFirst({
           where: {
@@ -60,6 +67,7 @@ export default async function NewMatchPage({ searchParams }: NewMatchPageProps) 
         })
       : Promise.resolve(0),
     getNewMatchPrefill(user.id),
+    getRecentOpponentDecks(user.id),
   ]);
 
   const initialGameName = continueGameName ?? prefill.latest?.gameName;
@@ -98,6 +106,18 @@ export default async function NewMatchPage({ searchParams }: NewMatchPageProps) 
       headerRight={<HeaderActions avatarUrl={display.avatarUrl} name={display.name} />}
     >
       <div className="mx-auto flex max-w-md flex-col gap-4 pb-28 md:pb-6">
+        {showSavedBanner ? (
+          <div className="flex items-center justify-between rounded-2xl bg-surface-container-low px-4 py-3 text-sm">
+            <span className="font-medium text-ink">저장 완료</span>
+            <Link
+              href="/matches"
+              className="font-medium text-accent underline-offset-4 hover:underline"
+            >
+              기록 목록 보기
+            </Link>
+          </div>
+        ) : null}
+
         {isContinue && activeTournamentId && roundNumber ? (
           <TournamentBanner
             eventLabel={eventLabel}
@@ -149,15 +169,10 @@ export default async function NewMatchPage({ searchParams }: NewMatchPageProps) 
               defaultFormat={initialMatchFormat}
               gameDefaults={prefill.byGame}
             />
-            <label className="grid gap-2 text-sm font-semibold">
-              상대 덱명
-              <input
-                name="opponentDeckName"
-                type="text"
-                required
-                className="rounded-2xl bg-surface-container-high px-4 py-3 text-ink"
-              />
-            </label>
+            <OpponentDeckField
+              defaultGameName={initialGameName}
+              recentByGame={recentOpponentDecks}
+            />
           </section>
 
           <MatchDetailControls

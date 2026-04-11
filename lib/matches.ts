@@ -212,6 +212,33 @@ export async function getNewMatchPrefill(userId: string): Promise<NewMatchPrefil
   };
 }
 
+/**
+ * Returns recently seen opponent deck names grouped by game name (for autocomplete).
+ * Scans the user's 300 most recent matches, deduplicates per game, caps at 30 per game.
+ */
+export async function getRecentOpponentDecks(userId: string): Promise<Record<string, string[]>> {
+  const matches = await prisma.matchResult.findMany({
+    where: { userId },
+    orderBy: [{ playedAt: "desc" }, { createdAt: "desc" }],
+    select: {
+      opponentDeckName: true,
+      myDeck: { select: { game: { select: { name: true } } } },
+    },
+    take: 300,
+  });
+
+  const byGame: Record<string, string[]> = {};
+  for (const { opponentDeckName, myDeck } of matches) {
+    const game = myDeck.game.name;
+    if (!byGame[game]) byGame[game] = [];
+    const list = byGame[game];
+    if (list.length < 30 && !list.includes(opponentDeckName)) {
+      list.push(opponentDeckName);
+    }
+  }
+  return byGame;
+}
+
 export async function countMatchesForUser(userId: string, filters: MatchFilters) {
   return prisma.matchResult.count({
     where: buildMatchWhere(userId, filters),

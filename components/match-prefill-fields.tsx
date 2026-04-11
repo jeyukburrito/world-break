@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+const GAME_CHANGE_EVENT = "world-break:game-name-change";
 
 import { GameDeckFields } from "@/components/game-deck-fields";
 import { MatchResultInput } from "@/components/match-result-input";
@@ -20,6 +22,13 @@ export function MatchPrefillFields({
   gameDefaults,
 }: MatchPrefillFieldsProps) {
   const [selectedGameName, setSelectedGameName] = useState(defaultGameName ?? "");
+
+  // Broadcast game changes so OpponentDeckField can filter suggestions reactively.
+  useEffect(() => {
+    window.dispatchEvent(
+      new CustomEvent(GAME_CHANGE_EVENT, { detail: { gameName: selectedGameName } }),
+    );
+  }, [selectedGameName]);
 
   const deckDefaults = Object.fromEntries(
     Object.entries(gameDefaults).map(([gameName, preference]) => [gameName, preference.deckName]),

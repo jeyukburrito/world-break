@@ -26,21 +26,7 @@ export async function deleteAccount() {
     }
   }
 
-  // 2. Storage cleanup (Optional/Best Effort)
-  try {
-    const admin = createAdminClient();
-    const { data: scorecardFiles } = await admin.storage
-      .from("tournament-scorecards")
-      .list(user.id);
-    if (scorecardFiles && scorecardFiles.length > 0) {
-      const paths = scorecardFiles.map((f) => `${user.id}/${f.name}`);
-      await admin.storage.from("tournament-scorecards").remove(paths);
-    }
-  } catch (storageError) {
-    console.error("[deleteAccount] Storage cleanup failed:", storageError);
-  }
-
-  // 3. DB row last — if this fails, we have an orphaned record but the user can't log in anymore.
+  // 2. DB row last — if this fails, we have an orphaned record but the user can't log in anymore.
   await prisma.user.delete({ where: { id: user.id } });
 
   // 4. Client session cleanup
